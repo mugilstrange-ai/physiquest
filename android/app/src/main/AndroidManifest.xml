@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Only used to load the web fonts; everything else works offline. -->
-    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- No permissions: lessons, simulations and fonts are all inside the app. -->
 
     <application
         android:allowBackup="true"

@@ -16,7 +16,7 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.window.OnBackInvokedDispatcher;
 
-/** Shows the PhysiQuest web app, bundled in assets/, full screen. */
+/** Shows the PhysiQuest web app, bundled in assets/, full screen and fully offline. */
 public class MainActivity extends Activity {
 
     private WebView web;
