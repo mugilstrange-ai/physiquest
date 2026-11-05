@@ -359,6 +359,10 @@ textarea.code{width:100%;font-family:var(--f-mono);font-size:.82rem;color:var(--
 .field{display:flex;flex-direction:column;gap:6px}
 .qr{flex:0 0 auto;background:#fff;border-radius:10px;padding:6px;line-height:0}
 .qr svg{display:block;width:168px;height:168px}
+.neet-card.locked{opacity:.55;cursor:default}
+.neet-card.locked:hover{transform:none;border-color:var(--line);box-shadow:none}
+.lock-panel{border-color:rgba(255,224,107,.45)}
+.chip.bad{color:var(--bad);border-color:rgba(255,107,138,.5)}
 .note.lock{border-color:var(--gold);background:rgba(255,224,107,.07)}
 .pay-steps .eyebrow{color:var(--gold)}
 .field label{font-size:.9rem;color:var(--muted)}
@@ -448,7 +452,7 @@ footer{border-top:1px solid var(--line);padding-block:var(--s5);color:var(--fain
 
  <div class="grid3" id="questGrid">
   <a class="quest" href="#classes"><svg class="qi" style="color:var(--cyan)" aria-hidden="true"><use href="#i-book"/></svg><h3>NCERT chapters, class by class</h3><p>Class 6 to Class 12, every physics chapter: a live animation, key ideas, formulas with SI units and quick checks.</p><div class="row"><span class="chip c">52 chapters</span><span class="chip">7 classes</span></div></a>
-  <a class="quest" href="#neet"><svg class="qi" style="color:var(--coral)" aria-hidden="true"><use href="#i-neet"/></svg><h3>NEET Physics</h3><p>All 20 NEET units mapped to NCERT Class 11 and 12, with must-know tips, fresh practice and mocks marked +4 / −1.</p><div class="row"><span class="chip c">20 units</span><span class="chip">Tips free · Premium practice</span></div></a>
+  <a class="quest" href="#neet"><svg class="qi" style="color:var(--coral)" aria-hidden="true"><use href="#i-neet"/></svg><h3>NEET Physics</h3><p>All 20 NEET units mapped to NCERT Class 11 and 12, with must-know tips, fresh practice and mocks marked +4 / −1.</p><div class="row"><span class="chip c">20 units</span><span class="chip">Premium</span></div></a>
   <a class="quest" href="#lesson"><svg class="qi" style="color:var(--magenta)" aria-hidden="true"><use href="#i-lesson"/></svg><h3>Deep dive: transformers</h3><p>Watch alternating flux carry energy from one coil to another, then derive <span class="m"><i>V</i><sub>s</sub>/<i>V</i><sub>p</sub> = <i>N</i><sub>s</sub>/<i>N</i><sub>p</sub></span> step by step.</p><div class="row"><span class="chip">+40 XP</span><span class="chip">Class 12 · Ch 7</span></div></a>
   <a class="quest" href="#circuits"><svg class="qi" style="color:var(--gold)" aria-hidden="true"><use href="#i-circuit"/></svg><h3>Project: study-desk lights</h3><p>Wire batteries, lamps, a switch and meters on a live board. Electrons flow and lamps glow as you build.</p><div class="row"><span class="chip">+80 XP</span><span class="chip">Class 10 · Ch 11</span></div></a>
   <a class="quest" href="#lab"><svg class="qi" style="color:var(--cyan)" aria-hidden="true"><use href="#i-lab"/></svg><h3>Visual lab</h3><p>Launch projectiles, stretch springs, send waves and drag charges to see their field lines appear.</p><div class="row"><span class="chip">4 simulations</span></div></a>
@@ -3193,11 +3197,18 @@ function workedHTML(c,n){const q=genFor(c,n,true);if(!q)return '';const right=q.
 /* ---------- NEET view ---------- */
 const NM={phase:'intro',size:15,qs:[],ans:{},idx:0,left:0,timer:null};
 function neetChLinks(U){return U.ch.map(([c,n])=>`<a class="chip c" href="#ch-${c}-${n}">Class ${c} · Ch ${n} ${findCh(c,n).t}</a>`).join('');}
+function premUntil(){if(STORE_PLAY||!ST.prem)return '';const left=ST.prem.exp-todayN();return `<span class="chip good">Premium until ${dayDate(ST.prem.exp)} · ${left+1} day${left?'s':''} left</span>`;}
+function neetLocked(){return `<div class="panel lock-panel stack"><h2 style="margin:0">NEET Physics is for Premium members</h2>
+ <p class="muted" style="margin:0">Unlock all 20 NEET units with must-know tips, NEET-style practice and full mocks marked +4 / −1. It stays open until your plan's end date.</p>
+ <div class="row"><span class="chip c">₹199 / month</span><span class="chip c">₹1,999 / year</span></div>
+ <div class="row"><a class="btn" href="#plans">See plans and pay by UPI</a>${ST.prem&&ST.prem.exp<todayN()?`<span class="chip bad">Your Premium ended on ${dayDate(ST.prem.exp)}</span>`:''}</div></div>`;}
 function showNeet(){const done=(ST.neetBest!==undefined&&ST.neetBest!==null)?`<span class="chip good">Best mock: ${ST.neetBest} marks</span>`:'';
- $('#neetHead').innerHTML=`<p>${NEET_FACTS}</p><p class="muted">NEET follows the NMC syllabus. Its physics is built on NCERT Class 11 and 12, so every unit below links to those chapters in PhysiQuest.</p><div class="row">${done}<span class="chip">${NEET.length} units</span><span class="chip c">${isPremium()?'Premium active':'Tips free · practice and mocks with Premium'}</span></div>`;
+ $('#neetHead').innerHTML=`<p>${NEET_FACTS}</p><p class="muted">NEET follows the NMC syllabus. Its physics is built on NCERT Class 11 and 12, so every unit below links to those chapters in PhysiQuest.</p><div class="row">${done}<span class="chip">${NEET.length} units</span>${isPremium()?premUntil():'<span class="chip c">Premium only</span>'}</div>`;
  $('#neetUnits').innerHTML=NEET.map(U=>`<a class="quest neet-card" href="#neet-${U.u}"><span class="eyebrow">Unit ${U.u}</span><h3>${U.t}</h3><p>${U.ch.map(([c,n])=>`Class ${c} Ch ${n}`).join(' · ')}</p><div class="row"><span class="chip">${U.f.length} NEET tips</span><span class="chip">Practice set</span></div></a>`).join('');
+ if(!isPremium()){$('#neetMock').innerHTML=neetLocked();$('#neetUnits').innerHTML=NEET.map(U=>`<div class="quest neet-card locked" aria-disabled="true"><span class="eyebrow">Unit ${U.u} · locked</span><h3>${U.t}</h3><p>${U.ch.map(([c,n])=>`Class ${c} Ch ${n}`).join(' · ')}</p></div>`).join('');return;}
  neetMockRender();}
 function showNeetUnit(u){const U=NEET.find(x=>x.u===u)||NEET[0];
+ if(!isPremium()){$('#neetUnitBox').innerHTML=`<div class="v-head"><span class="eyebrow">NEET Physics · Unit ${U.u}</span><h1 id="h-neetunit">${U.t}</h1></div><div class="row"><a class="chip c" href="#neet">← All NEET units</a></div>${neetLocked()}`;return;}
  $('#neetUnitBox').innerHTML=`<div class="v-head"><span class="eyebrow">NEET Physics · Unit ${U.u}</span><h1 id="h-neetunit">${U.t}</h1><p>The must-know points for NEET, then fresh NEET-style questions from the matching NCERT chapters.</p></div>
   <div class="row"><a class="chip c" href="#neet">← All NEET units</a>${neetChLinks(U)}</div>
   <div class="panel"><h2>NEET focus</h2><ol class="ideas">${U.f.map(s=>`<li><span>${s}</span></li>`).join('')}</ol></div>
@@ -3233,7 +3244,7 @@ function neetMockRender(){const box=$('#neetMock');if(!box)return;
  $('#nmAgain').addEventListener('click',()=>{NM.phase='intro';neetMockRender();});}
 
 /* ---------- feedback: bugs, topic ideas and question errors ---------- */
-const FEEDBACK_TO='mugilstrange@gmail.com';const APP_VER='1.5';
+const FEEDBACK_TO='mugilstrange@gmail.com';const APP_VER='1.6';
 let FB={ctx:''};
 function renderFeedback(){const ctx=FB.ctx||'';const list=(ST.reports||[]).slice(-5).reverse();
  $('#fbBox').innerHTML=`<div class="grid2" style="gap:20px"><form class="stack" id="fbForm" novalidate>
@@ -3335,8 +3346,8 @@ function renderPlans(){if(STORE_PLAY){$('#plansBox').innerHTML=`<div class="note
  const dev=devId(),prem=isPremium(),p=PAY.plans[PLANSEL];
  $('#plansBox').innerHTML=`${prem?`<div class="note good"><b>Premium is active on this device</b> (${PAY.plans[ST.prem.plan].label}) until ${dayDate(ST.prem.exp)}. Thank you!</div>`:''}
  <div class="plans">
-  <div class="plan"><span class="eyebrow">Free</span><div class="price">₹0</div><ul><li>All 52 NCERT chapters, Class 6–12</li><li>Animations, lessons, worked examples and quick checks</li><li>Class mock tests and drills</li><li>3 extra practice sets a day</li><li>NEET tips for all 20 units</li></ul>${prem?'':'<span class="chip good">Your current plan</span>'}</div>
-  <div class="plan ${PLANSEL==='M'?'best':''}"><span class="eyebrow">Premium · monthly</span><div class="price">₹199<small> / month</small></div><ul><li>Everything in Free</li><li>Unlimited new-number practice</li><li>NEET practice sets for all 20 units</li><li>NEET mocks marked +4 / −1</li></ul><button class="btn ${PLANSEL==='M'?'':'ghost'}" type="button" data-plan="M" aria-pressed="${PLANSEL==='M'}">${PLANSEL==='M'?'Selected':'Choose monthly'}</button></div>
+  <div class="plan"><span class="eyebrow">Free</span><div class="price">₹0</div><ul><li>All 52 NCERT chapters, Class 6–12</li><li>Animations, lessons, worked examples and quick checks</li><li>Class mock tests and drills</li><li>3 extra practice sets a day</li></ul>${prem?'':'<span class="chip good">Your current plan</span>'}</div>
+  <div class="plan ${PLANSEL==='M'?'best':''}"><span class="eyebrow">Premium · monthly</span><div class="price">₹199<small> / month</small></div><ul><li>Everything in Free</li><li>NEET Physics: all 20 units, tips and practice</li><li>NEET mocks marked +4 / −1</li><li>Unlimited new-number practice</li><li>Open until your plan's end date</li></ul><button class="btn ${PLANSEL==='M'?'':'ghost'}" type="button" data-plan="M" aria-pressed="${PLANSEL==='M'}">${PLANSEL==='M'?'Selected':'Choose monthly'}</button></div>
   <div class="plan ${PLANSEL==='Y'?'best':''}"><span class="eyebrow">Premium · yearly</span><div class="price">₹1,999<small> / year</small></div><ul><li>Everything in Premium</li><li>Save ₹389 compared with 12 monthly payments</li><li>Best for a full school or NEET year</li></ul><button class="btn ${PLANSEL==='Y'?'':'ghost'}" type="button" data-plan="Y" aria-pressed="${PLANSEL==='Y'}">${PLANSEL==='Y'?'Selected':'Choose yearly'}</button></div></div>
  <div class="grid2 pay-steps" style="margin-top:20px">
   <div class="panel stack"><span class="eyebrow">Step 1 · Pay ₹${p.price.toLocaleString('en-IN')} by UPI</span>
