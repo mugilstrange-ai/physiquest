@@ -65,6 +65,14 @@ public class MainActivity extends Activity {
                     }
                     return true;
                 }
+                if ("upi".equals(scheme)) {
+                    // "Pay with GPay / UPI" opens the phone's UPI app (GPay, PhonePe, Paytm…).
+                    try {
+                        startActivity(Intent.createChooser(new Intent(Intent.ACTION_VIEW, url), "Pay with"));
+                    } catch (Exception ignored) {
+                    }
+                    return true;
+                }
                 if ("mailto".equals(scheme)) {
                     // Bug reports and topic suggestions open the phone's email app.
                     try {
