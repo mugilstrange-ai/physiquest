@@ -1,0 +1,45 @@
+name: Build Android app
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build the APK
+        working-directory: android
+        run: gradle assembleRelease --no-daemon --stacktrace
+
+      - name: Name the file
+        run: cp android/app/build/outputs/apk/release/app-release.apk PhysiQuest.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PhysiQuest-apk
+          path: PhysiQuest.apk
+
+      - name: Publish the download link
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete android-latest --yes --cleanup-tag || true
+          gh release create android-latest PhysiQuest.apk \
+            --title "PhysiQuest for Android" \
+            --notes "Download **PhysiQuest.apk** on your Android phone and open it to install. Built from commit ${GITHUB_SHA::7}."

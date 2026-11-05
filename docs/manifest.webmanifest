@@ -1,0 +1,16 @@
+{
+  "name": "PhysiQuest",
+  "short_name": "PhysiQuest",
+  "description": "Level-based physics for first-year college: animated lessons, live simulations, a circuit builder, diagram practice and mock tests.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f0626",
+  "theme_color": "#0f0626",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
