@@ -10,15 +10,25 @@ android {
         applicationId 'com.physiquest.app'
         minSdk 24
         targetSdk 36
-        versionCode 3
-        versionName '1.2'
+        versionCode 4
+        versionName '1.3'
+    }
+
+    // A fixed key for the direct-download APK, so each new version installs over the last one.
+    // It is not the Google Play upload key, which never goes into this repository.
+    signingConfigs {
+        directInstall {
+            storeFile file('direct-install.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            // Signed with the standard debug key so the APK installs directly on a phone.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.directInstall
         }
         // Google Play build: left unsigned here and signed afterwards with the upload key.
         play {

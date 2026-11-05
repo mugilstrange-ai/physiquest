@@ -1,6 +1,16 @@
 # PhysiQuest
 
-Level-based physics for first-year college students: an animated transformer lesson, four live simulations, a circuit-builder project, diagram practice, topic quizzes and a mock test that explains every mistake.
+NCERT physics from Class 6 to Class 12, sorted class by class and chapter by chapter. Every one of the 52 physics chapters has a live animation, key ideas, formulas with SI units and quick checks, and each class has a mock test that draws a fresh set of questions every time. There is also an animated transformer lesson, four live simulations, a circuit-builder project and diagram practice.
+
+| Class | NCERT book | Physics chapters |
+|---|---|---|
+| 6 | Curiosity | 4 Exploring Magnets · 5 Measurement of Length and Motion · 7 Temperature and its Measurement · 8 A Journey through States of Water · 12 Beyond Earth |
+| 7 | Curiosity | 3 Electricity: Circuits and their Components · 7 Heat Transfer in Nature · 8 Measurement of Time and Motion · 11 Light: Shadows and Reflections · 12 Earth, Moon, and the Sun |
+| 8 | Curiosity | 4 Electricity: Magnetic and Heating Effects · 5 Exploring Forces · 6 Pressure, Winds, Storms, and Cyclones · 7 Particulate Nature of Matter · 10 Light: Mirrors and Lenses · 11 Keeping Time with the Skies |
+| 9 | Exploration (2026–27) | 4 Describing Motion Around Us · 6 How Forces Affect Motion · 7 Work, Energy, and Simple Machines · 10 Sound Waves: Characteristics and Applications |
+| 10 | Science | 9 Light – Reflection and Refraction · 10 The Human Eye and the Colourful World · 11 Electricity · 12 Magnetic Effects of Electric Current |
+| 11 | Physics Part I and II | Chapters 1–14, Units and Measurements to Waves |
+| 12 | Physics Part I and II | Chapters 1–14, Electric Charges and Fields to Semiconductor Electronics |
 
 ## Install on Android
 
@@ -8,7 +18,9 @@ Level-based physics for first-year college students: an animated transformer les
 2. Open the downloaded file. If Android asks, allow your browser or Files app to **install unknown apps**.
 3. Tap **Install**, then open **PhysiQuest** from your home screen.
 
-The app works offline. Your XP, badges and progress are saved on the phone.
+The app works offline. Your XP, badges and progress are saved on the phone; to move them to another device, make a progress code on the Badges page.
+
+Updating from version 1.2 or earlier: uninstall the old PhysiQuest first (once). From version 1.3 on, each new APK installs over the previous one.
 
 ## How it is built
 
