@@ -1,6 +1,6 @@
 # PhysiQuest
 
-NCERT physics from Class 6 to Class 12, sorted class by class and chapter by chapter. Every one of the 52 physics chapters has a live animation, key ideas, formulas with SI units and quick checks, and each class has a mock test that draws a fresh set of questions every time. There is also an animated transformer lesson, four live simulations, a circuit-builder project and diagram practice.
+NCERT physics from Class 6 to Class 12, sorted class by class and chapter by chapter. Every one of the 52 physics chapters has a live animation, key ideas, formulas with SI units and quick checks, and each class has a mock test that draws a fresh set of questions every time. Every chapter also has a fuller lesson written in simple words, a worked example, and practice questions whose numbers change every time. A NEET Physics section maps all 20 NMC units to the NCERT Class 11 and 12 chapters, with tips, practice and mocks marked +4 / −1. A plans page shows Premium at ₹199 a month or ₹1,999 a year (payments are not switched on yet, so everything is free), and a feedback page sends bug reports and topic ideas by email. There is also an animated transformer lesson, four live simulations, a circuit-builder project and diagram practice.
 
 | Class | NCERT book | Physics chapters |
 |---|---|---|
@@ -21,6 +21,8 @@ NCERT physics from Class 6 to Class 12, sorted class by class and chapter by cha
 The app works offline. Your XP, badges and progress are saved on the phone; to move them to another device, make a progress code on the Badges page.
 
 Updating from version 1.2 or earlier: uninstall the old PhysiQuest first (once). From version 1.3 on, each new APK installs over the previous one.
+
+The lessons are written for PhysiQuest; for the full printed chapters, use the free official NCERT textbooks at https://ncert.nic.in/textbook.php.
 
 ## How it is built
 

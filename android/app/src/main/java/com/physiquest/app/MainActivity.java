@@ -65,6 +65,14 @@ public class MainActivity extends Activity {
                     }
                     return true;
                 }
+                if ("mailto".equals(scheme)) {
+                    // Bug reports and topic suggestions open the phone's email app.
+                    try {
+                        startActivity(new Intent(Intent.ACTION_SENDTO, url));
+                    } catch (Exception ignored) {
+                    }
+                    return true;
+                }
                 return false;
             }
         });
