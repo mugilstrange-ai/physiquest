@@ -4,14 +4,14 @@ plugins {
 
 android {
     namespace 'com.physiquest.app'
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         applicationId 'com.physiquest.app'
         minSdk 24
-        targetSdk 34
-        versionCode 2
-        versionName '1.1'
+        targetSdk 36
+        versionCode 3
+        versionName '1.2'
     }
 
     buildTypes {
@@ -19,6 +19,11 @@ android {
             minifyEnabled false
             // Signed with the standard debug key so the APK installs directly on a phone.
             signingConfig signingConfigs.debug
+        }
+        // Google Play build: left unsigned here and signed afterwards with the upload key.
+        play {
+            initWith release
+            signingConfig null
         }
     }
 

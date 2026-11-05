@@ -14,6 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Bundle fonts so the app works fully offline
+        run: python3 tools/bundle_fonts.py
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -21,25 +24,29 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.9'
+          gradle-version: '8.14.3'
 
-      - name: Build the APK
+      - name: Build the APK and the Play Store bundle
         working-directory: android
-        run: gradle assembleRelease --no-daemon --stacktrace
+        run: gradle assembleRelease bundlePlay --no-daemon --stacktrace
 
-      - name: Name the file
-        run: cp android/app/build/outputs/apk/release/app-release.apk PhysiQuest.apk
+      - name: Name the files
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk PhysiQuest.apk
+          cp android/app/build/outputs/bundle/play/app-play.aab PhysiQuest-play-unsigned.aab
 
       - uses: actions/upload-artifact@v4
         with:
-          name: PhysiQuest-apk
-          path: PhysiQuest.apk
+          name: PhysiQuest
+          path: |
+            PhysiQuest.apk
+            PhysiQuest-play-unsigned.aab
 
       - name: Publish the download link
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete android-latest --yes --cleanup-tag || true
-          gh release create android-latest PhysiQuest.apk \
+          gh release create android-latest PhysiQuest.apk PhysiQuest-play-unsigned.aab \
             --title "PhysiQuest for Android" \
-            --notes "Download **PhysiQuest.apk** on your Android phone and open it to install. Built from commit ${GITHUB_SHA::7}."
+            --notes "Download **PhysiQuest.apk** on your Android phone and open it to install. PhysiQuest-play-unsigned.aab is the Google Play bundle before signing. Built from commit ${GITHUB_SHA::7}."
