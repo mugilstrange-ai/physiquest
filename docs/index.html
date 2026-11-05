@@ -3291,7 +3291,9 @@ function readCodeU(raw,dev){const s=(raw||'').toUpperCase().replace(/[^A-Z0-9]/g
 
 /* this device's ID, made once and kept */
 function devId(){if(!ST.dev||!/^[A-Z2-9]{6}$/.test(ST.dev)){const r=new Uint8Array(6);try{crypto.getRandomValues(r);}catch(e){for(let i=0;i<6;i++)r[i]=Math.random()*256|0;}ST.dev=[...r].map(x=>B32[x&31]).join('');save();}return ST.dev;}
-function isPremium(){return !!(ST.prem&&typeof ST.prem.exp==='number'&&ST.prem.exp>=todayN());}
+/* the Google Play build may not sell digital content by UPI, so there Premium is simply free */
+const STORE_PLAY=typeof window!=='undefined'&&window.PQ_STORE==='play';
+function isPremium(){if(STORE_PLAY)return true;return !!(ST.prem&&typeof ST.prem.exp==='number'&&ST.prem.exp>=todayN());}
 /* free users get three extra practice sets a day; Premium is unlimited */
 function usePracticeSet(){if(isPremium())return true;const d=todayN();if(!ST.freeSets||ST.freeSets.d!==d)ST.freeSets={d,n:0};if(ST.freeSets.n>=3)return false;ST.freeSets.n++;save();return true;}
 const freeSetsLeft=()=>{const d=todayN();return Math.max(0,3-((ST.freeSets&&ST.freeSets.d===d)?ST.freeSets.n:0));};
@@ -3333,7 +3335,8 @@ function qrSVG(text,px){const Q=qrMatrix(text);if(!Q)return '';const N=Q.length,
 
 /* ---------- the Plans page ---------- */
 let PLANSEL='M';
-function renderPlans(){const dev=devId(),prem=isPremium(),p=PAY.plans[PLANSEL];
+function renderPlans(){if(STORE_PLAY){$('#plansBox').innerHTML=`<div class="note good"><b>Everything is unlocked in this Google Play version.</b> NEET practice, NEET mocks and unlimited practice are free for now. If paid plans come later, they will be offered through Google Play.</div>`;return;}
+ const dev=devId(),prem=isPremium(),p=PAY.plans[PLANSEL];
  $('#plansBox').innerHTML=`${prem?`<div class="note good"><b>Premium is active on this device</b> (${PAY.plans[ST.prem.plan].label}) until ${dayDate(ST.prem.exp)}. Thank you!</div>`:''}
  <div class="plans">
   <div class="plan"><span class="eyebrow">Free</span><div class="price">₹0</div><ul><li>All 52 NCERT chapters, Class 6–12</li><li>Animations, lessons, worked examples and quick checks</li><li>Class mock tests and drills</li><li>3 extra practice sets a day</li><li>NEET tips for all 20 units</li></ul>${prem?'':'<span class="chip good">Your current plan</span>'}</div>
