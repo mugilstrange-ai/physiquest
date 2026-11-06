@@ -1,0 +1,453 @@
+
+<!-- ================= launch screen: shows at once, while the app gets ready ================= -->
+<div id="splash">
+ <div class="sp-in">
+  <svg class="sp-atom" viewBox="-64 -64 128 128" aria-hidden="true">
+   <defs><radialGradient id="spGlow"><stop offset="0" stop-color="#19e0dc" stop-opacity=".55"/><stop offset="1" stop-color="#19e0dc" stop-opacity="0"/></radialGradient></defs>
+   <circle r="30" fill="url(#spGlow)"/><circle r="9" fill="#ffe06b"/>
+   <g fill="none" stroke="rgba(25,224,220,.55)" stroke-width="1.6">
+    <g><path id="spO1" d="M-54 0a54 19 0 1 0 108 0a54 19 0 1 0-108 0"/><circle r="4.6" fill="#19e0dc" stroke="none"><animateMotion dur="1.7s" repeatCount="indefinite"><mpath href="#spO1"/></animateMotion></circle></g>
+    <g transform="rotate(60)"><path id="spO2" d="M-54 0a54 19 0 1 0 108 0a54 19 0 1 0-108 0"/><circle r="4.6" fill="#ff5bd6" stroke="none"><animateMotion dur="2.1s" repeatCount="indefinite" begin="-.6s"><mpath href="#spO2"/></animateMotion></circle></g>
+    <g transform="rotate(120)"><path id="spO3" d="M-54 0a54 19 0 1 0 108 0a54 19 0 1 0-108 0"/><circle r="4.6" fill="#a8f060" stroke="none"><animateMotion dur="2.5s" repeatCount="indefinite" begin="-1.2s"><mpath href="#spO3"/></animateMotion></circle></g>
+   </g>
+  </svg>
+  <div class="sp-word">Physi<span>Quest</span></div>
+  <figure class="sp-prov"><figcaption>Physics proverb</figcaption><blockquote id="spText"></blockquote></figure>
+  <div class="sp-bar" aria-hidden="true"><i></i></div>
+  <p class="sp-hint" id="spHint">Getting ready…</p>
+  <p class="sp-msg" id="spMsg" hidden>This is taking longer than usual. <button type="button" onclick="location.reload()">Reload</button></p>
+ </div>
+</div>
+<script>
+(function(){var P=["A body at rest stays at rest. Your first step is the only push it needs.", "Energy is never lost, only changed. Effort works the same way.", "Friction slows the sliding block, never the curious mind.", "Small pushes at the right moment build the biggest swings.", "Check the units before you trust the answer.", "Light takes the quickest path. Let your notes do the same.", "Every vector has a direction. Choose yours.", "Heat flows from hot to cold; knowledge flows from those who share it.", "A lens gathers scattered light into one bright point. Focus does that for thoughts.", "The higher you climb, the more potential you store.", "Resistance turns current into heat. Persistence turns practice into skill.", "Inertia fights the first step and helps the hundredth.", "Momentum is mass in motion: keep moving, and you become hard to stop.", "Speed tells you how fast. Velocity tells you how fast in the right direction.", "No displacement, no work: progress is measured by distance moved.", "Two waves in step make one big wave. So do two friends studying together.", "Pressure is force spread over area. Spread your revision over days.", "Even light bends when it enters something new. Changing your approach is allowed.", "Gravity pulls everything down; curiosity lifts it back up.", "The pendulum always returns to the centre, and so does a calm mind.", "Order never arrives on its own. Entropy is patient; be more patient.", "A short circuit is the fastest road to nowhere.", "Torque comes from a force applied far from the pivot. Lean on your strengths.", "Sound needs a medium to travel. Dreams need a plan.", "Measure twice, calculate once.", "A mistake is just a measurement you can learn from.", "Electrons in a wire drift slowly, yet the light comes on at once. Start, and results follow.", "A spring stores what you put into it. So does your memory.", "Equal and opposite: every hour you give physics, it gives back.", "Stars burn for billions of years one reaction at a time. Learn one idea at a time."];var i=Math.floor(Math.random()*P.length);
+ try{var last=localStorage.getItem('pq-prov');if(last!==null&&+last===i)i=(i+1)%P.length;localStorage.setItem('pq-prov',String(i));}catch(e){}
+ document.getElementById('spText').textContent=P[i];window.PQ_T0=Date.now();
+ try{if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){var a=document.querySelector('.sp-atom');if(a&&a.pauseAnimations)a.pauseAnimations();}}catch(e){}
+ setTimeout(function(){if(!window.PQ_BOOTED){var m=document.getElementById('spMsg');if(m)m.hidden=false;}},10000);})();
+</script>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="m11 13-2 4h3l-1 3 3-5h-3l1-2"/></symbol>
+  <symbol id="i-path" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="6" height="6" rx="1"/><rect x="16" y="15" width="6" height="6" rx="1"/><path d="M8 6h5a3 3 0 0 1 3 3v6"/><circle cx="16" cy="6" r="1.5"/><path d="M5 9v9h11"/></symbol>
+  <symbol id="i-lesson" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="16" rx="1"/><path d="M5 8h3M5 11h3M5 14h3M5 17h3M16 8h3M16 11h3M16 14h3M16 17h3"/><path d="M10 4v16M14 4v16"/></symbol>
+  <symbol id="i-lab" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c2.5-6 5-6 7.5 0s5 6 7.5 0 3.5-4 5-2"/><circle cx="5" cy="19" r="1.4"/><path d="M8 19h13"/></symbol>
+  <symbol id="i-circuit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5"/><path d="m9.5 6.5 5 5M14.5 6.5l-5 5"/><path d="M9 17h6M10 20h4"/><path d="M12 14v3"/></symbol>
+  <symbol id="i-studio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="9" width="8" height="8" rx="1"/><path d="M11 13V3M8 6l3-3 3 3"/><path d="M11 13h10M18 10l3 3-3 3"/></symbol>
+  <symbol id="i-practice" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></symbol>
+  <symbol id="i-mock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M10 2h4M12 2v3"/></symbol>
+  <symbol id="i-badge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 20 6.5v9L12 20l-8-4.5v-9z"/><path d="m9 11 2 2 4-4"/></symbol>
+  <symbol id="i-plan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12l4 4v12H4z"/><path d="M16 4v4h4M8 12h8M8 16h5"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M8 7h7M8 11h5"/></symbol>
+  <symbol id="i-neet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v6a5 5 0 0 0 10 0V3"/><path d="M11 14v2a4 4 0 0 0 8 0v-2"/><circle cx="19" cy="12" r="2"/><path d="M5 3h2M15 3h2"/></symbol>
+  <symbol id="i-jee" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  <symbol id="i-crown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></symbol>
+  <symbol id="i-reset" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 3-6.2"/><path d="M4 4v5h5"/></symbol>
+ </defs>
+</svg>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="toasts" role="status" aria-live="polite"></div>
+
+<header class="top">
+ <div class="wrap">
+  <div class="top-row">
+   <a class="brand" href="#home" aria-label="PhysiQuest home"><span id="brandLogo" style="display:flex;align-items:center;gap:8px"></span></a>
+   <a class="xp" href="#badges" aria-label="Your XP and rank"><svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15" fill="none" stroke="rgba(191,178,228,.25)" stroke-width="4"/><circle id="xpRing" cx="18" cy="18" r="15" fill="none" stroke="#19e0dc" stroke-width="4" stroke-linecap="round" stroke-dasharray="94.2" stroke-dashoffset="94.2" transform="rotate(-90 18 18)"/><text id="xpLvl" x="18" y="22.5" text-anchor="middle" font-family="Unbounded,sans-serif" font-size="12" fill="#f4efff">1</text></svg><span class="xp-txt"><b id="xpNum">0 XP</b><span id="xpRank">Spark</span></span></a>
+  </div>
+  <nav class="nav" aria-label="Sections">
+   <a href="#home"><svg aria-hidden="true"><use href="#i-home"/></svg>Home</a>
+   <a href="#classes"><svg aria-hidden="true"><use href="#i-book"/></svg>Classes 6–12</a>
+   <a href="#neet"><svg aria-hidden="true"><use href="#i-neet"/></svg>NEET</a>
+   <a href="#jee"><svg aria-hidden="true"><use href="#i-jee"/></svg>JEE</a>
+   <a href="#path"><svg aria-hidden="true"><use href="#i-path"/></svg>Path</a>
+   <a href="#lesson"><svg aria-hidden="true"><use href="#i-lesson"/></svg>Lesson</a>
+   <a href="#lab"><svg aria-hidden="true"><use href="#i-lab"/></svg>Visual lab</a>
+   <a href="#circuits"><svg aria-hidden="true"><use href="#i-circuit"/></svg>Circuit lab</a>
+   <a href="#studio"><svg aria-hidden="true"><use href="#i-studio"/></svg>Diagram studio</a>
+   <a href="#practice"><svg aria-hidden="true"><use href="#i-practice"/></svg>Practice</a>
+   <a href="#mock"><svg aria-hidden="true"><use href="#i-mock"/></svg>Mock test</a>
+   <a href="#badges"><svg aria-hidden="true"><use href="#i-badge"/></svg>Badges</a>
+   <a href="#plans"><svg aria-hidden="true"><use href="#i-crown"/></svg>Plans</a>
+   <a href="#account" id="navAcc"><svg aria-hidden="true"><use href="#i-user"/></svg><span>Sign in</span></a>
+   <a href="#feedback"><svg aria-hidden="true"><use href="#i-chat"/></svg>Feedback</a>
+   <a href="#blueprint"><svg aria-hidden="true"><use href="#i-plan"/></svg>Blueprint</a>
+  </nav>
+ </div>
+</header>
+
+<main class="wrap">
+
+<!-- ================= HOME ================= -->
+<section id="v-home" class="view" aria-labelledby="h-home">
+ <div class="hero">
+  <div class="hero-copy">
+   <span class="eyebrow">NCERT physics · Class 6 to Class 12</span>
+   <h1 id="h-home">See the field.<br>Build the circuit.<br><em>Own the physics.</em></h1>
+   <p>Every physics chapter of the NCERT books from Class 6 to Class 12, sorted class by class: an animation for each chapter, key ideas, formulas with SI units, and quick checks that explain every wrong answer.</p>
+   <div class="row"><a class="btn" href="#classes">Choose your class</a><a class="btn ghost" href="#neet">NEET Physics</a><a class="btn ghost" href="#jee">JEE Main</a></div>
+   <div class="stats" aria-label="What is inside">
+    <div class="stat"><b id="statCh">52</b><span>NCERT physics chapters, each animated</span></div>
+    <div class="stat"><b>20 + 20</b><span>NEET and JEE Main units with tips and mocks</span></div>
+    <div class="stat"><b id="statQ">200+</b><span>questions, each answer explained</span></div>
+    <div class="stat"><b>∞</b><span>practice questions: new numbers every time</span></div>
+   </div>
+  </div>
+  <div class="hero-stage" id="heroStage">
+   <canvas id="heroCanvas" aria-hidden="true"></canvas>
+   <div class="sr">Animated PhysiQuest logo: a transformer drawn in cyan lines, with alternating magnetic flux flowing around it.</div>
+  </div>
+ </div>
+
+ <div class="panel home-cls">
+  <div class="row" style="justify-content:space-between;align-items:baseline"><h2 style="margin:0">Jump to your class</h2><a class="chip c" href="#classes">All classes and chapters →</a></div>
+  <div id="homeCls" style="margin-top:12px"></div>
+ </div>
+
+ <div class="grid3" id="questGrid">
+  <a class="quest" href="#classes"><svg class="qi" style="color:var(--cyan)" aria-hidden="true"><use href="#i-book"/></svg><h3>NCERT chapters, class by class</h3><p>Class 6 to Class 12, every physics chapter: a live animation, key ideas, formulas with SI units and quick checks.</p><div class="row"><span class="chip c">52 chapters</span><span class="chip">7 classes</span></div></a>
+  <a class="quest" href="#neet"><svg class="qi" style="color:var(--coral)" aria-hidden="true"><use href="#i-neet"/></svg><h3>NEET Physics</h3><p>All 20 NEET units mapped to NCERT Class 11 and 12, with must-know tips, fresh practice and mocks marked +4 / −1.</p><div class="row"><span class="chip c">20 units</span><span class="chip">Premium</span></div></a>
+  <a class="quest" href="#jee"><svg class="qi" style="color:var(--gold)" aria-hidden="true"><use href="#i-jee"/></svg><h3>JEE Main Physics</h3><p>All 20 JEE Main units with exam tips, multi-step problems, Section B numerical answers and 25-question mocks marked +4 / −1.</p><div class="row"><span class="chip c">20 units</span><span class="chip">Premium</span></div></a>
+  <a class="quest" href="#lesson"><svg class="qi" style="color:var(--magenta)" aria-hidden="true"><use href="#i-lesson"/></svg><h3>Deep dive: transformers</h3><p>Watch alternating flux carry energy from one coil to another, then derive <span class="m"><i>V</i><sub>s</sub>/<i>V</i><sub>p</sub> = <i>N</i><sub>s</sub>/<i>N</i><sub>p</sub></span> step by step.</p><div class="row"><span class="chip">+40 XP</span><span class="chip">Class 12 · Ch 7</span></div></a>
+  <a class="quest" href="#circuits"><svg class="qi" style="color:var(--gold)" aria-hidden="true"><use href="#i-circuit"/></svg><h3>Project: study-desk lights</h3><p>Wire batteries, lamps, a switch and meters on a live board. Electrons flow and lamps glow as you build.</p><div class="row"><span class="chip">+80 XP</span><span class="chip">Class 10 · Ch 11</span></div></a>
+  <a class="quest" href="#lab"><svg class="qi" style="color:var(--cyan)" aria-hidden="true"><use href="#i-lab"/></svg><h3>Visual lab</h3><p>Launch projectiles, stretch springs, send waves and drag charges to see their field lines appear.</p><div class="row"><span class="chip">4 simulations</span></div></a>
+  <a class="quest" href="#studio"><svg class="qi" style="color:var(--amber)" aria-hidden="true"><use href="#i-studio"/></svg><h3>Diagram studio</h3><p>Draw force arrows on a block on a slope and aim a refracted ray. Every diagram is checked with a reason.</p><div class="row"><span class="chip">+60 XP</span></div></a>
+  <a class="quest" href="#mock"><svg class="qi" style="color:var(--lime)" aria-hidden="true"><use href="#i-mock"/></svg><h3>Class mock tests</h3><p>Pick a class: eight new questions from its bank in ten minutes, with every mistake explained and linked to its chapter.</p><div class="row"><span class="chip">7 tests</span><span class="chip">+30 XP each</span></div></a>
+ </div>
+
+ <div class="panel">
+  <h2>How to read every diagram here</h2>
+  <p class="muted" style="margin-bottom:14px">One colour always means one kind of quantity, in every lesson, simulation and question.</p>
+  <div class="lang" id="colorLang"></div>
+ </div>
+</section>
+
+<!-- ================= PATH ================= -->
+<section id="v-path" class="view" aria-labelledby="h-path" hidden>
+ <div class="v-head"><span class="eyebrow">Learning path</span><h1 id="h-path">Class 6 to Class 12, wired in order</h1><p>Current flows along the board as you finish each class. Select a class to see its goal, what it needs, and its chapters.</p></div>
+ <div class="board-box"><svg class="board" id="board" viewBox="0 0 1000 620" role="group" aria-label="Learning path board"></svg></div>
+ <div class="grid2">
+  <div class="panel" id="lvlDetail" aria-live="polite"></div>
+  <div class="panel tight"><h2 style="font-size:1.05rem">All classes</h2><div class="lvl-list" id="lvlList" style="margin-top:10px;grid-template-columns:minmax(0,1fr)"></div></div>
+ </div>
+</section>
+
+<!-- ================= CLASSES ================= -->
+<section id="v-classes" class="view" aria-labelledby="h-classes" hidden>
+ <div class="v-head"><span class="eyebrow">NCERT physics</span><h1 id="h-classes">Classes and chapters</h1><p>Pick your class. Each chapter has a live animation, the key ideas, formulas with units, and quick checks.</p></div>
+ <div id="clsTabs"></div>
+ <div class="panel cls-head" id="clsHead" aria-live="polite"></div>
+ <div class="ch-grid" id="chGrid"></div>
+</section>
+
+<!-- ================= CHAPTER ================= -->
+<section id="v-chapter" class="view" aria-labelledby="h-chapter" hidden>
+ <div class="stack" id="chBox" style="gap:22px"></div>
+</section>
+
+<!-- ================= NEET ================= -->
+<section id="v-neet" class="view" aria-labelledby="h-neet" hidden>
+ <div class="v-head"><span class="eyebrow">NEET UG · Physics</span><h1 id="h-neet">NEET Physics, unit by unit</h1><div id="neetHead" class="stack" style="gap:8px"></div></div>
+ <div class="panel stack" id="neetMock"></div>
+ <div class="ch-grid" id="neetUnits"></div>
+</section>
+<section id="v-neetunit" class="view" aria-labelledby="h-neetunit" hidden>
+ <div class="stack" id="neetUnitBox" style="gap:22px"></div>
+</section>
+
+<!-- ================= PLANS ================= -->
+<!-- ================= JEE Main ================= -->
+<section id="v-jee" class="view" aria-labelledby="h-jee" hidden>
+ <div class="v-head"><span class="eyebrow">JEE Main · Physics</span><h1 id="h-jee">JEE Main Physics, unit by unit</h1><div id="jeeHead" class="stack" style="gap:8px"></div></div>
+ <div class="panel stack" id="jeeMock"></div>
+ <div class="ch-grid" id="jeeUnits"></div>
+</section>
+<section id="v-jeeunit" class="view" aria-labelledby="h-jeeunit" hidden>
+ <div class="stack" id="jeeUnitBox" style="gap:22px"></div>
+</section>
+
+<!-- ================= ACCOUNT ================= -->
+<section id="v-account" class="view" aria-labelledby="h-account" hidden>
+ <div class="v-head"><span class="eyebrow">Account</span><h1 id="h-account">Your PhysiQuest account</h1></div>
+ <div class="stack" id="accBox" style="gap:20px"></div>
+</section>
+
+<section id="v-plans" class="view" aria-labelledby="h-plans" hidden>
+ <div class="v-head"><span class="eyebrow">Plans</span><h1 id="h-plans">Free to learn. Premium for NEET and JEE.</h1><p>The NCERT chapters are free. Premium adds NEET and JEE Main practice and mocks, and unlimited practice. Pay by UPI; Premium unlocks on your device with a code.</p></div>
+ <div id="plansBox"></div>
+</section>
+
+<!-- ================= FEEDBACK ================= -->
+<section id="v-feedback" class="view" aria-labelledby="h-feedback" hidden>
+ <div class="v-head"><span class="eyebrow">Feedback</span><h1 id="h-feedback">Report a bug or suggest a topic</h1><p>Found something broken, a wrong answer, or a topic you want? Tell us here.</p></div>
+ <div class="panel" id="fbBox"></div>
+</section>
+
+<!-- ================= LESSON ================= -->
+<section id="v-lesson" class="view" aria-labelledby="h-lesson" hidden>
+ <div class="v-head"><span class="eyebrow">Deep dive · Class 12, Ch 7 Alternating Current · about 20 minutes</span><h1 id="h-lesson">Transformers: changing flux, changing voltage</h1>
+  <p>A transformer has no moving parts, yet it turns 230 V mains into the 12 V a doorbell needs. The secret is a magnetic flux that never stops changing.</p></div>
+ <div class="row"><span class="chip c">Goal: explain and use <span class="m"><i>V</i><sub>s</sub>/<i>V</i><sub>p</sub> = <i>N</i><sub>s</sub>/<i>N</i><sub>p</sub></span></span><a class="chip" href="#ch-12-6">Needs: Faraday's law (Class 12 Ch 6)</a><a class="chip" href="#ch-12-7">Needs: AC basics (Class 12 Ch 7)</a></div>
+
+ <div class="grid2">
+  <div class="stack">
+   <div class="canvas-box"><canvas id="txCanvas" aria-label="Animated transformer: primary coil, iron core with magnetic flux, secondary coil and a lamp, with an oscilloscope below." role="img"></canvas>
+    <span class="cb-tag" id="txTag">AC · slowed down 100×</span>
+    <div class="cb-ctl"><button class="icon-btn" id="txPlay" aria-label="Pause animation"><svg aria-hidden="true"><use href="#i-pause"/></svg></button></div></div>
+   <div class="legend"><span><i class="dot" style="background:var(--cyan)"></i>primary current &amp; <span class="m"><i>V</i><sub>p</sub></span></span><span><i class="dot" style="background:var(--magenta)"></i>magnetic flux <span class="m"><i>Φ</i></span> in the core</span><span><i class="dot" style="background:var(--lime)"></i>secondary current &amp; <span class="m"><i>V</i><sub>s</sub></span></span></div>
+  </div>
+  <div class="panel stack">
+   <div class="row" style="justify-content:space-between"><h2 style="font-size:1.05rem;margin:0">Controls</h2><div class="seg" role="group" aria-label="Supply type"><button id="txAC" aria-pressed="true">AC supply</button><button id="txDC" aria-pressed="false">DC supply</button></div></div>
+   <div class="ctl"><label for="txVp">Primary voltage <span class="m"><i>V</i><sub>p</sub></span> (rms)</label><output id="txVpO" for="txVp"></output><input type="range" id="txVp" min="12" max="240" step="1" value="230"></div>
+   <div class="ctl"><label for="txNp">Primary turns <span class="m"><i>N</i><sub>p</sub></span></label><output id="txNpO" for="txNp"></output><input type="range" id="txNp" min="100" max="2400" step="50" value="2300"></div>
+   <div class="ctl"><label for="txNs">Secondary turns <span class="m"><i>N</i><sub>s</sub></span></label><output id="txNsO" for="txNs"></output><input type="range" id="txNs" min="20" max="2400" step="10" value="120"></div>
+   <div class="row"><span class="faint" style="font-size:.85rem">Presets:</span><button class="btn quiet sm" data-tx="230,2300,120">Doorbell 230 V → 12 V</button><button class="btn quiet sm" data-tx="12,200,240">Step-up 1 : 1.2</button><button class="btn quiet sm" data-tx="120,1000,1000">1 : 1 isolation</button></div>
+   <div class="readouts" id="txRead"></div>
+   <div class="note" id="txNote" aria-live="polite"></div>
+  </div>
+ </div>
+
+ <div class="grid2">
+  <div class="panel">
+   <h2>What you are seeing</h2>
+   <ol class="stack" style="padding-left:1.2em;margin:0">
+    <li>The AC supply pushes a current that reverses 50 times a second (we slowed it 100× so you can follow it). The cyan dots show the primary current changing direction.</li>
+    <li>That current magnetises the iron core. The magenta arrows show the flux <span class="m"><i>Φ</i></span>: it grows, shrinks and reverses in step with the current.</li>
+    <li>The same changing flux passes through every turn of the secondary coil, so each turn gets an induced emf. More turns, more voltage: that is why the lamp's brightness follows <span class="m"><i>N</i><sub>s</sub></span>.</li>
+    <li>Switch to <b>DC</b>: the flux rises once and then stays steady. Steady flux induces nothing, so the lamp flashes once and goes dark.</li>
+   </ol>
+  </div>
+  <div class="panel stack">
+   <h2>Real world</h2>
+   <div class="placeholder" role="img" aria-label="Photo placeholder"><b>PHOTO PLACEHOLDER</b><span>Pole-mounted distribution transformer (11 kV → 415 V) in an Indian street. Add a licensed photograph here.</span></div>
+   <p class="muted" style="font-size:.92rem">Power stations send energy at very high voltage so the current, and the <span class="m"><i>I</i>²<i>R</i></span> heating loss in the cables, stays small. Transformers near your street step it back down.</p>
+  </div>
+ </div>
+
+ <div class="panel">
+  <div class="row" style="justify-content:space-between;margin-bottom:12px"><h2 style="margin:0">Derive it yourself</h2><button class="btn sm" id="dNext">Show next step</button></div>
+  <div class="steps-derive" id="derive">
+   <div class="dstep"><div><b>Faraday's law for one coil.</b> A coil of <span class="m"><i>N</i></span> turns in a changing flux gets an induced emf
+     <div class="eq"><i>ε</i> = −<i>N</i> d<i>Φ</i>/d<i>t</i></div><span class="muted">Units: <span class="m"><i>Φ</i></span> in weber (Wb = V s), <span class="m"><i>t</i></span> in seconds, so <span class="m"><i>ε</i></span> comes out in volts. The minus sign is Lenz's law: the emf opposes the change.</span></div></div>
+   <div class="dstep" hidden><div><b>One flux, two coils.</b> In an ideal core, every bit of flux made by the primary also passes through the secondary. So both coils see the same <span class="m">d<i>Φ</i>/d<i>t</i></span>.</div></div>
+   <div class="dstep" hidden><div><b>Write it for each coil</b> (sizes only, ignoring coil resistance):
+     <div class="eq"><i>V</i><sub>p</sub> = <i>N</i><sub>p</sub> d<i>Φ</i>/d<i>t</i> &nbsp;&nbsp;and&nbsp;&nbsp; <i>V</i><sub>s</sub> = <i>N</i><sub>s</sub> d<i>Φ</i>/d<i>t</i></div></div></div>
+   <div class="dstep" hidden><div><b>Divide one by the other.</b> The unknown <span class="m">d<i>Φ</i>/d<i>t</i></span> cancels:
+     <div class="eq"><i>V</i><sub>s</sub> / <i>V</i><sub>p</sub> = <i>N</i><sub>s</sub> / <i>N</i><sub>p</sub></div><span class="muted">More secondary turns than primary turns steps the voltage up; fewer steps it down.</span></div></div>
+   <div class="dstep" hidden><div><b>Energy is conserved.</b> An ideal transformer wastes nothing, so power in equals power out:
+     <div class="eq"><i>V</i><sub>p</sub><i>I</i><sub>p</sub> = <i>V</i><sub>s</sub><i>I</i><sub>s</sub> &nbsp;⇒&nbsp; <i>I</i><sub>s</sub> / <i>I</i><sub>p</sub> = <i>N</i><sub>p</sub> / <i>N</i><sub>s</sub></div><span class="muted">Stepping voltage up steps current down by the same factor. No free energy.</span></div></div>
+   <div class="dstep" hidden><div><b>Why DC fails.</b> Steady DC gives steady flux, so <span class="m">d<i>Φ</i>/d<i>t</i> = 0</span> and <span class="m"><i>ε</i> = 0</span>. Try the DC button above to watch it happen.</div></div>
+  </div>
+ </div>
+
+ <div class="grid2">
+  <div class="panel stack">
+   <h2>Worked example</h2>
+   <p>A doorbell transformer steps 230 V mains down to 12 V. Its primary has 1150 turns. How many turns does the secondary need?</p>
+   <div class="dstep" style="grid-template-columns:minmax(0,1fr)"><div class="eq" style="font-size:1.15rem"><i>N</i><sub>s</sub> = <i>N</i><sub>p</sub> × <i>V</i><sub>s</sub> / <i>V</i><sub>p</sub> = 1150 × 12 V / 230 V = <b>60 turns</b></div><span class="muted">The volts cancel, leaving a pure number of turns. Check: 60/1150 = 12/230 ≈ 0.052. ✔</span></div>
+  </div>
+  <div class="panel stack">
+   <h2>Common mistake</h2>
+   <div class="note bad"><b>“A step-up transformer gives you more energy.”</b><br>It gives more <em>voltage</em> but less <em>current</em>. Power out can never be more than power in. Real transformers lose 2–5 % as heat in the core and windings.</div>
+  </div>
+ </div>
+
+ <div class="panel"><h2>Check your understanding</h2><div class="stack" id="lessonQs" style="gap:22px"></div></div>
+</section>
+
+<!-- ================= LAB ================= -->
+<section id="v-lab" class="view" aria-labelledby="h-lab" hidden>
+ <div class="v-head"><span class="eyebrow">Visual lab</span><h1 id="h-lab">Simulations you can steer</h1><p>Only one simulation runs at a time, so nothing competes for your attention. Each one says what it shows and why it helps.</p></div>
+ <div class="seg" role="group" aria-label="Choose a simulation" id="labPick"></div>
+ <div class="grid2">
+  <div class="stack">
+   <div class="canvas-box"><canvas id="labCanvas" role="img" aria-label="Simulation"></canvas><span class="cb-tag" id="labTag"></span>
+    <div class="cb-ctl"><button class="icon-btn" id="labPlay" aria-label="Pause animation"><svg aria-hidden="true"><use href="#i-pause"/></svg></button><button class="icon-btn" id="labReset" aria-label="Reset simulation"><svg aria-hidden="true"><use href="#i-reset"/></svg></button></div></div>
+   <div class="legend" id="labLegend"></div>
+  </div>
+  <div class="panel stack" id="labSide"></div>
+ </div>
+</section>
+
+<!-- ================= CIRCUITS ================= -->
+<section id="v-circuits" class="view" aria-labelledby="h-circuits" hidden>
+ <div class="v-head"><span class="eyebrow">Circuit lab project · Class 10, Ch 11 Electricity</span><h1 id="h-circuits">Project: light a study desk</h1><p>Wire two 6 V desk lamps to one 6 V battery so that both shine at full brightness, one switch controls both, and an ammeter shows the total current.</p></div>
+ <div class="panel tight stack">
+  <div class="row" style="justify-content:space-between"><div class="tools" role="toolbar" aria-label="Circuit tools" id="ctools"></div></div>
+  <p class="muted" style="font-size:.9rem" id="ctoolHelp"></p>
+ </div>
+ <div class="grid2">
+  <div class="stack">
+   <div class="cboard-box"><svg class="cboard" id="cboard" viewBox="0 0 700 500" role="group" aria-label="Circuit board. Each gap between two dots holds one part."></svg></div>
+   <div class="row"><div class="seg" role="group" aria-label="Show flow as"><button id="cfConv" aria-pressed="true">Conventional current</button><button id="cfElec" aria-pressed="false">Electron flow</button></div><button class="btn quiet sm" id="cReset">Reset starter circuit</button><button class="btn quiet sm" id="cClear">Clear board</button></div>
+   <div class="note" id="cStatus" aria-live="polite"></div>
+  </div>
+  <div class="stack">
+   <div class="panel stack"><h2 style="font-size:1.05rem;margin:0">Project goals</h2><div class="stack" id="cGoals"></div><button class="btn" id="cCheck">Check my circuit</button></div>
+   <div class="panel tight stack"><h2 style="font-size:1.05rem;margin:0">Meter readings</h2><div class="readouts" id="cRead"></div><p class="faint" style="font-size:.82rem">Lamps: 6 V, 0.5 A (12 Ω). Battery internal resistance 0.1 Ω.</p></div>
+  </div>
+ </div>
+</section>
+
+<!-- ================= STUDIO ================= -->
+<section id="v-studio" class="view" aria-labelledby="h-studio" hidden>
+ <div class="v-head"><span class="eyebrow">Diagram studio</span><h1 id="h-studio">Draw it, then get it checked</h1><p>Answer with a diagram instead of a letter. The checker looks at direction, not neatness, and tells you which arrow is off and why.</p></div>
+ <div class="panel stack">
+  <div class="row" style="justify-content:space-between"><h2 style="margin:0">Task 1 · Forces on a block at rest on a 30° slope</h2><span class="chip">Class 9 · Ch 6 · +30 XP</span></div>
+  <p class="muted">Pick a force, then drag outward from the block to draw its arrow. Draw every force acting <b>on the block</b>, and nothing else.</p>
+  <div class="row" id="fbdChips" role="group" aria-label="Force to draw"></div>
+  <div class="grid2" style="gap:16px">
+   <div class="canvas-box" style="background:#0c0420"><svg class="studio-svg" id="fbdSvg" viewBox="0 0 640 420" role="img" aria-label="A block resting on a slope that rises to the right at 30 degrees. Arrows you draw appear here."></svg></div>
+   <div class="stack"><div id="fbdList" class="stack"></div><div class="row"><button class="btn" id="fbdCheck">Check diagram</button><button class="btn quiet sm" id="fbdClear">Clear arrows</button></div><div id="fbdFb" class="stack" aria-live="polite"></div></div>
+  </div>
+ </div>
+ <div class="panel stack">
+  <div class="row" style="justify-content:space-between"><h2 style="margin:0">Task 2 · Aim the refracted ray</h2><span class="chip">Class 10 · Ch 9 · +30 XP</span></div>
+  <p class="muted">Light in air hits a glass block (<span class="m"><i>n</i> = 1.50</span>) at 40° to the normal. Drag the green handle, or use the slider, to draw the ray inside the glass.</p>
+  <div class="grid2" style="gap:16px">
+   <div class="canvas-box" style="background:#0c0420"><svg class="studio-svg" id="raySvg" viewBox="0 0 640 400" role="img" aria-label="Refraction diagram"></svg></div>
+   <div class="stack"><div class="ctl"><label for="rayAng">Refraction angle <span class="m"><i>r</i></span></label><output id="rayAngO" for="rayAng"></output><input type="range" id="rayAng" min="0" max="80" step="0.5" value="60"></div><button class="btn" id="rayCheck">Check ray</button><div id="rayFb" aria-live="polite"></div></div>
+  </div>
+ </div>
+</section>
+
+<!-- ================= PRACTICE ================= -->
+<section id="v-practice" class="view" aria-labelledby="h-practice" hidden>
+ <div class="v-head"><span class="eyebrow">Practice</span><h1 id="h-practice">Quick drills and sample questions</h1><p>Five questions at a time from any class, unsolved ones first. Hints are optional and cost nothing.</p></div>
+ <div class="panel stack" style="gap:14px">
+  <div class="row" style="justify-content:space-between"><h2 style="margin:0">Quick drill by class</h2><button class="btn sm" id="drillAgain" type="button">New set of five</button></div>
+  <div id="drillPick"></div><p class="muted" id="drillInfo" style="margin:0"></p>
+  <div class="stack" id="drillQs" style="gap:16px"></div>
+ </div>
+ <div class="v-head" style="margin-top:12px"><h2 style="margin:0">Sample quiz and diagram questions</h2><p>Six question types: units, notation, a formula, a graph, a circuit diagram and a field-line picture.</p></div>
+ <div class="stack" id="practiceQs" style="gap:20px"></div>
+</section>
+
+<!-- ================= MOCK ================= -->
+<section id="v-mock" class="view" aria-labelledby="h-mock" hidden>
+ <div class="v-head"><span class="eyebrow">Mock tests</span><h1 id="h-mock">Eight questions. Ten minutes. Any class.</h1><p>Each test draws a fresh set from the class’s question bank. When you finish, every wrong answer is explained and linked to the chapter to review.</p></div>
+ <div class="panel" id="mockBox"></div>
+</section>
+
+<!-- ================= BADGES ================= -->
+<section id="v-badges" class="view" aria-labelledby="h-badges" hidden>
+ <div class="v-head"><span class="eyebrow">Progress</span><h1 id="h-badges">Badges and XP</h1><p>XP comes from doing physics, not from clicking: first correct answers, finished diagrams, working circuits and completed tests.</p></div>
+ <div class="grid2">
+  <div class="panel"><div class="badges" id="badgeGrid"></div></div>
+  <div class="panel stack" id="xpPanel"></div>
+ </div>
+ <div class="panel stack" id="syncPanel"></div>
+</section>
+
+<!-- ================= BLUEPRINT ================= -->
+<section id="v-blueprint" class="view bp" aria-labelledby="h-bp" hidden>
+ <div class="v-head"><span class="eyebrow">Product blueprint</span><h1 id="h-bp">The PhysiQuest plan</h1><p>How the platform is organised, what it teaches, how it looks, and how to build it. The lessons, labs, diagram tasks and tests it describes all work in this app.</p></div>
+ <nav class="bp-toc" aria-label="Blueprint sections">
+  <a class="chip c" href="#bp1" data-bp>1 · Learning paths</a><a class="chip c" href="#bp2" data-bp>2 · Interactive learning</a><a class="chip c" href="#bp3" data-bp>3 · Physics content</a><a class="chip c" href="#bp4" data-bp>4 · Visual teaching</a><a class="chip c" href="#bp5" data-bp>5 · Diagram practice</a><a class="chip c" href="#bp6" data-bp>6 · Mock tests</a><a class="chip c" href="#bp7" data-bp>7 · Design system</a><a class="chip c" href="#bp8" data-bp>8 · Build plan</a>
+ </nav>
+
+ <div class="panel stack" id="bp1"><h2>1 · Learning paths</h2>
+  <p>Seven classes, Class 6 to Class 12, each holding the physics chapters of its NCERT book (Curiosity for Classes 6–8, Exploration for Class 9, Science for Class 10, Physics Part I and II for Classes 11–12). Every class is open, so a student starts where their syllabus is; the path only suggests an order. Every chapter follows the same beats: <b>think first → watch → key ideas → formulas → check</b>. The deep-dive lesson adds <b>explore → derive</b>.</p>
+  <div class="tbl"><table id="bpLevels"><thead><tr><th>Class</th><th>Goal</th><th>Prerequisites</th><th>Chapters</th><th>Badge</th></tr></thead><tbody></tbody></table></div>
+ </div>
+
+ <div class="panel stack" id="bp2"><h2>2 · Interactive learning and rewards</h2>
+  <div class="grid2" style="gap:20px">
+   <div class="stack"><h3>Activity types</h3><ul>
+    <li><b>Quick checks</b> inside lessons: 1–2 questions right after a new idea.</li>
+    <li><b>Topic problems</b>: numeric answers with a unit picker, so units are graded too.</li>
+    <li><b>Practical tasks</b>: steer a simulation to hit a target (for example, land a projectile 30 m away).</li>
+    <li><b>Projects</b>: multi-goal builds such as the study-desk circuit, checked goal by goal.</li>
+    <li><b>Diagram answers</b>: free-body diagrams, ray diagrams and circuits, checked by rules.</li></ul></div>
+   <div class="stack"><h3>Points and badges</h3><ul>
+    <li>XP only for a <b>first</b> correct answer, so retrying is free and farming is pointless.</li>
+    <li>No penalty for wrong answers. Hints are free; the goal is learning, not gaming.</li>
+    <li>Six ranks named after physics: Spark, Current, Voltage, Field, Flux and Quantum.</li>
+    <li>One badge per class, plus badges for habits: exploring every simulation, scoring 80 % on a mock test.</li>
+    <li>Streaks count days with at least one finished activity, and they pause on exam days instead of breaking.</li></ul></div>
+  </div>
+ </div>
+
+ <div class="panel stack" id="bp3"><h2>3 · Physics content and notation standards</h2>
+  <p>Content follows SI (the International System of Units) and the notation conventions used by NIST and the BIPM. These rules apply to every screen.</p>
+  <div class="grid2" style="gap:20px">
+   <div class="tbl"><table><thead><tr><th>Base quantity</th><th>Unit</th><th>Symbol</th></tr></thead><tbody>
+    <tr><td>length</td><td>metre</td><td>m</td></tr><tr><td>mass</td><td>kilogram</td><td>kg</td></tr><tr><td>time</td><td>second</td><td>s</td></tr><tr><td>electric current</td><td>ampere</td><td>A</td></tr><tr><td>thermodynamic temperature</td><td>kelvin</td><td>K</td></tr><tr><td>amount of substance</td><td>mole</td><td>mol</td></tr><tr><td>luminous intensity</td><td>candela</td><td>cd</td></tr></tbody></table></div>
+   <div class="tbl"><table><thead><tr><th>Derived unit</th><th>Symbol</th><th>In base units</th></tr></thead><tbody>
+    <tr><td>newton (force)</td><td>N</td><td>kg m s⁻²</td></tr><tr><td>joule (energy)</td><td>J</td><td>kg m² s⁻²</td></tr><tr><td>watt (power)</td><td>W</td><td>kg m² s⁻³</td></tr><tr><td>pascal (pressure)</td><td>Pa</td><td>kg m⁻¹ s⁻²</td></tr><tr><td>coulomb (charge)</td><td>C</td><td>A s</td></tr><tr><td>volt (potential difference)</td><td>V</td><td>kg m² s⁻³ A⁻¹</td></tr><tr><td>ohm (resistance)</td><td>Ω</td><td>kg m² s⁻³ A⁻²</td></tr><tr><td>hertz (frequency)</td><td>Hz</td><td>s⁻¹</td></tr><tr><td>weber (magnetic flux)</td><td>Wb</td><td>kg m² s⁻² A⁻¹</td></tr><tr><td>tesla (flux density)</td><td>T</td><td>kg s⁻² A⁻¹</td></tr></tbody></table></div>
+  </div>
+  <h3>Notation rules</h3><ul>
+   <li>Quantity symbols are italic (<span class="m"><i>v</i>, <i>F</i>, <i>m</i></span>); unit symbols are upright (m, kg, s). Descriptive subscripts are upright too: <span class="m"><i>V</i><sub>s</sub></span> for “secondary”.</li>
+   <li>A space separates number and unit: 9.8 m s⁻², 230 V, 25 °C. Unit symbols never take a plural “s” or a full stop.</li>
+   <li>Scientific notation is <span class="m"><i>a</i> × 10<sup><i>n</i></sup></span> with 1 ≤ |<span class="m"><i>a</i></span>| &lt; 10; the number of digits shown is the number of significant figures (6.50 × 10⁻⁷ m has three).</li>
+   <li>Vectors are bold or carry an arrow (<b>F</b> or <span class="m"><i>F⃗</i></span>); a plain <span class="m"><i>F</i></span> means the magnitude.</li>
+   <li>The course uses <span class="m"><i>g</i> = 9.8 m s⁻²</span> throughout.</li>
+   <li>Every formula is shown with what each symbol means and its unit, and every derivation lists its assumptions (for example “ideal core, no resistance”).</li></ul>
+ </div>
+
+ <div class="panel stack" id="bp4"><h2>4 · Visual teaching catalogue</h2>
+  <p>Each visual earns its place by showing something that static text or a single picture cannot. The first six are built in this app; the rest are next in the build plan.</p>
+  <div class="tbl"><table><thead><tr><th>Visual</th><th>What it shows</th><th>Why it helps</th><th>Status</th></tr></thead><tbody id="bpVisuals"></tbody></table></div>
+ </div>
+
+ <div class="panel stack" id="bp5"><h2>5 · Diagram-based practice</h2>
+  <div class="grid2" style="gap:20px">
+   <div class="stack"><h3>Drawing tools</h3><ul>
+    <li><b>Arrow tool</b> with a label picker (W, N, f, T, F) for force and velocity diagrams.</li>
+    <li><b>Ray tool</b> with a draggable handle and a protractor read-out for optics.</li>
+    <li><b>Circuit board</b> with wires, cells, lamps, resistors, switches, ammeters and voltmeters that snap to a grid.</li>
+    <li><b>Shapes and labels</b> (boxes, circles, text tags) for free sketches in later chapters.</li>
+    <li>Every tool works by mouse, touch and keyboard, and every drawn object is also listed as text.</li></ul></div>
+   <div class="stack"><h3>How answers are checked</h3><ul>
+    <li><b>Force diagrams</b>: each arrow's direction within ±12° of the correct one; extra or doubled forces are named (for example, a “sliding force” that is really a component of the weight).</li>
+    <li><b>Ray diagrams</b>: the angle is compared with Snell's law, <span class="m"><i>n</i><sub>1</sub> sin <i>θ</i><sub>1</sub> = <i>n</i><sub>2</sub> sin <i>θ</i><sub>2</sub></span>, within ±3°.</li>
+    <li><b>Circuits</b>: the board is solved with nodal analysis. Goals test lamp power, whether a switch really controls each lamp (by simulating it open and closed), meter placement and short circuits.</li>
+    <li>Feedback names the specific object that is wrong and the physics reason, never just “incorrect”.</li></ul></div>
+  </div>
+ </div>
+
+ <div class="panel stack" id="bp6"><h2>6 · Mini mock tests</h2><ul>
+  <li><b>Shape</b>: 8–10 questions, 10 minutes, one per topic, with a flag-for-review option and no negative marking.</li>
+  <li><b>Distractor mapping</b>: every wrong option is written to match one known misconception (inverting a ratio, forgetting a square root, confusing a third-law pair). Choosing it triggers that misconception's explanation.</li>
+  <li><b>Recommendation engine</b>: each question carries a topic tag and a review link. The results page ranks topics by mistakes and suggests the two most useful things to review next.</li>
+  <li><b>Retakes</b> shuffle the option order so the test checks understanding, not memory of positions.</li></ul></div>
+
+ <div class="panel stack" id="bp7"><h2>7 · Learner-friendly design system</h2>
+  <h3>Colours</h3><div class="swatches" id="bpSwatches"></div>
+  <div class="grid2" style="gap:20px">
+   <div class="stack"><h3>Type and layout</h3><ul>
+    <li><b>Unbounded</b> for headings, <b>Atkinson Hyperlegible</b> for reading (designed for low-vision readers), <b>STIX Two</b> for maths, <b>JetBrains Mono</b> for read-outs.</li>
+    <li>Body text 16 px or larger, lines under 75 characters, one main action per panel.</li>
+    <li>Every symbol is introduced in words the first time it appears on a page.</li>
+    <li>Layouts collapse to one column on phones; diagrams scroll inside their own frame.</li></ul></div>
+   <div class="stack"><h3>Accessibility and motion</h3><ul>
+    <li>Text contrast of at least 4.5 : 1; colour is never the only signal (ticks, labels and patterns too).</li>
+    <li>All controls reachable by keyboard with a visible focus ring; touch targets at least 44 px.</li>
+    <li>Results and feedback announced to screen readers through live regions.</li>
+    <li>Only one simulation animates at a time, each has a pause button, and “reduce motion” settings are honoured.</li>
+    <li>Animations explain something; nothing moves just to decorate a lesson page.</li></ul></div>
+  </div>
+ </div>
+
+ <div class="panel stack" id="bp8"><h2>8 · Build plan</h2>
+  <div class="grid2" style="gap:20px">
+   <div class="stack"><h3>Technology</h3><ul>
+    <li>Front end: React + TypeScript; simulations on Canvas 2D, diagrams in SVG (both are used in this prototype).</li>
+    <li>Maths typesetting: KaTeX in production for full equation layout.</li>
+    <li>Circuit solver: modified nodal analysis, the same method used here, run in a Web Worker for large boards.</li>
+    <li>Accounts and progress: a hosted database (for example Supabase) storing activity results and misconception tags.</li>
+    <li>Content: lessons written in MDX with embedded simulation components, reviewed by a physics teacher before release.</li></ul></div>
+   <div class="stack"><h3>Phases</h3><ol>
+    <li><b>Weeks 1–4</b>: design system, Classes 6–8, practice engine, XP and badges.</li>
+    <li><b>Weeks 5–8</b>: visual lab, diagram studio, Classes 9–10.</li>
+    <li><b>Weeks 9–12</b>: circuit lab, Classes 11–12, class mock tests with the recommendation engine.</li>
+    <li><b>Weeks 13–14</b>: pilot with one class, measure which misconceptions persist, revise.</li></ol></div>
+  </div>
+ </div>
+</section>
+</main>
+<footer><div class="wrap">PhysiQuest prototype · all graphics and animations are drawn live in the browser · your progress is saved on this device (move it with a progress code on the Badges page).</div></footer>
+
