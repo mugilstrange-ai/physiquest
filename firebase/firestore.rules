@@ -1,0 +1,88 @@
+rules_version = '2';
+// PhysiQuest database rules.
+// The app talks to the database directly, so these rules ARE the security:
+//  - a student can only read and change their own details, progress and payment requests;
+//  - a payment request is just a request: it cannot switch Premium on;
+//  - only the owner's Google account can approve a payment and grant Premium.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isMe(uid) { return signedIn() && request.auth.uid == uid; }
+    function isOwner() {
+      return signedIn()
+        && request.auth.token.email == 'mugilstrange@gmail.com'
+        && request.auth.token.email_verified == true
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+    function text(v, lo, hi) { return v is string && v.size() >= lo && v.size() <= hi; }
+    function mobile(v) { return v is string && v.matches('^[6-9][0-9]{9}$'); }
+
+    // ---------- a student's details (only what the app needs) ----------
+    match /users/{uid} {
+      allow read: if isMe(uid) || isOwner();
+      allow create, update: if isMe(uid) && validProfile(request.resource.data);
+      allow delete: if isMe(uid);
+    }
+    function validProfile(d) {
+      return d.keys().hasOnly(['name', 'cls', 'city', 'state', 'phone', 'adult', 'parentName', 'parentPhone', 'parentOk', 'email', 'v', 'at'])
+        && d.keys().hasAll(['name', 'cls', 'city', 'state', 'phone', 'adult', 'email', 'v', 'at'])
+        && text(d.name, 2, 60)
+        && d.cls in ['6', '7', '8', '9', '10', '11', '12', 'dropper', 'college', 'other']
+        && text(d.city, 2, 50)
+        && d.state in ['Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry']
+        && (d.phone == '' || mobile(d.phone))
+        && d.adult is bool
+        && d.email == request.auth.token.email
+        && d.v == 1 && d.at is timestamp
+        && ((d.adult == true && !d.keys().hasAny(['parentName', 'parentPhone', 'parentOk']))
+          || (d.adult == false && text(d.parentName, 2, 60) && mobile(d.parentPhone)
+              && d.parentOk == true && d.parentPhone != d.phone));
+    }
+
+    // ---------- saved progress ----------
+    match /progress/{uid} {
+      allow read, delete: if isMe(uid);
+      allow create, update: if isMe(uid)
+        && request.resource.data.keys().hasOnly(['code', 'at'])
+        && text(request.resource.data.code, 4, 200000)
+        && request.resource.data.at is timestamp;
+    }
+
+    // ---------- payment requests: one per UPI transaction ID (UTR), so a UTR can only be used once ----------
+    match /payments/{utr} {
+      allow create: if signedIn() && utr.matches('^[0-9]{12}$')
+        && validPayment(request.resource.data, utr)
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+      allow read: if isOwner() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow update: if isOwner()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'decidedAt', 'exp', 'note'])
+        && request.resource.data.status in ['approved', 'rejected'];
+      allow delete: if false;
+    }
+    function validPayment(d, utr) {
+      return d.keys().hasOnly(['uid', 'plan', 'amount', 'utr', 'status', 'at', 'name', 'email'])
+        && d.keys().hasAll(['uid', 'plan', 'amount', 'utr', 'status', 'at', 'name', 'email'])
+        && d.uid == request.auth.uid && d.utr == utr && d.status == 'pending'
+        && ((d.plan == 'M' && d.amount == 199) || (d.plan == 'Y' && d.amount == 1999))
+        && text(d.name, 2, 60) && d.email == request.auth.token.email && d.at is timestamp;
+    }
+
+    // ---------- Premium: only the owner can grant, change or remove it ----------
+    match /premium/{uid} {
+      allow read: if isMe(uid) || isOwner();
+      allow create, update: if isOwner()
+        && request.resource.data.keys().hasOnly(['plan', 'exp', 'utr', 'at'])
+        && request.resource.data.keys().hasAll(['plan', 'exp', 'utr', 'at'])
+        && request.resource.data.plan in ['M', 'Y']
+        && request.resource.data.exp is int && request.resource.data.exp >= 0 && request.resource.data.exp < 5000
+        && request.resource.data.utr is string && request.resource.data.at is timestamp;
+      allow delete: if isOwner();
+    }
+
+    // everything else is closed
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

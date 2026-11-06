@@ -1,0 +1,11 @@
+{
+  "name": "physiquest-database-tests",
+  "private": true,
+  "description": "Checks the PhysiQuest database rules and the app's cloud code against the Firebase emulators.",
+  "type": "module",
+  "scripts": { "test": "node --test test/" },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^3.0.4",
+    "firebase": "^10.14.1"
+  }
+}

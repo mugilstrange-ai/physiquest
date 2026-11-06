@@ -75,6 +75,31 @@ html{scroll-behavior:smooth}
 .int-ask{display:block;margin-top:6px;font-size:.92rem;color:var(--gold)}
 .view-error{border-color:rgba(255,107,138,.5);margin-bottom:20px}
 .review-item .chip{white-space:normal;max-width:100%;height:auto;text-align:left}
+/* accounts */
+html:not(.acc-on) #navAcc{display:none}
+.acc-card{max-width:560px}
+.acc-seg{display:inline-flex;align-self:flex-start;border:1px solid var(--line-2);border-radius:999px;padding:3px;gap:2px;background:rgba(15,6,38,.6);flex-wrap:wrap}
+.acc-seg button{font:inherit;font-size:.9rem;border:0;background:transparent;color:var(--muted);padding:8px 14px;border-radius:999px;cursor:pointer;min-height:40px}
+.acc-seg button.on{background:var(--cyan);color:var(--on-cyan);font-weight:700}
+.acc-msg{margin:0;font-size:.92rem;min-height:0}
+.acc-msg:empty{display:none}
+.acc-msg.bad{color:var(--bad)}
+.acc-msg.good{color:var(--good,#4cf0a0)}
+.ph-row{display:flex;gap:8px;align-items:center}
+.ph-cc{font-family:var(--f-mono);color:var(--muted);flex:0 0 auto}
+.ph-row input{flex:1;min-width:0}
+input[type=email],input[type=password],input[type=tel]{font:inherit;color:var(--text);background:rgba(15,6,38,.7);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:10px 12px;min-height:44px;width:100%}
+.acc-age{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.acc-age legend{font-size:.9rem;color:var(--muted);margin-bottom:6px;padding:0}
+.acc-age label,.acc-check{display:flex;gap:10px;align-items:center;min-height:40px;cursor:pointer}
+.acc-age input,.acc-check input{width:20px;height:20px;accent-color:var(--cyan);flex:0 0 auto}
+.acc-danger summary{cursor:pointer;color:var(--muted)}
+.btn.danger{background:var(--bad);color:#1a0610;border-color:var(--bad)}
+.btn svg{flex:0 0 auto}
+.acc-parent{border-left:3px solid var(--gold);padding-left:14px}
+.pay-list li{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.pay-list li>span:first-child{font-variant-numeric:tabular-nums}
+#gBox,#gBox2{min-height:44px}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{background:var(--ink);color:var(--text);font-family:var(--f-body);font-size:16px;line-height:1.55;
   background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),
@@ -445,6 +470,7 @@ footer{border-top:1px solid var(--line);padding-block:var(--s5);color:var(--fain
   <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M8 7h7M8 11h5"/></symbol>
   <symbol id="i-neet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v6a5 5 0 0 0 10 0V3"/><path d="M11 14v2a4 4 0 0 0 8 0v-2"/><circle cx="19" cy="12" r="2"/><path d="M5 3h2M15 3h2"/></symbol>
   <symbol id="i-jee" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
   <symbol id="i-crown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/></symbol>
   <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></symbol>
   <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></symbol>
@@ -475,6 +501,7 @@ footer{border-top:1px solid var(--line);padding-block:var(--s5);color:var(--fain
    <a href="#mock"><svg aria-hidden="true"><use href="#i-mock"/></svg>Mock test</a>
    <a href="#badges"><svg aria-hidden="true"><use href="#i-badge"/></svg>Badges</a>
    <a href="#plans"><svg aria-hidden="true"><use href="#i-crown"/></svg>Plans</a>
+   <a href="#account" id="navAcc"><svg aria-hidden="true"><use href="#i-user"/></svg><span>Sign in</span></a>
    <a href="#feedback"><svg aria-hidden="true"><use href="#i-chat"/></svg>Feedback</a>
    <a href="#blueprint"><svg aria-hidden="true"><use href="#i-plan"/></svg>Blueprint</a>
   </nav>
@@ -569,6 +596,12 @@ footer{border-top:1px solid var(--line);padding-block:var(--s5);color:var(--fain
 </section>
 <section id="v-jeeunit" class="view" aria-labelledby="h-jeeunit" hidden>
  <div class="stack" id="jeeUnitBox" style="gap:22px"></div>
+</section>
+
+<!-- ================= ACCOUNT ================= -->
+<section id="v-account" class="view" aria-labelledby="h-account" hidden>
+ <div class="v-head"><span class="eyebrow">Account</span><h1 id="h-account">Your PhysiQuest account</h1></div>
+ <div class="stack" id="accBox" style="gap:20px"></div>
 </section>
 
 <section id="v-plans" class="view" aria-labelledby="h-plans" hidden>
@@ -864,7 +897,7 @@ const uSp=' '; /* narrow no-break space between number and unit */
 
 /* ---------- saved progress (this browser only) ---------- */
 const KEY='physiquest-v3';
-let ST={xp:0,done:{},labSeen:{},mockBest:null,badges:{},mockBy:{},lastCls:null,gen:{},reports:[],neetBest:null,jeeBest:null};
+let ST={xp:0,done:{},labSeen:{},mockBest:null,badges:{},mockBy:{},lastCls:null,gen:{},reports:[],neetBest:null,jeeBest:null,acct:null};
 /* storage can be missing (private mode), full, or damaged: every read and write is guarded, a damaged save is
    kept aside as a backup instead of being lost, and each field is checked before use */
 let STORE_OK=true;
@@ -889,6 +922,8 @@ const NOISE=/ResizeObserver loop|^Script error\.?$/;
 window.addEventListener('error',e=>{const m=String(e.message||'');if(NOISE.test(m))return;logErr(e.error||m,'window');});
 window.addEventListener('unhandledrejection',e=>logErr(e.reason,'promise'));
 function safe(f,where){try{return f();}catch(e){logErr(e,where);}}
+/* used once by the Android app to bring progress across from the older version */
+window.pqImport=function(json){try{if(!json)return 0;const o=JSON.parse(json);if(!isObj(o))return 0;if(ST.xp>0&&Object.keys(ST.done).length)return 0;ST=Object.assign(ST,o);saveNow();setTimeout(()=>location.reload(),60);return 1;}catch(e){logErr(e,'import');return 0;}};
 
 const RANKS=[{n:'Spark',xp:0},{n:'Current',xp:100},{n:'Voltage',xp:250},{n:'Field',xp:450},{n:'Flux',xp:700},{n:'Quantum',xp:1000},{n:'Photon',xp:1500},{n:'Nova',xp:2100}];
 function rankOf(xp){let i=0;for(let k=0;k<RANKS.length;k++)if(xp>=RANKS[k].xp)i=k;const next=RANKS[i+1];return{i,name:RANKS[i].n,next,frac:next?(xp-RANKS[i].xp)/(next.xp-RANKS[i].xp):1};}
@@ -992,7 +1027,7 @@ function renderQ(box,q){const wrap=H('div',{class:'q'});
  wrap.appendChild(fb);box.appendChild(wrap);return wrap;}
 
 /* ---------- router ---------- */
-const VIEWS=['home','classes','chapter','neet','neetunit','jee','jeeunit','plans','feedback','path','lesson','lab','circuits','studio','practice','mock','badges','blueprint'];
+const VIEWS=['home','account','classes','chapter','neet','neetunit','jee','jeeunit','plans','feedback','path','lesson','lab','circuits','studio','practice','mock','badges','blueprint'];
 const HOOKS={};let curView=null,curParam=null,routed=false;
 function route(){let hsh=(location.hash||'#home').slice(1);let anchor=null,param=null,m;
  if(/^bp\d$/.test(hsh)){anchor=hsh;hsh='blueprint';}
@@ -1673,7 +1708,7 @@ function renderXPPanel(){const p=$('#xpPanel');if(!p)return;const r=rankOf(ST.xp
   <h3 style="font-size:.95rem">Where XP comes from</h3><div class="tbl"><table style="min-width:0"><tbody>
   ${[['Chapter quick check (Classes 6–12)','10'],['New-number practice question','2'],['NEET mock (15 / 45 questions, first finish)','25 / 60'],['Drill question','5'],['Topic practice question','10–15'],['Transformer lesson check','20'],['Lab practical task','25'],['Diagram studio task','30'],['Circuit project','80'],['Class mock test (first finish)','30'],['Your first mock test','100']].map(x=>`<tr><td>${x[0]}</td><td class="num" style="text-align:right">${x[1]} XP</td></tr>`).join('')}</tbody></table></div>
   <button class="btn quiet sm" id="xpReset" style="align-self:flex-start">Reset my progress</button><p class="faint" id="xpResetMsg" style="font-size:.85rem"></p>`;
- $('#xpReset').addEventListener('click',()=>{const b=$('#xpReset');if(b.dataset.arm){const keep={dev:ST.dev,prem:ST.prem,payments:ST.payments,freeSets:ST.freeSets};ST=Object.assign({xp:0,done:{},labSeen:{},mockBest:null,badges:{},mockBy:{},lastCls:null,gen:{},reports:[],neetBest:null,jeeBest:null},keep);saveNow();updateXP();renderBadges();refreshPath();if(window.refreshClasses)refreshClasses();$('#xpResetMsg').textContent='Progress cleared.';}else{b.dataset.arm='1';b.textContent='Tap again to confirm reset';}});}
+ $('#xpReset').addEventListener('click',()=>{const b=$('#xpReset');if(b.dataset.arm){const keep={dev:ST.dev,prem:ST.prem,payments:ST.payments,freeSets:ST.freeSets,acct:ST.acct};ST=Object.assign({xp:0,done:{},labSeen:{},mockBest:null,badges:{},mockBy:{},lastCls:null,gen:{},reports:[],neetBest:null,jeeBest:null},keep);saveNow();updateXP();renderBadges();refreshPath();if(window.refreshClasses)refreshClasses();$('#xpResetMsg').textContent='Progress cleared.';}else{b.dataset.arm='1';b.textContent='Tap again to confirm reset';}});}
 
 /* ================= blueprint tables ================= */
 function fillBlueprint(){
@@ -3298,11 +3333,12 @@ function workedHTML(c,n){const q=genFor(c,n,true);if(!q)return '';const right=q.
 /* ---------- NEET view ---------- */
 const NM={phase:'intro',size:15,qs:[],ans:{},idx:0,left:0,timer:null};
 function neetChLinks(U){return U.ch.map(([c,n])=>`<a class="chip c" href="#ch-${c}-${n}">Class ${c} · Ch ${n} ${findCh(c,n).t}</a>`).join('');}
-function premUntil(){if(STORE_PLAY||!ST.prem)return '';const left=ST.prem.exp-todayN();return `<span class="chip good">Premium until ${dayDate(ST.prem.exp)} · ${left+1} day${left?'s':''} left</span>`;}
+function premUntil(){const e=premExp();if(STORE_PLAY||e===null||e<todayN())return '';const left=e-todayN();return `<span class="chip good">Premium until ${dayDate(e)} · ${left+1} day${left?'s':''} left</span>`;}
+const premEnded=()=>{const e=premExp();return e!==null&&e<todayN()?`<span class="chip bad">Your Premium ended on ${dayDate(e)}</span>`:'';};
 function neetLocked(){return `<div class="panel lock-panel stack"><h2 style="margin:0">NEET Physics is for Premium members</h2>
  <p class="muted" style="margin:0">Unlock all 20 NEET units with must-know tips, NEET-style practice and full mocks marked +4 / −1. It stays open until your plan's end date.</p>
  <div class="row"><span class="chip c">₹199 / month</span><span class="chip c">₹1,999 / year</span></div>
- <div class="row"><a class="btn" href="#plans">See plans and pay by UPI</a>${ST.prem&&ST.prem.exp<todayN()?`<span class="chip bad">Your Premium ended on ${dayDate(ST.prem.exp)}</span>`:''}</div></div>`;}
+ <div class="row"><a class="btn" href="#plans">See plans</a>${premEnded()}</div></div>`;}
 function showNeet(){const done=(ST.neetBest!==undefined&&ST.neetBest!==null)?`<span class="chip good">Best mock: ${ST.neetBest} marks</span>`:'';
  $('#neetHead').innerHTML=`<p>${NEET_FACTS}</p><p class="muted">NEET follows the NMC syllabus. Its physics is built on NCERT Class 11 and 12, so every unit below links to those chapters in PhysiQuest.</p><div class="row">${done}<span class="chip">${NEET.length} units</span>${isPremium()?premUntil():'<span class="chip c">Premium only</span>'}</div>`;
  $('#neetUnits').innerHTML=NEET.map(U=>`<a class="quest neet-card" href="#neet-${U.u}"><span class="eyebrow">Unit ${U.u}</span><h3>${U.t}</h3><p>${U.ch.map(([c,n])=>`Class ${c} Ch ${n}`).join(' · ')}</p><div class="row"><span class="chip">${U.f.length} NEET tips</span><span class="chip">Practice set</span></div></a>`).join('');
@@ -3345,7 +3381,7 @@ function neetMockRender(){const box=$('#neetMock');if(!box)return;
  $('#nmAgain').addEventListener('click',()=>{NM.phase='intro';neetMockRender();});}
 
 /* ---------- feedback: bugs, topic ideas and question errors ---------- */
-const FEEDBACK_TO='mugilstrange@gmail.com';const APP_VER='1.7';
+const FEEDBACK_TO='mugilstrange@gmail.com';const APP_VER='1.8';
 let FB={ctx:''};
 function renderFeedback(){const ctx=FB.ctx||'';const list=(ST.reports||[]).slice(-5).reverse();
  $('#fbBox').innerHTML=`<div class="grid2" style="gap:20px"><form class="stack" id="fbForm" novalidate>
@@ -3605,7 +3641,7 @@ const JM={phase:'intro',size:25,nB:5,qs:[],ans:{},idx:0,left:0,timer:null};
 function jeeLocked(){return `<div class="panel lock-panel stack"><h2 style="margin:0">JEE Main Physics is for Premium members</h2>
  <p class="muted" style="margin:0">Unlock all 20 JEE Main units with exam tips, tougher multi-step practice, Section B numerical questions and full 25-question mocks marked +4 / −1. It stays open until your plan's end date.</p>
  <div class="row"><span class="chip c">₹199 / month</span><span class="chip c">₹1,999 / year</span></div>
- <div class="row"><a class="btn" href="#plans">See plans and pay by UPI</a>${ST.prem&&ST.prem.exp<todayN()?`<span class="chip bad">Your Premium ended on ${dayDate(ST.prem.exp)}</span>`:''}</div></div>`;}
+ <div class="row"><a class="btn" href="#plans">See plans</a>${premEnded()}</div></div>`;}
 function jeeChLinks(U){return U.ch.map(([c,n])=>`<a class="chip c" href="#ch-${c}-${n}">Class ${c} · Ch ${n} ${findCh(c,n).t}</a>`).join('');}
 function showJee(){const best=(ST.jeeBest!==undefined&&ST.jeeBest!==null)?`<span class="chip good">Best full mock: ${ST.jeeBest} / 100</span>`:'';
  $('#jeeHead').innerHTML=`<p>${JEE_FACTS}</p><p class="muted">The JEE Main physics syllabus has 20 units, built on NCERT Class 11 and 12. Every unit below links to those chapters, then goes further with JEE-level problems.</p><div class="row">${best}<span class="chip">${JEE.length} units</span>${isPremium()?premUntil():'<span class="chip c">Premium only</span>'}</div>`;
@@ -3661,11 +3697,11 @@ function jeeMockRender(){const box=$('#jeeMock');if(!box)return;
    return `<div class="review-item"><span class="chip c">Section ${o.q.sec} · ${o.q.unit.t}</span><p>${o.q.prompt}</p>${yours}<div class="fb good"><b>Correct: ${rightTxt(o.q)}</b>${rightWhy(o.q)}</div></div>`;}).join('')||'<p class="muted">None.</p>'}</div>
   <div class="row"><button class="btn" id="jmAgain" type="button">New mock</button></div>`;
  $('#jmAgain').addEventListener('click',()=>{JM.phase='intro';jeeMockRender();});}
-/* ================= Premium by UPI, with device-bound unlock codes =================
-   A student pays Mugilan by UPI, sends the transaction ID (UTR) and this device's ID,
-   and gets back an unlock code made with the PhysiQuest unlock-code tool.
-   Without a server the app cannot see payments itself; a determined person who reads
-   the app's source could make codes. A payment server later will close that gap. */
+/* ================= Premium by UPI =================
+   Before accounts are switched on: the student pays by UPI and gets a device-bound unlock code (made with the
+   private owner tool). The key for those codes is inside the app, so a skilled person could make codes.
+   With accounts on (see u_account.js), codes are ignored: Premium comes only from the database, where only the
+   owner's Google account can write it after checking the payment. */
 const PAY={upi:'mugilstrange@oksbi',name:'Mugilan',to:'mugilstrange@gmail.com',
  plans:{M:{key:'monthly',label:'Premium · monthly',price:199,days:31},Y:{key:'yearly',label:'Premium · yearly',price:1999,days:366}}};
 const PQ_KEY='imZBEPxRCHHjQkDtZn2mt3SXqvy9JLEE';
@@ -3699,7 +3735,10 @@ function readCodeU(raw,dev){const s=(raw||'').toUpperCase().replace(/[^A-Z0-9]/g
 function devId(){if(!ST.dev||!/^[A-Z2-9]{6}$/.test(ST.dev)){const r=new Uint8Array(6);try{crypto.getRandomValues(r);}catch(e){for(let i=0;i<6;i++)r[i]=Math.random()*256|0;}ST.dev=[...r].map(x=>B32[x&31]).join('');save();}return ST.dev;}
 /* the Google Play build may not sell digital content by UPI, so there Premium is simply free */
 const STORE_PLAY=typeof window!=='undefined'&&window.PQ_STORE==='play';
-function isPremium(){if(STORE_PLAY)return true;return !!(ST.prem&&typeof ST.prem.exp==='number'&&ST.prem.exp>=todayN());}
+/* with accounts switched on, only the server-confirmed plan counts (the old device codes are ignored) */
+const accountsOn=()=>typeof ACC!=='undefined'&&ACC.mode==='on';
+function premExp(){if(accountsOn())return ST.acct&&ST.acct.sub&&typeof ST.acct.sub.exp==='number'?ST.acct.sub.exp:null;return ST.prem&&typeof ST.prem.exp==='number'?ST.prem.exp:null;}
+function isPremium(){if(STORE_PLAY)return true;const e=premExp();return e!==null&&e>=todayN();}
 /* free users get three extra practice sets a day; Premium is unlimited */
 function usePracticeSet(){if(isPremium())return true;const d=todayN();if(!ST.freeSets||ST.freeSets.d!==d)ST.freeSets={d,n:0};if(ST.freeSets.n>=3)return false;ST.freeSets.n++;save();return true;}
 const freeSetsLeft=()=>{const d=todayN();return Math.max(0,3-((ST.freeSets&&ST.freeSets.d===d)?ST.freeSets.n:0));};
@@ -3741,7 +3780,7 @@ function qrSVG(text,px){const Q=qrMatrix(text);if(!Q)return '';const N=Q.length,
 
 /* ---------- the Plans page ---------- */
 let PLANSEL='M';
-function renderPlans(){if(STORE_PLAY){$('#plansBox').innerHTML=`<div class="note good"><b>Everything is unlocked in this Google Play version.</b> NEET and JEE Main practice and mocks, and unlimited practice, are free for now. If paid plans come later, they will be offered through Google Play.</div>`;return;}
+function renderPlans(){if(!STORE_PLAY&&accountsOn()){renderPlansSecure();return;}if(STORE_PLAY){$('#plansBox').innerHTML=`<div class="note good"><b>Everything is unlocked in this Google Play version.</b> NEET and JEE Main practice and mocks, and unlimited practice, are free for now. If paid plans come later, they will be offered through Google Play.</div>`;return;}
  const dev=devId(),prem=isPremium(),p=PAY.plans[PLANSEL];
  $('#plansBox').innerHTML=`${prem?`<div class="note good"><b>Premium is active on this device</b> (${PAY.plans[ST.prem.plan].label}) until ${dayDate(ST.prem.exp)}. Thank you!</div>`:''}
  <div class="plans">
@@ -3772,6 +3811,257 @@ function renderPlans(){if(STORE_PLAY){$('#plansBox').innerHTML=`<div class="note
  $('#payUnlock').addEventListener('click',()=>{const r=readCodeU($('#payCode').value,dev),m=$('#unlockMsg');if(r.err){m.innerHTML=`<span style="color:var(--bad)">${r.err}</span>`;return;}
   ST.prem={plan:r.plan,exp:r.exp,code:makeCode(dev,r.plan,r.exp)};save();toast('Premium unlocked',`${PAY.plans[r.plan].label} until ${dayDate(r.exp)}`);burst(1.4);renderPlans();});}
 HOOKS.plans={show:renderPlans};
+/* ================= PhysiQuest cloud: Google sign-in and the database, over plain HTTPS =================
+   No big libraries: the app still opens instantly and works offline. Firebase's own web addresses are used:
+   Identity Toolkit (sign-in), Secure Token (keeping the sign-in fresh) and Firestore (the database).
+   The database rules decide what each person may read or write; this code just asks. */
+const PQC=(()=>{
+ const W=typeof window!=='undefined'?window:globalThis;
+ const C=Object.assign({authUrl:'https://identitytoolkit.googleapis.com',tokenUrl:'https://securetoken.googleapis.com',fsUrl:'https://firestore.googleapis.com',owner:'mugilstrange@gmail.com'},W.PQ_CLOUD||{});
+ const on=()=>!!(C.apiKey&&C.projectId);
+ const SKEY='physiquest-auth';
+ class CloudErr extends Error{constructor(code,msg){super(msg);this.code=code;this.friendly=true;}}
+ const MSG={offline:'No internet connection. Connect and try again.',busy:'The server is busy. Please try again in a minute.',denied:'You are not allowed to do that.',
+  'signed-out':'Please sign in first.',exists:'That already exists.',expired:'Your sign-in has expired. Please sign in again.'};
+ const err=(code,m)=>new CloudErr(code,m||MSG[code]||'Something went wrong. Please try again.');
+ let S=null;try{S=JSON.parse(localStorage.getItem(SKEY)||'null');if(!S||typeof S!=='object'||!S.uid||!S.refresh)S=null;}catch(e){S=null;}
+ const keep=()=>{try{if(S)localStorage.setItem(SKEY,JSON.stringify(S));else localStorage.removeItem(SKEY);}catch(e){}};
+ const listeners=new Set();const changed=()=>listeners.forEach(f=>{try{f(S);}catch(e){}});
+
+ /* one request, with a time limit; turns every failure into a clear CloudErr */
+ async function req(method,url,body,form,tok){const ctl=typeof AbortController!=='undefined'?new AbortController():null;const t=ctl?setTimeout(()=>ctl.abort(),20000):0;let r;
+  const h={};if(body!==undefined)h['Content-Type']=form?'application/x-www-form-urlencoded':'application/json';if(tok)h.Authorization='Bearer '+tok;
+  try{r=await fetch(url,{method,headers:h,body:body===undefined?undefined:(form?body:JSON.stringify(body)),signal:ctl?ctl.signal:undefined});}catch(e){throw err('offline');}finally{if(t)clearTimeout(t);}
+  let j=null;const txt=await r.text().catch(()=>'');try{j=txt?JSON.parse(txt):null;}catch(e){}
+  if(r.ok)return j;
+  const e0=Array.isArray(j)?j[0]&&j[0].error:j&&j.error;const st=e0&&(e0.status||(e0.message||'').split(' ')[0])||'';
+  if(r.status===404||st==='NOT_FOUND')return null;
+  if(r.status===409||st==='ALREADY_EXISTS'||(st==='FAILED_PRECONDITION'&&/exist/i.test(e0&&e0.message||'')))throw err('exists');
+  if(r.status===403||st==='PERMISSION_DENIED')throw err('denied');
+  if(/TOKEN_EXPIRED|INVALID_REFRESH_TOKEN|USER_NOT_FOUND|USER_DISABLED|INVALID_ID_TOKEN|CREDENTIAL_TOO_OLD/.test(st))throw err('expired');
+  if(r.status===401||st==='UNAUTHENTICATED')throw err('expired');
+  if(r.status>=500||r.status===429)throw err('busy');
+  throw err('bad',(e0&&e0.message)?'The request was refused: '+String(e0.message).slice(0,120):undefined);}
+
+ /* ---------- sign-in ---------- */
+ function setSession(r,old){S={uid:r.localId||r.user_id||(old&&old.uid),email:r.email||(old&&old.email)||'',name:r.displayName||r.fullName||(old&&old.name)||'',
+  idToken:r.idToken||r.id_token,refresh:r.refreshToken||r.refresh_token,exp:Date.now()+((+(r.expiresIn||r.expires_in)||3600)-120)*1000,
+  at:old&&old.at?old.at:Date.now()};keep();}  /* at = when this person last signed in with Google */
+ /* a Google ID token (from the Android sign-in sheet or Google's web button) becomes a PhysiQuest sign-in */
+ async function signInGoogle(googleIdToken){if(!on())throw err('off','Accounts are not switched on yet.');
+  const r=await req('POST',`${C.authUrl}/v1/accounts:signInWithIdp?key=${C.apiKey}`,{postBody:'id_token='+encodeURIComponent(googleIdToken)+'&providerId=google.com',requestUri:'http://localhost',returnSecureToken:true,returnIdpCredential:true});
+  if(!r||!r.idToken)throw err('bad','Google sign-in did not work. Please try again.');setSession(r,null);changed();return S;}
+ let refreshing=null;
+ async function token(){if(!S)throw err('signed-out');if(Date.now()<S.exp&&S.idToken)return S.idToken;
+  if(!refreshing)refreshing=(async()=>{try{const r=await req('POST',`${C.tokenUrl}/v1/token?key=${C.apiKey}`,'grant_type=refresh_token&refresh_token='+encodeURIComponent(S.refresh),true);setSession(r,S);}
+   catch(e){if(e.code==='expired'||e.code==='bad'){S=null;keep();changed();}throw e;}finally{refreshing=null;}})();
+  await refreshing;return S.idToken;}
+ function signOut(){S=null;keep();changed();}
+
+ /* ---------- the database (Firestore REST) ---------- */
+ const root=()=>`projects/${C.projectId}/databases/(default)/documents`;
+ const url=p=>`${C.fsUrl}/v1/${root()}/${p}`;
+ function enc(v){if(v===null||v===undefined)return{nullValue:null};if(typeof v==='boolean')return{booleanValue:v};
+  if(typeof v==='number')return Number.isInteger(v)?{integerValue:String(v)}:{doubleValue:v};if(typeof v==='string')return{stringValue:v};
+  if(v instanceof Date)return{timestampValue:v.toISOString()};if(Array.isArray(v))return{arrayValue:{values:v.map(enc)}};
+  const f={};for(const k in v)f[k]=enc(v[k]);return{mapValue:{fields:f}};}
+ function dec(x){if(!x)return null;if('stringValue'in x)return x.stringValue;if('integerValue'in x)return Number(x.integerValue);if('doubleValue'in x)return x.doubleValue;
+  if('booleanValue'in x)return x.booleanValue;if('nullValue'in x)return null;if('timestampValue'in x)return new Date(x.timestampValue);
+  if('arrayValue'in x)return(x.arrayValue.values||[]).map(dec);if('mapValue'in x)return fields(x.mapValue.fields);return null;}
+ function fields(f){const o={};for(const k in (f||{}))o[k]=dec(f[k]);return o;}
+ const encFields=o=>{const f={};for(const k in o)f[k]=enc(o[k]);return f;};
+ const idOf=name=>String(name||'').split('/').pop();
+ async function get(path){const j=await req('GET',url(path),undefined,false,await token());return j?Object.assign(fields(j.fields),{_id:idOf(j.name)}):null;}
+ /* replace a whole document (create it if missing) */
+ async function set(path,obj){await req('PATCH',url(path),{fields:encFields(obj)},false,await token());}
+ /* create only if it does not exist yet */
+ async function create(path,obj){await req('PATCH',url(path)+'?currentDocument.exists=false',{fields:encFields(obj)},false,await token());}
+ async function del(path){await req('DELETE',url(path),undefined,false,await token());}
+ /* documents in a collection where every field equals the given value */
+ async function query(coll,where,limit){const filters=Object.keys(where).map(k=>({fieldFilter:{field:{fieldPath:k},op:'EQUAL',value:enc(where[k])}}));
+  const sq={from:[{collectionId:coll}],limit:limit||100};if(filters.length===1)sq.where=filters[0];else if(filters.length)sq.where={compositeFilter:{op:'AND',filters}};
+  const j=await req('POST',`${C.fsUrl}/v1/${root()}:runQuery`,{structuredQuery:sq},false,await token());
+  return(j||[]).filter(x=>x.document).map(x=>Object.assign(fields(x.document.fields),{_id:idOf(x.document.name)}));}
+ /* several writes that all happen together, or not at all */
+ async function commit(writes){await req('POST',`${C.fsUrl}/v1/${root()}:commit`,{writes:writes.map(w=>{const o={update:{name:`${root()}/${w.path}`,fields:encFields(w.data)}};
+  if(w.mask)o.updateMask={fieldPaths:w.mask};if(w.mustExist)o.currentDocument={exists:true};return o;})},false,await token());}
+ /* deletes the sign-in account itself (the database records are removed first by the caller) */
+ async function deleteAccount(){const t=await token();await req('POST',`${C.authUrl}/v1/accounts:delete?key=${C.apiKey}`,{idToken:t});signOut();}
+
+ return{C,on,CloudErr,err,user:()=>S,isOwner:()=>!!(S&&S.email&&S.email.toLowerCase()===String(C.owner).toLowerCase()),onChange:f=>listeners.add(f),
+  signInGoogle,signOut,token,get,set,create,del,query,commit,deleteAccount,enc,dec};
+})();
+if(typeof module!=='undefined')module.exports=PQC;
+/* ================= accounts: Google sign-in, a short profile, progress kept in the account =================
+   Switched on when the Firebase settings are built into the app (PQ_CLOUD); until then the app works fully
+   offline exactly as before. Signing in is optional: guests can use everything that is free.
+   Premium with accounts on: the student pays by UPI and sends the transaction ID (UTR). The owner checks it in the
+   bank and approves it on the owner page. Only then does the database hold a Premium record, and the database
+   rules let only the owner's Google account write it, so Premium cannot be faked from the app. */
+const ACC={mode:PQC.on()?'on':'off',info:null,loading:false,err:'',editing:false,ret:'',payList:null,payMsg:null};
+const PRIVACY_URL='https://github.com/mugilstrange-ai/physiquest/blob/main/PRIVACY.md';
+const IN_STATES=['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal','Andaman and Nicobar Islands','Chandigarh','Dadra and Nagar Haveli and Daman and Diu','Delhi','Jammu and Kashmir','Ladakh','Lakshadweep','Puducherry'];
+const CLS_OPTS=[['6','Class 6'],['7','Class 7'],['8','Class 8'],['9','Class 9'],['10','Class 10'],['11','Class 11'],['12','Class 12'],['dropper','Preparing for NEET / JEE (after Class 12)'],['college','College'],['other','Other']];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const onAndroid=()=>!!(window.PQAndroid&&typeof PQAndroid.googleSignIn==='function');
+const mobile10=s=>{const d=String(s||'').replace(/\D/g,'').replace(/^(91|0)(?=[6-9]\d{9}$)/,'');return /^[6-9]\d{9}$/.test(d)?d:null;};
+if(!isObj(ST.acct))ST.acct=null;
+if(ACC.mode==='on')document.documentElement.classList.add('acc-on');
+/* problems worth a bug report are logged; no internet or a student’s typing mistake is not */
+const accFail=(e,where)=>{if(!e||!['offline','input','exists'].includes(e.code))logErr(e,where);return e&&e.friendly?e.message:'Something went wrong. Please try again.';};
+
+/* ---------- Android hands the Google sign-in result back here ---------- */
+const NATIVE={};
+window.pqNative=function(m){try{if(typeof m==='string')m=JSON.parse(m);const f=NATIVE[m.type];if(f){delete NATIVE[m.type];f(m);}}catch(e){logErr(e,'native');}};
+const nativeCall=(type,start)=>new Promise(res=>{NATIVE[type]=res;try{start();}catch(e){delete NATIVE[type];res({error:'Sign-in could not start on this phone.'});}});
+
+/* ---------- getting a Google ID token: Android's sign-in sheet, or Google's own button on the web ---------- */
+let GSI=null;
+function loadGsi(){if(window.google&&google.accounts&&google.accounts.id)return Promise.resolve();if(GSI)return GSI;
+ GSI=new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.async=true;s.onload=()=>res();s.onerror=()=>{GSI=null;rej(PQC.err('offline','Could not reach Google. Check your internet and try again.'));};document.head.appendChild(s);});return GSI;}
+/* draws a Google sign-in button into box; onDone runs after PhysiQuest has signed the person in */
+function googleButton(box,msgId,onDone){box.innerHTML='';
+ if(onAndroid()){const b=H('button',{class:'btn',type:'button'},`<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3zM12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22zM6.4 14a6 6 0 0 1 0-4V7.4H3.1a10 10 0 0 0 0 9.2zM12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.4L6.4 10C7.2 7.7 9.4 6 12 6z"/></svg>Continue with Google`);
+  b.addEventListener('click',()=>run(b,msgId,async()=>{const m=await nativeCall('google',()=>PQAndroid.googleSignIn(PQC.C.webClientId||''));
+   if(!m||!m.idToken){if(m&&m.error)throw PQC.err('bad',m.error);return;}await PQC.signInGoogle(m.idToken);await onDone();}));box.appendChild(b);return;}
+ box.innerHTML='<p class="muted" style="margin:0">Loading Google sign-in…</p>';
+ loadGsi().then(()=>{box.innerHTML='';google.accounts.id.initialize({client_id:PQC.C.webClientId,ux_mode:'popup',auto_select:false,cancel_on_tap_outside:true,
+   callback:r=>{setMsg(msgId,'Signing you in…',true);PQC.signInGoogle(r.credential).then(onDone).then(()=>setMsg(msgId,'')).catch(e=>setMsg(msgId,accFail(e,'sign in')));}});
+  google.accounts.id.renderButton(box,{theme:'filled_black',size:'large',shape:'pill',text:'continue_with',width:Math.max(220,Math.min(320,box.clientWidth||320))});})
+ .catch(e=>{box.innerHTML=`<p class="muted" style="margin:0">${esc(accFail(e,'gsi'))} Google sign-in also works in the PhysiQuest Android app.</p>`;});}
+
+/* ---------- after sign-in: load the account, bring progress across, keep Premium for offline use ---------- */
+async function accRefresh(){const u=PQC.user();if(!u)return;ACC.loading=true;ACC.err='';
+ try{const [profile,prem,prog]=await Promise.all([PQC.get('users/'+u.uid),PQC.get('premium/'+u.uid),PQC.get('progress/'+u.uid)]);
+  ACC.info={profile};ST.acct={uid:u.uid,sub:prem&&typeof prem.exp==='number'?{plan:prem.plan,exp:prem.exp}:null,checked:Date.now()};save();
+  if(prog&&prog.code){try{const added=mergeCode(readCode(prog.code));if(added){updateXP();if(window.renderBadges)renderBadges();}}catch(e){logErr(e,'merge cloud progress');}}
+  accSync(true);}
+ catch(e){ACC.err=accFail(e,'acc refresh');}
+ finally{ACC.loading=false;accRerender();}}
+function accRerender(){accNav();if(['account','plans','neet','jee','neetunit','jeeunit'].includes(curView)){curView=null;safe(route,'route');}}
+function accNav(){const a=$('#navAcc');if(a)a.querySelector('span').textContent=PQC.user()?'My account':'Sign in';}
+PQC.onChange(s=>{if(!s){ACC.info=null;if(ST.acct){ST.acct=null;save();}accRerender();}});
+/* signed in before: quietly refresh the account and Premium once the app has started */
+if(ACC.mode==='on'&&PQC.user())setTimeout(()=>{accNav();accRefresh();},400);
+
+/* ---------- progress saved to the account, so a lost phone does not mean lost progress ---------- */
+let accLast='',accSyncT=0;
+async function accSync(force){const u=PQC.user();if(ACC.mode!=='on'||!u||!ACC.info||!ACC.info.profile)return;const code=progCode();if(!force&&code===accLast)return;
+ try{await PQC.set('progress/'+u.uid,{code,at:new Date()});accLast=code;accSyncT=Date.now();}catch(e){if(e.code!=='offline')logErr(e,'sync');}}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)accSync();});
+setInterval(()=>{if(Date.now()-accSyncT>180000)accSync();},60000);
+
+/* ---------- small helpers for forms ---------- */
+function busyBtn(btn,on,txt){if(!btn)return;if(on){btn.dataset.t=btn.innerHTML;btn.textContent=txt||'Please wait…';btn.disabled=true;}else{if(btn.dataset.t)btn.innerHTML=btn.dataset.t;btn.disabled=false;}}
+function setMsg(id,msg,good){const el=$('#'+id);if(!el)return;el.textContent=msg||'';el.className='acc-msg'+(good?' good':msg?' bad':'');}
+async function run(btn,msgId,fn){setMsg(msgId,'');busyBtn(btn,true);try{await fn();}catch(e){setMsg(msgId,accFail(e,'account'));}finally{busyBtn(btn,false);}}
+
+/* ---------- the account page ---------- */
+function showAccount(){const box=$('#accBox');if(!box)return;const u=PQC.user();
+ if(ACC.mode!=='on'){box.innerHTML=`<div class="panel stack acc-card"><h2 style="margin:0">Accounts are coming soon</h2><p class="muted" style="margin:0">For now your progress is saved on this device only. To move it to another device, use a progress code on the <a href="#badges">Badges</a> page.</p></div>`;return;}
+ if(!u)return accSignInView(box);
+ if(ACC.loading||(!ACC.info&&!ACC.err)){box.innerHTML='<div class="panel acc-card"><p class="muted" style="margin:0">Loading your account…</p></div>';if(!ACC.loading)accRefresh();return;}
+ if(!ACC.info){box.innerHTML=`<div class="panel stack acc-card"><p style="margin:0">${esc(ACC.err)}</p><div class="row"><button class="btn sm" type="button" id="accRetry">Try again</button><button class="btn quiet sm" type="button" id="accOut3">Sign out</button></div></div>`;
+  $('#accRetry').addEventListener('click',()=>{ACC.err='';showAccount();});$('#accOut3').addEventListener('click',accSignOut);return;}
+ if(!ACC.info.profile||ACC.editing)return accProfileView(box,!ACC.info.profile);
+ accSummaryView(box);}
+HOOKS.account={show:showAccount};
+
+function accSignInView(box){
+ box.innerHTML=`<div class="panel stack acc-card"><h2 style="margin:0">Sign in with Google</h2>
+  <p class="muted" style="margin:0">An account keeps your Premium plan and your progress safe, even if you change or lose your phone. You can also keep using PhysiQuest without one.</p>
+  <div id="gBox"></div><p class="acc-msg" id="accMsg" role="alert"></p>
+  <p class="faint" style="font-size:.85rem;margin:0">By continuing you agree to the <a href="${PRIVACY_URL}" target="_blank" rel="noopener">privacy policy</a>. Students under 18 will be asked for a parent’s agreement. PhysiQuest never sees your Google password.</p></div>`;
+ googleButton($('#gBox'),'accMsg',accRefresh);}
+
+function accProfileView(box,isNew){const p=(ACC.info&&ACC.info.profile)||{},u=PQC.user();
+ const opt=(list,cur)=>list.map(([v,l])=>`<option value="${esc(v)}" ${v===cur?'selected':''}>${esc(l)}</option>`).join('');
+ const minorShown=p.adult===false;
+ box.innerHTML=`<form class="panel stack acc-card" id="profForm" novalidate><h2 style="margin:0">${isNew?'Tell us about you':'Edit your details'}</h2>
+  <p class="muted" style="margin:0">We only ask what PhysiQuest needs. We never sell your details or show ads, and you can delete your account at any time.</p>
+  <div class="field"><label for="pfName">Full name</label><input id="pfName" type="text" autocomplete="name" maxlength="60" value="${esc(p.name||u.name||'')}"></div>
+  <div class="field"><label for="pfCls">Class</label><select id="pfCls"><option value="">Choose…</option>${opt(CLS_OPTS,p.cls)}</select></div>
+  <div class="grid2" style="gap:12px"><div class="field"><label for="pfCity">City or town</label><input id="pfCity" type="text" autocomplete="address-level2" maxlength="50" value="${esc(p.city||'')}"></div>
+  <div class="field"><label for="pfState">State</label><select id="pfState"><option value="">Choose…</option>${opt(IN_STATES.map(s=>[s,s]),p.state)}</select></div></div>
+  <div class="field"><label for="pfPhone">Mobile number (optional)</label><div class="ph-row"><span class="ph-cc">+91</span><input id="pfPhone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="14" value="${esc(p.phone||'')}"></div></div>
+  <fieldset class="field acc-age"><legend>Are you 18 or older?</legend><label><input type="radio" name="pfAdult" value="1" ${p.adult===true?'checked':''}> Yes, I am 18 or older</label><label><input type="radio" name="pfAdult" value="0" ${p.adult===false?'checked':''}> No, I am under 18</label></fieldset>
+  <div class="stack acc-parent" id="pfParent" ${minorShown?'':'hidden'}>
+   <div class="note"><b>For your parent or guardian.</b> PhysiQuest stores this student’s name, class, city, state, Google email and the mobile numbers below, to run their account and any Premium plan. We never sell them or show ads. You can ask for the account to be deleted at any time, and PhysiQuest may call or message you to confirm a payment.</div>
+   <div class="field"><label for="pfParName">Parent or guardian’s name</label><input id="pfParName" type="text" maxlength="60" value="${esc(p.parentName||'')}"></div>
+   <div class="field"><label for="pfParPhone">Parent or guardian’s mobile number</label><div class="ph-row"><span class="ph-cc">+91</span><input id="pfParPhone" type="tel" inputmode="numeric" maxlength="14" value="${esc(p.parentPhone||'')}"></div></div>
+   <label class="acc-check"><input type="checkbox" id="pfParOk" ${p.parentOk?'checked':''}> My parent or guardian has read this note and agrees.</label></div>
+  <label class="acc-check"><input type="checkbox" id="pfAgree" ${isNew?'':'checked'}> I agree to the <a href="${PRIVACY_URL}" target="_blank" rel="noopener">privacy policy</a>.</label>
+  <div class="row"><button class="btn" type="submit" id="pfSave">${isNew?'Save and continue':'Save changes'}</button>${isNew?'<button class="btn quiet sm" type="button" id="pfOut">Sign out</button>':'<button class="btn quiet sm" type="button" id="pfCancel">Cancel</button>'}</div><p class="acc-msg" id="pfMsg" role="alert"></p></form>`;
+ $$('input[name=pfAdult]').forEach(r=>r.addEventListener('change',()=>{const c=$('input[name=pfAdult]:checked');$('#pfParent').hidden=!c||c.value==='1';}));
+ const c=$('#pfCancel');if(c)c.addEventListener('click',()=>{ACC.editing=false;showAccount();});const o=$('#pfOut');if(o)o.addEventListener('click',accSignOut);
+ $('#profForm').addEventListener('submit',e=>{e.preventDefault();run($('#pfSave'),'pfMsg',async()=>{
+  const name=$('#pfName').value.replace(/\s+/g,' ').trim(),cls=$('#pfCls').value,city=$('#pfCity').value.replace(/\s+/g,' ').trim(),state=$('#pfState').value,ad=$('input[name=pfAdult]:checked');
+  const phRaw=$('#pfPhone').value.trim(),phone=phRaw?mobile10(phRaw):'';const bad=m=>{throw PQC.err('input',m);};
+  if(name.length<2)bad('Please enter your full name.');if(!cls)bad('Please choose your class.');if(city.length<2)bad('Please enter your city or town.');if(!state)bad('Please choose your state.');
+  if(phone===null)bad('Please enter a 10-digit mobile number, or leave it empty.');if(!ad)bad('Please say whether you are 18 or older.');
+  const data={name,cls,city,state,phone,adult:ad.value==='1',email:u.email,v:1,at:new Date()};
+  if(!data.adult){const pn=$('#pfParName').value.replace(/\s+/g,' ').trim(),pp=mobile10($('#pfParPhone').value);
+   if(pn.length<2)bad('Please enter your parent or guardian’s name.');if(!pp)bad('Please enter your parent or guardian’s 10-digit mobile number.');if(pp===phone)bad('Your parent’s mobile number must be different from yours.');
+   if(!$('#pfParOk').checked)bad('Your parent or guardian needs to read the note and tick the box.');Object.assign(data,{parentName:pn,parentPhone:pp,parentOk:true});}
+  if(!$('#pfAgree').checked)bad('Please tick the box to agree to the privacy policy.');
+  await PQC.set('users/'+u.uid,data);ACC.info.profile=data;ACC.editing=false;toast('Details saved','Welcome, '+name.split(' ')[0]);accSync(true);
+  if(ACC.ret){const r=ACC.ret;ACC.ret='';location.hash='#'+r;}else showAccount();});});}
+
+function accSummaryView(box){const p=ACC.info.profile,u=PQC.user(),s=ST.acct&&ST.acct.sub,prem=isPremium();
+ const fresh=Date.now()-(u.at||0)<4*60e3;
+ box.innerHTML=`<div class="grid2" style="gap:20px;align-items:start"><div class="panel stack acc-card"><span class="eyebrow">Signed in</span><h2 style="margin:0">${esc(p.name)}</h2>
+  <p class="muted" style="margin:0">${esc((CLS_OPTS.find(c=>c[0]===p.cls)||['',''])[1])} · ${esc(p.city)}, ${esc(p.state)}</p><p class="faint" style="margin:0;font-size:.9rem;overflow-wrap:anywhere">Google · ${esc(u.email)}</p>
+  <div class="row"><button class="btn quiet sm" type="button" id="accEdit">Edit details</button><button class="btn quiet sm" type="button" id="accOut">Sign out</button></div></div>
+  <div class="panel stack acc-card"><span class="eyebrow">Your plan</span>${STORE_PLAY?'<h2 style="margin:0">Everything unlocked</h2><p class="muted" style="margin:0">Premium is free in this version.</p>'
+   :prem&&s?`<h2 style="margin:0">Premium</h2><p class="muted" style="margin:0">Until ${dayDate(s.exp)} · ${s.exp-todayN()+1} day${s.exp-todayN()?'s':''} left</p><a class="btn ghost sm" href="#plans" style="align-self:flex-start">Extend</a>`
+   :`<h2 style="margin:0">Free</h2><p class="muted" style="margin:0">${s?'Your Premium ended on '+dayDate(s.exp)+'.':'Unlock NEET, JEE Main and unlimited practice.'}</p><a class="btn sm" href="#plans" style="align-self:flex-start">See plans</a>`}
+  <p class="faint" style="margin:0;font-size:.85rem">Progress is saved to your account automatically${accSyncT?' (last saved '+new Date(accSyncT).toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'})+')':''}.</p></div></div>
+  <details class="panel acc-danger" id="accDelBox" ${ACC.delOpen?'open':''}><summary>Delete my account</summary><div class="stack" style="margin-top:12px"><p class="muted" style="margin:0">This deletes your details, your saved progress and your sign-in from PhysiQuest. Records of payments are kept, as the law requires for accounts. ${prem&&!STORE_PLAY?'<b>Your remaining Premium days will be lost.</b> ':''}Progress on this phone stays.</p>
+   ${fresh?'<button class="btn sm danger" type="button" id="accDel" style="align-self:flex-start">Delete my account</button>':'<p style="margin:0">For safety, first confirm it is you:</p><div id="gBox2"></div>'}<p class="acc-msg" id="delMsg" role="alert"></p></div></details>`;
+ $('#accEdit').addEventListener('click',()=>{ACC.editing=true;showAccount();});$('#accOut').addEventListener('click',accSignOut);
+ $('#accDelBox').addEventListener('toggle',e=>{ACC.delOpen=e.currentTarget.open;});
+ const g2=$('#gBox2');if(g2)googleButton(g2,'delMsg',async()=>{const now=PQC.user();if(!now||now.uid!==u.uid){ACC.delOpen=false;await accRefresh();toast('Signed in','That was a different Google account, so nothing was deleted.');return;}ACC.delOpen=true;showAccount();});
+ const d=$('#accDel');if(d)d.addEventListener('click',()=>{if(!d.dataset.arm){d.dataset.arm=1;d.textContent='Tap again to delete for good';return;}
+  run(d,'delMsg',async()=>{await PQC.del('progress/'+u.uid);await PQC.del('users/'+u.uid);await PQC.deleteAccount();if(onAndroid()&&PQAndroid.signOut)try{PQAndroid.signOut();}catch(e){}
+   ST.acct=null;saveNow();ACC.info=null;ACC.delOpen=false;toast('Account deleted','Your progress on this phone stays.');showAccount();});});}
+async function accSignOut(){await accSync(true);PQC.signOut();if(onAndroid()&&PQAndroid.signOut)try{PQAndroid.signOut();}catch(e){}ST.acct=null;ACC.info=null;ACC.editing=false;ACC.payList=null;saveNow();accNav();showAccount();}
+
+/* ---------- Plans page with accounts: pay by UPI, send the UTR, the owner approves ---------- */
+const refOf=uid=>String(uid||'').replace(/[^A-Za-z0-9]/g,'').slice(0,6).toUpperCase();
+const upiLinkFor=(plan,ref)=>{const p=PAY.plans[plan];return `upi://pay?pa=${encodeURIComponent(PAY.upi)}&pn=${encodeURIComponent(PAY.name)}&am=${p.price}.00&cu=INR&tn=${encodeURIComponent(`PhysiQuest ${p.key} ${ref}`)}`;};
+async function loadPayList(){const u=PQC.user();if(!u)return;try{ACC.payList=(await PQC.query('payments',{uid:u.uid},20)).sort((a,b)=>(b.at||0)-(a.at||0));}catch(e){ACC.payList=ACC.payList||[];accFail(e,'pay list');}
+ if(curView==='plans')renderPlansSecure();}
+function renderPlansSecure(){const box=$('#plansBox');const u=PQC.user(),prem=isPremium(),s=ST.acct&&ST.acct.sub,P=PAY.plans,ready=!!(u&&ACC.info&&ACC.info.profile);
+ const gate=!u?'<a class="btn sm" href="#account" data-ret="plans">Sign in with Google to buy</a>':!ACC.info?'<span class="chip">Loading your account…</span>':!ACC.info.profile?'<a class="btn sm" href="#account" data-ret="plans">Add your details first</a>':'';
+ const card=(k,extra)=>`<div class="plan ${PLANSEL===k&&ready?'best':''}"><span class="eyebrow">${P[k].label}</span><div class="price">₹${P[k].price.toLocaleString('en-IN')}<small> / ${k==='M'?'month':'year'}</small></div><ul>${extra}</ul>${gate||`<button class="btn ${PLANSEL===k?'':'ghost'}" type="button" data-plan="${k}" aria-pressed="${PLANSEL===k}">${PLANSEL===k?'Selected':'Choose '+(k==='M'?'monthly':'yearly')}</button>`}</div>`;
+ const p=P[PLANSEL],ref=u?refOf(u.uid):'';
+ const st=x=>x.status==='approved'?`<span class="chip good">Approved${typeof x.exp==='number'?' · until '+dayDate(x.exp):''}</span>`:x.status==='rejected'?`<span class="chip bad">Not approved</span>`:'<span class="chip c">Waiting for approval</span>';
+ const list=ACC.payList&&ACC.payList.length?`<h3 style="font-size:1rem;margin:6px 0 0">Your payment requests</h3><ul class="act-list pay-list">${ACC.payList.map(x=>`<li><span>${x.at instanceof Date?x.at.toLocaleDateString('en-IN',{day:'numeric',month:'short'}):''} · ₹${esc(x.amount)} · UTR …${esc(String(x.utr).slice(-4))}</span>${st(x)}${x.status==='rejected'&&x.note?`<span class="faint" style="font-size:.85rem">${esc(x.note)}</span>`:''}</li>`).join('')}</ul>`:'';
+ box.innerHTML=`${prem&&s?`<div class="note good"><b>Premium is active</b> until ${dayDate(s.exp)}. A new payment adds its days after that date.</div>`:''}
+ <div class="plans"><div class="plan"><span class="eyebrow">Free</span><div class="price">₹0</div><ul><li>All 52 NCERT chapters, Class 6–12</li><li>Animations, lessons, worked examples and quick checks</li><li>Class mock tests and drills</li><li>3 extra practice sets a day</li></ul>${prem?'':'<span class="chip good">Your current plan</span>'}</div>
+  ${card('M','<li>Everything in Free</li><li>NEET Physics: 20 units, tips and practice</li><li>JEE Main Physics: 20 units, numerical questions</li><li>NEET and JEE mocks marked +4 / −1</li><li>Unlimited new-number practice</li>')}
+  ${card('Y','<li>Everything in monthly</li><li>366 days for about the price of 10 months</li><li>Best for a full school, NEET or JEE year</li>')}</div>
+ ${ready?`<div class="grid2 pay-steps" style="margin-top:20px">
+  <div class="panel stack"><span class="eyebrow">Step 1 · Pay ₹${p.price.toLocaleString('en-IN')} by UPI</span>
+   <a class="btn" href="${upiLinkFor(PLANSEL,ref)}">Pay ₹${p.price.toLocaleString('en-IN')} with GPay / UPI</a>
+   <div class="row" style="align-items:flex-start;gap:18px"><div class="qr">${qrSVG(upiLinkFor(PLANSEL,ref),180)}</div><div class="stack" style="gap:6px;min-width:150px;flex:1"><p class="muted" style="margin:0">On a computer, scan this with any UPI app. Or pay by hand to:</p><p style="margin:0"><b>${PAY.name}</b><br><span style="font-family:var(--f-mono);overflow-wrap:anywhere">${PAY.upi}</span></p><button class="btn quiet sm" type="button" id="upiCopy">Copy UPI ID</button><p class="faint" style="font-size:.85rem;margin:0">Add the note <b>PhysiQuest ${ref}</b> so your payment can be matched to you.</p></div></div>
+   <p class="faint" style="font-size:.85rem;margin:0">PhysiQuest never asks for your UPI PIN, card or bank details.</p></div>
+  <div class="panel stack"><span class="eyebrow">Step 2 · Send the transaction ID</span>
+   <p class="muted" style="margin:0">After paying, copy the 12-digit UPI transaction ID (UTR) from your UPI app and send it here. Your payment is checked against the bank record, then Premium switches on in your account, on every phone you sign in to.</p>
+   <div class="field"><label for="payUtr">UPI transaction ID (UTR)</label><input id="payUtr" type="text" inputmode="numeric" autocomplete="off" maxlength="16" placeholder="For example 412345678901"></div>
+   <div class="row"><button class="btn" type="button" id="paySend">Send for approval</button><button class="btn quiet sm" type="button" id="payCheck">Check for approval</button></div>
+   <p class="acc-msg ${ACC.payMsg&&ACC.payMsg.good?'good':ACC.payMsg?'bad':''}" id="payMsg" role="status">${ACC.payMsg?esc(ACC.payMsg.t):''}</p>${list}</div></div>`:''}`;
+ $$('#plansBox [data-plan]').forEach(b=>b.addEventListener('click',()=>{PLANSEL=b.dataset.plan;renderPlansSecure();}));
+ $$('#plansBox [data-ret]').forEach(a=>a.addEventListener('click',()=>{ACC.ret=a.dataset.ret;}));
+ if(!ready){if(u&&!ACC.info&&!ACC.loading)accRefresh();return;}
+ if(ACC.payList===null){ACC.payList=[];loadPayList();}
+ $('#upiCopy').addEventListener('click',async()=>{let ok=false;try{await navigator.clipboard.writeText(PAY.upi);ok=true;}catch(e){}$('#upiCopy').textContent=ok?'Copied':PAY.upi;});
+ $('#paySend').addEventListener('click',e=>{const btn=e.currentTarget;const utr=$('#payUtr').value.replace(/\s/g,'');
+  if(!/^\d{12}$/.test(utr)){ACC.payMsg={t:'Enter the 12-digit UPI transaction ID (UTR) from your UPI app first.'};renderPlansSecure();$('#payUtr').focus();return;}
+  busyBtn(btn,true,'Sending…');PQC.create('payments/'+utr,{uid:u.uid,plan:PLANSEL,amount:PAY.plans[PLANSEL].price,utr,status:'pending',at:new Date(),name:ACC.info.profile.name,email:u.email})
+   .then(()=>{ACC.payMsg={t:`Sent. Your ₹${p.price.toLocaleString('en-IN')} payment (UTR …${utr.slice(-4)}) is waiting for approval. Premium appears here as soon as it is approved.`,good:true};ST.payments=(ST.payments||[]).concat([{plan:PLANSEL,utr,at:Date.now()}]).slice(-10);save();return loadPayList();})
+   .catch(er=>{ACC.payMsg={t:er.code==='exists'||er.code==='denied'?'This transaction ID has already been sent. If you did not send it, contact '+PAY.to+'.':accFail(er,'pay send')};renderPlansSecure();});});
+ $('#payCheck').addEventListener('click',e=>{busyBtn(e.currentTarget,true,'Checking…');ACC.payMsg=null;Promise.all([accRefresh(),loadPayList()]).then(()=>{if(isPremium())toast('Premium is active','Until '+dayDate(ST.acct.sub.exp));});});}
 /* ================= launch screen ================= 
    The splash and its proverb are plain HTML at the top of the page, so they appear at once.
    It stays for a short moment (long enough to read the proverb), and a tap skips it once the app is ready. */

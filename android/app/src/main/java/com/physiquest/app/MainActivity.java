@@ -2,32 +2,77 @@ package com.physiquest.app;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Insets;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CancellationSignal;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
+import android.webkit.JavascriptInterface;
 import android.webkit.RenderProcessGoneDetail;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.window.OnBackInvokedDispatcher;
 
-/** Shows the PhysiQuest web app, bundled in assets/, full screen and fully offline. */
+import androidx.credentials.ClearCredentialStateRequest;
+import androidx.credentials.Credential;
+import androidx.credentials.CredentialManager;
+import androidx.credentials.CredentialManagerCallback;
+import androidx.credentials.CustomCredential;
+import androidx.credentials.GetCredentialRequest;
+import androidx.credentials.GetCredentialResponse;
+import androidx.credentials.exceptions.ClearCredentialException;
+import androidx.credentials.exceptions.GetCredentialCancellationException;
+import androidx.credentials.exceptions.GetCredentialException;
+import androidx.credentials.exceptions.NoCredentialException;
+import androidx.webkit.WebViewAssetLoader;
+
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption;
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
+
+import org.json.JSONObject;
+
+import java.util.concurrent.Executor;
+
+/**
+ * Shows the PhysiQuest web app, bundled in assets/, full screen.
+ * Lessons, simulations and fonts are all inside the app and work offline. The internet is used only for the
+ * optional account: Google sign-in, saving progress, and Premium.
+ * The page is served from a private https address (WebViewAssetLoader) rather than file://, which is safer and
+ * is what Google sign-in and the database need.
+ */
 public class MainActivity extends Activity {
+
+    private static final String START = "https://appassets.androidplatform.net/assets/index.html";
+    private static final String HOST = "appassets.androidplatform.net";
 
     private WebView web;
     private FrameLayout root;
     private int ink;
+    private WebViewAssetLoader assets;
+    private CredentialManager credentials;
+    private String oldProgress;          // progress saved by versions before 1.8, brought across once
+    private final Handler main = new Handler(Looper.getMainLooper());
+    private final Executor onMain = main::post;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ink = Color.parseColor("#0f0626");
+        assets = new WebViewAssetLoader.Builder()
+                .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
+                .build();
+        credentials = CredentialManager.create(this);
 
         // The app draws edge to edge; this frame keeps the page clear of the
         // status bar, navigation bar, camera cut-out and on-screen keyboard.
@@ -58,26 +103,45 @@ public class MainActivity extends Activity {
 
         if (savedInstanceState != null) {
             web.restoreState(savedInstanceState);
+            return;
+        }
+        SharedPreferences prefs = getSharedPreferences("physiquest", MODE_PRIVATE);
+        if (prefs.getBoolean("progress_moved", false)) {
+            web.loadUrl(START);
         } else {
-            web.loadUrl("file:///android_asset/index.html");
+            readOldProgress(json -> {
+                prefs.edit().putBoolean("progress_moved", true).apply();
+                oldProgress = json;
+                web.loadUrl(START);
+            });
         }
     }
 
-    /** Creates the page view: offline, with outside links, UPI and email handed to the phone's apps. */
+    /** Creates the page view: outside links, UPI and email are handed to the phone's own apps. */
     private WebView makeWebView() {
         WebView w = new WebView(this);
         w.setBackgroundColor(ink);
         WebSettings s = w.getSettings();
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);   // saves XP, badges and progress on the phone
-        s.setAllowFileAccess(true);
+        s.setAllowFileAccess(false);     // the page comes from the private https address, not from files
+        s.setAllowContentAccess(false);
         s.setTextZoom(100);
+        w.addJavascriptInterface(new Bridge(), "PQAndroid");
 
         w.setWebViewClient(new WebViewClient() {
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                return assets.shouldInterceptRequest(request.getUrl());
+            }
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri url = request.getUrl();
                 String scheme = url.getScheme();
+                if ("https".equals(scheme) && HOST.equals(url.getHost())) {
+                    return false;                       // the app's own pages
+                }
                 if ("http".equals(scheme) || "https".equals(scheme)) {
                     // Outside links open in the phone's browser.
                     try {
@@ -94,16 +158,27 @@ public class MainActivity extends Activity {
                     }
                     return true;
                 }
-                if ("mailto".equals(scheme)) {
-                    // Bug reports and topic suggestions open the phone's email app.
+                if ("mailto".equals(scheme) || "tel".equals(scheme)) {
+                    // Bug reports open the phone's email app.
                     try {
-                        startActivity(new Intent(Intent.ACTION_SENDTO, url));
+                        startActivity(new Intent("mailto".equals(scheme) ? Intent.ACTION_SENDTO : Intent.ACTION_DIAL, url));
                     } catch (Exception ignored) {
                     }
                     return true;
                 }
-                return false;
+                return true;                            // anything else stays out of the app
             }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                // Bring across progress saved by an older version of the app, once.
+                if (view == web && oldProgress != null && oldProgress.length() > 2 && !"null".equals(oldProgress)) {
+                    String json = oldProgress;
+                    oldProgress = null;
+                    view.evaluateJavascript("window.pqImport&&window.pqImport(" + json + ")", null);
+                }
+            }
+
             @Override
             public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
                 // The page's renderer was stopped (the phone ran low on memory, or it crashed).
@@ -112,7 +187,7 @@ public class MainActivity extends Activity {
                     root.removeView(view);
                     view.destroy();
                     web = makeWebView();
-                    web.loadUrl("file:///android_asset/index.html");
+                    web.loadUrl(START);
                 }
                 return true;
             }
@@ -121,6 +196,106 @@ public class MainActivity extends Activity {
         root.addView(w, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         return w;
+    }
+
+    /** What the page may ask of the app. Only the app's own page is ever loaded in this view. */
+    private class Bridge {
+        @JavascriptInterface
+        public void googleSignIn(String webClientId) {
+            main.post(() -> startGoogleSignIn(webClientId));
+        }
+
+        @JavascriptInterface
+        public void signOut() {
+            main.post(() -> credentials.clearCredentialStateAsync(new ClearCredentialStateRequest(), new CancellationSignal(), onMain,
+                    new CredentialManagerCallback<Void, ClearCredentialException>() {
+                        @Override public void onResult(Void result) { }
+                        @Override public void onError(ClearCredentialException e) { }
+                    }));
+        }
+    }
+
+    /** Android's own "Sign in with Google" sheet. The page receives a Google ID token, never a password. */
+    private void startGoogleSignIn(String webClientId) {
+        if (webClientId == null || webClientId.isEmpty()) {
+            sendToPage("google", "error", "Accounts are not set up yet.");
+            return;
+        }
+        GetSignInWithGoogleOption option = new GetSignInWithGoogleOption.Builder(webClientId).build();
+        GetCredentialRequest request = new GetCredentialRequest.Builder().addCredentialOption(option).build();
+        credentials.getCredentialAsync(this, request, new CancellationSignal(), onMain,
+                new CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
+                    @Override
+                    public void onResult(GetCredentialResponse response) {
+                        Credential c = response.getCredential();
+                        if (c instanceof CustomCredential
+                                && GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL.equals(c.getType())) {
+                            try {
+                                GoogleIdTokenCredential g = GoogleIdTokenCredential.createFrom(c.getData());
+                                sendToPage("google", "idToken", g.getIdToken());
+                                return;
+                            } catch (Exception ignored) {
+                            }
+                        }
+                        sendToPage("google", "error", "Google sign-in did not work. Please try again.");
+                    }
+
+                    @Override
+                    public void onError(GetCredentialException e) {
+                        if (e instanceof GetCredentialCancellationException) {
+                            sendToPage("google", "cancelled", "1");      // the student closed the sheet
+                        } else if (e instanceof NoCredentialException) {
+                            sendToPage("google", "error", "No Google account is on this phone. Add one in Settings, then try again.");
+                        } else {
+                            sendToPage("google", "error", "Google sign-in did not work. Check your internet and try again.");
+                        }
+                    }
+                });
+    }
+
+    private void sendToPage(String type, String key, String value) {
+        try {
+            JSONObject o = new JSONObject();
+            o.put("type", type);
+            o.put(key, value);
+            if (web != null) {
+                web.evaluateJavascript("window.pqNative&&window.pqNative(" + JSONObject.quote(o.toString()) + ")", null);
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    /** Versions before 1.8 kept progress under file://. Read it once with a hidden view, then hand it over. */
+    private void readOldProgress(java.util.function.Consumer<String> done) {
+        WebView old = new WebView(this);
+        WebSettings s = old.getSettings();
+        s.setJavaScriptEnabled(true);
+        s.setDomStorageEnabled(true);
+        s.setAllowFileAccess(true);
+        final boolean[] finished = {false};
+        Runnable giveUp = () -> {
+            if (finished[0]) return;
+            finished[0] = true;
+            root.removeView(old);
+            old.destroy();
+            done.accept(null);
+        };
+        old.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView v, String url) {
+                v.evaluateJavascript("(function(){try{return localStorage.getItem('physiquest-v3')||''}catch(e){return ''}})()", value -> {
+                    if (finished[0]) return;
+                    finished[0] = true;
+                    root.removeView(v);
+                    v.destroy();
+                    done.accept(value);
+                });
+            }
+        });
+        old.setVisibility(View.INVISIBLE);
+        root.addView(old, new FrameLayout.LayoutParams(1, 1));
+        main.postDelayed(giveUp, 4000);   // never hold the app up for long
+        old.loadUrl("file:///android_asset/blank.html");
     }
 
     private void goBackOrClose() {
