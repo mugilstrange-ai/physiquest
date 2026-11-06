@@ -1,6 +1,6 @@
 # PhysiQuest
 
-NCERT physics from Class 6 to Class 12, sorted class by class and chapter by chapter. Every one of the 52 physics chapters has a live animation, key ideas, formulas with SI units and quick checks, and each class has a mock test that draws a fresh set of questions every time. Every chapter also has a fuller lesson written in simple words, a worked example, and practice questions whose numbers change every time. A NEET Physics section maps all 20 NMC units to the NCERT Class 11 and 12 chapters, with tips, practice and mocks marked +4 / −1. A plans page offers Premium at ₹199 a month or ₹1,999 a year, paid by UPI (Google Pay, PhonePe, Paytm or a QR code). After paying, the student sends the UPI transaction ID and their Device ID, and gets back an unlock code that works on that device only. A feedback page sends bug reports and topic ideas by email. There is also an animated transformer lesson, four live simulations, a circuit-builder project and diagram practice.
+NCERT physics from Class 6 to Class 12, sorted class by class and chapter by chapter. Every one of the 52 physics chapters has a live animation, key ideas, formulas with SI units and quick checks, and each class has a mock test that draws a fresh set of questions every time. Every chapter also has a fuller lesson written in simple words, a worked example, and practice questions whose numbers change every time. A NEET Physics section maps all 20 NMC units to the NCERT Class 11 and 12 chapters, with tips, practice and mocks marked +4 / −1. A JEE Main Physics section covers the 20 NTA syllabus units with exam tips, multi-step problems, Section B questions with typed whole-number answers, and 25-question mocks (20 multiple choice + 5 numerical, +4 / −1). NEET and JEE are for Premium members. The app opens with a short launch screen showing a physics proverb while it gets ready. A plans page offers Premium at ₹199 a month or ₹1,999 a year, paid by UPI (Google Pay, PhonePe, Paytm or a QR code). After paying, the student sends the UPI transaction ID and their Device ID, and gets back an unlock code that works on that device only. A feedback page sends bug reports and topic ideas by email. There is also an animated transformer lesson, four live simulations, a circuit-builder project and diagram practice.
 
 | Class | NCERT book | Physics chapters |
 |---|---|---|
@@ -30,3 +30,8 @@ The lessons are written for PhysiQuest; for the full printed chapters, use the f
 - `android/app/src/main/assets/index.html` is the whole PhysiQuest app in one file.
 - `docs/` is the same app as an installable web app (manifest + service worker) for GitHub Pages.
 - `.github/workflows/android.yml` builds the APK on every push to `main` and publishes it as the `android-latest` release.
+
+
+## Reliability
+
+PhysiQuest has no server: each phone runs its own copy, so any number of students can use it at the same time without slowing it down. Downloads come from GitHub (and Google Play), which serve files worldwide. Inside the app, each section starts on its own, so a fault in one part cannot stop the rest; a page that fails shows a friendly “Try again” panel; damaged or blocked storage is handled without losing the app; and on Android, if the phone stops the page to free memory, the app rebuilds it instead of closing.

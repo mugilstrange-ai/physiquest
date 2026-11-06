@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
+import android.webkit.RenderProcessGoneDetail;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -20,15 +21,17 @@ import android.window.OnBackInvokedDispatcher;
 public class MainActivity extends Activity {
 
     private WebView web;
+    private FrameLayout root;
+    private int ink;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int ink = Color.parseColor("#0f0626");
+        ink = Color.parseColor("#0f0626");
 
         // The app draws edge to edge; this frame keeps the page clear of the
         // status bar, navigation bar, camera cut-out and on-screen keyboard.
-        FrameLayout root = new FrameLayout(this);
+        root = new FrameLayout(this);
         root.setBackgroundColor(ink);
         root.setOnApplyWindowInsetsListener((v, insets) -> {
             int l, t, r, b;
@@ -44,15 +47,33 @@ public class MainActivity extends Activity {
             return insets;
         });
 
-        web = new WebView(this);
-        web.setBackgroundColor(ink);
-        WebSettings s = web.getSettings();
+        web = makeWebView();
+        setContentView(root);
+
+        // Back steps through the sections you visited, then closes the app.
+        if (Build.VERSION.SDK_INT >= 33) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    OnBackInvokedDispatcher.PRIORITY_DEFAULT, this::goBackOrClose);
+        }
+
+        if (savedInstanceState != null) {
+            web.restoreState(savedInstanceState);
+        } else {
+            web.loadUrl("file:///android_asset/index.html");
+        }
+    }
+
+    /** Creates the page view: offline, with outside links, UPI and email handed to the phone's apps. */
+    private WebView makeWebView() {
+        WebView w = new WebView(this);
+        w.setBackgroundColor(ink);
+        WebSettings s = w.getSettings();
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);   // saves XP, badges and progress on the phone
         s.setAllowFileAccess(true);
         s.setTextZoom(100);
 
-        web.setWebViewClient(new WebViewClient() {
+        w.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri url = request.getUrl();
@@ -83,27 +104,27 @@ public class MainActivity extends Activity {
                 }
                 return false;
             }
+            @Override
+            public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
+                // The page's renderer was stopped (the phone ran low on memory, or it crashed).
+                // Build a fresh page instead of letting the whole app close. Progress is saved on the phone.
+                if (view == web) {
+                    root.removeView(view);
+                    view.destroy();
+                    web = makeWebView();
+                    web.loadUrl("file:///android_asset/index.html");
+                }
+                return true;
+            }
         });
 
-        root.addView(web, new FrameLayout.LayoutParams(
+        root.addView(w, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        setContentView(root);
-
-        // Back steps through the sections you visited, then closes the app.
-        if (Build.VERSION.SDK_INT >= 33) {
-            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
-                    OnBackInvokedDispatcher.PRIORITY_DEFAULT, this::goBackOrClose);
-        }
-
-        if (savedInstanceState != null) {
-            web.restoreState(savedInstanceState);
-        } else {
-            web.loadUrl("file:///android_asset/index.html");
-        }
+        return w;
     }
 
     private void goBackOrClose() {
-        if (web.canGoBack()) {
+        if (web != null && web.canGoBack()) {
             web.goBack();
         } else {
             finish();
@@ -119,18 +140,18 @@ public class MainActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        web.saveState(outState);
+        if (web != null) web.saveState(outState);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        web.onPause();
+        if (web != null) web.onPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        web.onResume();
+        if (web != null) web.onResume();
     }
 }
