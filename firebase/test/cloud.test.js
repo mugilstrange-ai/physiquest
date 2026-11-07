@@ -58,9 +58,11 @@ test('full journey: sign in, details, progress, pay, approve, Premium, delete', 
 
   // the sign-in renews itself when its hour is up
   const before = phone.user().idToken;
+  await new Promise((r) => setTimeout(r, 1100));   // tokens carry their issue time in whole seconds
   phone.user().exp = 0;
   const after = await phone.token();
   assert.ok(after && after !== before, 'token refreshed');
+  assert.ok(phone.user().exp > Date.now(), 'new token has a future expiry');
 
   // deleting the account removes the student’s own records and the sign-in
   await phone.del('progress/' + uid); await phone.del('users/' + uid);
