@@ -14,7 +14,7 @@ const owner = () => db('own1', OWNER);
 const now = () => Timestamp.now();
 const adult = (o) => Object.assign({ name: 'Ravi Kumar', cls: '12', city: 'Coimbatore', state: 'Tamil Nadu', phone: '9876543210', adult: true, email: 'stu1@example.com', v: 1, at: now() }, o || {});
 const minor = (o) => Object.assign({ name: 'Anu', cls: '9', city: 'Madurai', state: 'Tamil Nadu', phone: '', adult: false, parentName: 'Lakshmi', parentPhone: '9123456780', parentOk: true, email: 'stu1@example.com', v: 1, at: now() }, o || {});
-const pay = (o) => Object.assign({ uid: 'stu1', plan: 'M', amount: 199, utr: '412345678901', status: 'pending', at: now(), name: 'Ravi Kumar', email: 'stu1@example.com' }, o || {});
+const pay = (o) => Object.assign({ uid: 'stu1', plan: 'M', amount: 99, utr: '412345678901', status: 'pending', at: now(), name: 'Ravi Kumar', email: 'stu1@example.com' }, o || {});
 const seedUser = async (uid) => env.withSecurityRulesDisabled(async c => { await setDoc(doc(c.firestore(), 'users/' + uid), adult({ email: uid + '@example.com' })); });
 
 before(async () => {
@@ -72,13 +72,14 @@ test('a payment request must be honest, pending and the student’s own', async 
   await seedUser('stu1');
   const s = stu();
   await assertFails(setDoc(doc(s, 'payments/412345678901'), pay({ amount: 1 })));                // wrong price
-  await assertFails(setDoc(doc(s, 'payments/412345678901'), pay({ plan: 'Y', amount: 199 })));
+  await assertFails(setDoc(doc(s, 'payments/412345678901'), pay({ plan: 'Y', amount: 99 })));
+  await assertFails(setDoc(doc(s, 'payments/412345678901'), pay({ amount: 199 })));              // old monthly price is no longer accepted
   await assertFails(setDoc(doc(s, 'payments/412345678901'), pay({ status: 'approved' })));       // cannot approve itself
   await assertFails(setDoc(doc(s, 'payments/412345678901'), pay({ uid: 'stu2' })));
   await assertFails(setDoc(doc(s, 'payments/999'), pay({ utr: '999' })));                        // a UTR has 12 digits
   await assertFails(setDoc(doc(s, 'payments/412345678902'), pay()));                             // id must equal the UTR
   await assertSucceeds(setDoc(doc(s, 'payments/412345678901'), pay()));
-  await assertSucceeds(setDoc(doc(s, 'payments/512345678901'), pay({ utr: '512345678901', plan: 'Y', amount: 1999 })));
+  await assertSucceeds(setDoc(doc(s, 'payments/512345678901'), pay({ utr: '512345678901', plan: 'Y', amount: 899 })));
 });
 
 test('a student without saved details cannot send a payment', async () => {

@@ -127,7 +127,7 @@ if(typeof module!=='undefined')module.exports=PQC;
  const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const DAY0=Date.UTC(2026,0,1)/864e5,todayN=()=>Math.floor(Date.now()/864e5)-DAY0;
  const dayDate=n=>new Date((n+DAY0)*864e5).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
- const PLANS={M:{label:'Monthly',price:199,days:31},Y:{label:'Yearly',price:1999,days:366}};
+ const PLANS={M:{label:'Monthly',price:99,days:31},Y:{label:'Yearly',price:899,days:366}};
  const CLS={dropper:'NEET / JEE after Class 12',college:'College',other:'Other'};
  const when=d=>d instanceof Date?d.toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}):'';
  /* a new plan starts the day after the current one ends, or today if none is running */

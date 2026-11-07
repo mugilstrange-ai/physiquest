@@ -64,7 +64,7 @@ service cloud.firestore {
       return d.keys().hasOnly(['uid', 'plan', 'amount', 'utr', 'status', 'at', 'name', 'email'])
         && d.keys().hasAll(['uid', 'plan', 'amount', 'utr', 'status', 'at', 'name', 'email'])
         && d.uid == request.auth.uid && d.utr == utr && d.status == 'pending'
-        && ((d.plan == 'M' && d.amount == 199) || (d.plan == 'Y' && d.amount == 1999))
+        && ((d.plan == 'M' && d.amount == 99) || (d.plan == 'Y' && d.amount == 899))
         && text(d.name, 2, 60) && d.email == request.auth.token.email && d.at is timestamp;
     }
 

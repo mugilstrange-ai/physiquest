@@ -34,8 +34,8 @@ test('full journey: sign in, details, progress, pay, approve, Premium, delete', 
 
   await assert.rejects(phone.set('premium/' + uid, { plan: 'Y', exp: 9999, utr: 'x', at: new Date() }), e => e.code === 'denied', 'a student cannot grant Premium');
 
-  await phone.create('payments/412345678901', { uid, plan: 'M', amount: 199, utr: '412345678901', status: 'pending', at: new Date(), name: 'Ravi Kumar', email: 'ravi@example.com' });
-  await assert.rejects(phone.create('payments/412345678901', { uid, plan: 'M', amount: 199, utr: '412345678901', status: 'pending', at: new Date(), name: 'Ravi Kumar', email: 'ravi@example.com' }), 'same UTR twice');
+  await phone.create('payments/412345678901', { uid, plan: 'M', amount: 99, utr: '412345678901', status: 'pending', at: new Date(), name: 'Ravi Kumar', email: 'ravi@example.com' });
+  await assert.rejects(phone.create('payments/412345678901', { uid, plan: 'M', amount: 99, utr: '412345678901', status: 'pending', at: new Date(), name: 'Ravi Kumar', email: 'ravi@example.com' }), 'same UTR twice');
   const mine = await phone.query('payments', { uid });
   assert.equal(mine.length, 1); assert.equal(mine[0].status, 'pending');
 
