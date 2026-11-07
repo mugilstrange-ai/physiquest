@@ -26,6 +26,8 @@ input,select{font:inherit;color:var(--text);background:var(--ink);border:1px sol
 .kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;font-size:.95rem}.kv dt{color:var(--faint)}.kv dd{margin:0;overflow-wrap:anywhere}
 .utr{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.1rem;letter-spacing:.04em}
 .msg{margin:0;font-size:.92rem}.msg.good{color:var(--good)}.msg.bad{color:var(--bad)}
+.checks{display:grid;gap:6px;border:1px solid var(--line);border-radius:10px;padding:10px 12px}.checks label{display:flex;gap:8px;align-items:flex-start;font-size:.95rem}.checks input{min-height:auto;margin-top:4px}
+.warn{color:var(--gold);font-size:.92rem;margin:0}
 .note{border-left:3px solid var(--gold);padding:8px 12px;background:rgba(255,224,107,.07);border-radius:6px;font-size:.92rem}
 a{color:var(--cyan)}
 </style>
@@ -52,6 +54,7 @@ const PQC=(()=>{
   'signed-out':'Please sign in first.',exists:'That already exists.',expired:'Your sign-in has expired. Please sign in again.'};
  const err=(code,m)=>new CloudErr(code,m||MSG[code]||'Something went wrong. Please try again.');
  let S=null;try{S=JSON.parse(localStorage.getItem(SKEY)||'null');if(!S||typeof S!=='object'||!S.uid||!S.refresh)S=null;}catch(e){S=null;}
+ let ENDED='';  /* why the last sign-in ended: 'expired' (Google needs the person again) or 'out' (they signed out) */
  const keep=()=>{try{if(S)localStorage.setItem(SKEY,JSON.stringify(S));else localStorage.removeItem(SKEY);}catch(e){}};
  const listeners=new Set();const changed=()=>listeners.forEach(f=>{try{f(S);}catch(e){}});
 
@@ -77,13 +80,13 @@ const PQC=(()=>{
  /* a Google ID token (from the Android sign-in sheet or Google's web button) becomes a PhysiQuest sign-in */
  async function signInGoogle(googleIdToken){if(!on())throw err('off','Accounts are not switched on yet.');
   const r=await req('POST',`${C.authUrl}/v1/accounts:signInWithIdp?key=${C.apiKey}`,{postBody:'id_token='+encodeURIComponent(googleIdToken)+'&providerId=google.com',requestUri:'http://localhost',returnSecureToken:true,returnIdpCredential:true});
-  if(!r||!r.idToken)throw err('bad','Google sign-in did not work. Please try again.');setSession(r,null);changed();return S;}
+  if(!r||!r.idToken)throw err('bad','Google sign-in did not work. Please try again.');ENDED='';setSession(r,null);changed();return S;}
  let refreshing=null;
  async function token(){if(!S)throw err('signed-out');if(Date.now()<S.exp&&S.idToken)return S.idToken;
   if(!refreshing)refreshing=(async()=>{try{const r=await req('POST',`${C.tokenUrl}/v1/token?key=${C.apiKey}`,'grant_type=refresh_token&refresh_token='+encodeURIComponent(S.refresh),true);setSession(r,S);}
-   catch(e){if(e.code==='expired'||e.code==='bad'){S=null;keep();changed();}throw e;}finally{refreshing=null;}})();
+   catch(e){if(e.code==='expired'||e.code==='bad'){S=null;ENDED='expired';keep();changed();}throw e;}finally{refreshing=null;}})();
   await refreshing;return S.idToken;}
- function signOut(){S=null;keep();changed();}
+ function signOut(){S=null;ENDED='out';keep();changed();}
 
  /* ---------- the database (Firestore REST) ---------- */
  const root=()=>`projects/${C.projectId}/databases/(default)/documents`;
@@ -115,8 +118,28 @@ const PQC=(()=>{
  /* deletes the sign-in account itself (the database records are removed first by the caller) */
  async function deleteAccount(){const t=await token();await req('POST',`${C.authUrl}/v1/accounts:delete?key=${C.apiKey}`,{idToken:t});signOut();}
 
+ /* ---------- UPI payments: request (student) and decision (owner) ----------
+    The database rules check every step: a student may have at most 3 requests waiting, sent at least a minute apart,
+    and each request is written together with the student's queue counter (payq) in one step, using the server's clock.
+    Premium can only be written in the same step as approving a waiting payment from that student, for that plan. */
+ const MAX_WAITING=3,GAP_MS=60000;
+ const at=f=>({fieldPath:f,setToServerValue:'REQUEST_TIME'});
+ async function requestPayment(p){if(!S)throw err('signed-out');
+  const q=await get('payq/'+S.uid),open=q&&typeof q.open==='number'?q.open:0;
+  if(open>=MAX_WAITING)throw err('limit','You already have 3 payments waiting for approval. Please wait until they are checked.');
+  if(q&&q.at instanceof Date&&Date.now()-q.at.getTime()<GAP_MS)throw err('wait','Please wait a minute before sending another payment.');
+  await req('POST',`${C.fsUrl}/v1/${root()}:commit`,{writes:[
+   {update:{name:`${root()}/payments/${p.utr}`,fields:encFields({uid:S.uid,plan:p.plan,amount:p.amount,utr:p.utr,status:'pending',name:p.name,email:S.email})},updateTransforms:[at('at')],currentDocument:{exists:false}},
+   {update:{name:`${root()}/payq/${S.uid}`,fields:encFields({open:open+1,last:p.utr})},updateTransforms:[at('at')]}]},false,await token());}
+ /* owner only: approve (writes Premium too) or refuse a waiting payment, and free one place in the student's queue */
+ async function decidePayment(x,ok,o){const q=await get('payq/'+x.uid).catch(()=>null);
+  const w=ok?[{path:'premium/'+x.uid,data:{plan:x.plan,exp:o.exp,utr:x.utr,at:new Date()}},{path:'payments/'+x.utr,data:{status:'approved',decidedAt:new Date(),exp:o.exp},mask:['status','decidedAt','exp'],mustExist:true}]
+   :[{path:'payments/'+x.utr,data:{status:'rejected',decidedAt:new Date(),note:o.note},mask:['status','decidedAt','note'],mustExist:true}];
+  if(q&&typeof q.open==='number'&&q.open>0)w.push({path:'payq/'+x.uid,data:{open:q.open-1},mask:['open'],mustExist:true});
+  await commit(w);}
+
  return{C,on,CloudErr,err,user:()=>S,isOwner:()=>!!(S&&S.email&&S.email.toLowerCase()===String(C.owner).toLowerCase()),onChange:f=>listeners.add(f),
-  signInGoogle,signOut,token,get,set,create,del,query,commit,deleteAccount,enc,dec};
+  signInGoogle,signOut,token,get,set,create,del,query,commit,deleteAccount,requestPayment,decidePayment,MAX_WAITING,enc,dec,ended:()=>ENDED};
 })();
 if(typeof module!=='undefined')module.exports=PQC;
 
@@ -141,7 +164,7 @@ if(typeof module!=='undefined')module.exports=PQC;
   if(!PQC.isOwner()){app.innerHTML=`<div class="panel stack"><h2>Not the owner account</h2><p class="muted" style="margin:0">${esc(u.email)} cannot manage PhysiQuest.</p><button class="btn ghost sm" id="out">Sign out</button></div>`;$('#out').onclick=()=>{PQC.signOut();view();};return;}
   app.innerHTML=`<div class="panel row" style="justify-content:space-between"><span class="faint">Signed in as ${esc(u.email)}</span><button class="btn ghost sm" id="out">Sign out</button></div>
    <div class="panel stack"><div class="row" style="justify-content:space-between"><h2>Waiting for approval</h2><button class="btn sm" id="reload">Refresh</button></div>
-    <div class="note">Before approving, open your bank or GPay app and check that this exact UTR shows a payment <b>received</b> for the right amount. Students add the note “PhysiQuest” and a 6-letter reference.</div>
+    <div class="note">Before approving, open your bank or GPay app and check that this exact UTR shows money <b>received</b> for the right amount. Approve stays locked until you tick the three checks on each request. Never approve from a screenshot alone: screenshots are easy to fake.</div>
     <div id="list" class="stack"><p class="muted" style="margin:0">Loading…</p></div></div>
    <div class="panel stack"><h2>Look up</h2><div class="row"><input id="q" placeholder="UTR (12 digits) or student email" style="flex:1;min-width:220px"><button class="btn sm" id="find">Find</button></div><div id="found" class="stack"></div></div>`;
   $('#out').onclick=()=>{PQC.signOut();view();};$('#reload').onclick=load;$('#find').onclick=find;$('#q').onkeydown=e=>{if(e.key==='Enter')find();};load();}
@@ -150,7 +173,7 @@ if(typeof module!=='undefined')module.exports=PQC;
    callback:r=>{$('#m').textContent='Signing in…';PQC.signInGoogle(r.credential).then(view).catch(e=>{$('#m').className='msg bad';$('#m').textContent=e.message;});}});
   google.accounts.id.renderButton($('#g'),{theme:'filled_black',size:'large',shape:'pill',text:'signin_with'});};s.onerror=()=>{$('#m').textContent='Could not reach Google. Check the internet connection.';};document.head.appendChild(s);}
 
- async function studentInfo(uid){const [p,pr]=await Promise.all([PQC.get('users/'+uid).catch(()=>null),PQC.get('premium/'+uid).catch(()=>null)]);return{p,pr};}
+ async function studentInfo(uid){const [p,pr,all]=await Promise.all([PQC.get('users/'+uid).catch(()=>null),PQC.get('premium/'+uid).catch(()=>null),PQC.query('payments',{uid},50).catch(()=>[])]);return{p,pr,all};}
  function profileKV(p){if(!p)return '<dd>No details saved (account deleted?)</dd>';
   return `<dt>Class</dt><dd>${esc(CLS[p.cls]||('Class '+p.cls))}</dd><dt>Place</dt><dd>${esc(p.city)}, ${esc(p.state)}</dd>${p.phone?`<dt>Mobile</dt><dd><a href="tel:+91${esc(p.phone)}">+91 ${esc(p.phone)}</a></dd>`:''}
    ${p.adult?'<dt>Age</dt><dd>18 or older</dd>':`<dt>Age</dt><dd><span class="chip warn">Under 18</span></dd><dt>Parent</dt><dd>${esc(p.parentName)} · <a href="tel:+91${esc(p.parentPhone)}">+91 ${esc(p.parentPhone)}</a> (agreed in the app)</dd>`}`;}
@@ -159,21 +182,25 @@ if(typeof module!=='undefined')module.exports=PQC;
   try{pending=(await PQC.query('payments',{status:'pending'},200)).sort((a,b)=>(a.at||0)-(b.at||0));}catch(e){list.innerHTML=`<p class="msg bad">${esc(e.message)}</p>`;return;}
   if(!pending.length){list.innerHTML='<p class="muted" style="margin:0">Nothing waiting. All done.</p>';return;}
   list.innerHTML='';for(const x of pending){const c=document.createElement('div');c.className='card';list.appendChild(c);
-   c.innerHTML=`<p class="muted" style="margin:0">Loading ${esc(x.name)}…</p>`;studentInfo(x.uid).then(({p,pr})=>payCard(c,x,p,pr));}}
- function payCard(c,x,p,pr){const pl=PLANS[x.plan]||{label:x.plan,price:x.amount,days:0},cur=pr&&typeof pr.exp==='number'?pr.exp:null,exp=newExp(cur,x.plan);
+   c.innerHTML=`<p class="muted" style="margin:0">Loading ${esc(x.name)}…</p>`;studentInfo(x.uid).then(({p,pr,all})=>payCard(c,x,p,pr,all));}}
+ function payCard(c,x,p,pr,all){const pl=PLANS[x.plan]||{label:x.plan,price:x.amount,days:0},cur=pr&&typeof pr.exp==='number'?pr.exp:null,exp=newExp(cur,x.plan);
+  const ref='PhysiQuest '+String(x.uid).replace(/[^A-Za-z0-9]/g,'').slice(0,6).toUpperCase(),others=(all||[]).filter(y=>y.utr!==x.utr),waitN=others.filter(y=>y.status==='pending').length,noN=others.filter(y=>y.status==='rejected').length;
+  const warns=[noN?`${noN} earlier request${noN>1?'s were':' was'} not approved for this student. Check this one extra carefully.`:'',waitN?`This student has ${waitN} other request${waitN>1?'s':''} waiting. Make sure it is not the same payment sent twice.`:'',!p?'This student has no saved details (account deleted?).':''].filter(Boolean);
   c.innerHTML=`<div class="row" style="justify-content:space-between"><b>${esc(x.name)}</b><span class="chip">${esc(pl.label)} · ₹${esc(x.amount)}</span></div>
    <div class="row"><span class="utr">${esc(x.utr)}</span><button class="btn ghost sm" data-copy>Copy UTR</button></div>
-   <dl class="kv"><dt>Sent</dt><dd>${when(x.at)}</dd><dt>Email</dt><dd>${esc(x.email)}</dd><dt>Reference</dt><dd>PhysiQuest ${esc(String(x.uid).replace(/[^A-Za-z0-9]/g,'').slice(0,6).toUpperCase())}</dd>${profileKV(p)}
+   <dl class="kv"><dt>Sent</dt><dd>${when(x.at)}</dd><dt>Email</dt><dd>${esc(x.email)}</dd><dt>Note to expect</dt><dd><b>${esc(ref)}</b></dd>${profileKV(p)}
     <dt>Premium now</dt><dd>${cur!==null&&cur>=todayN()?'Active until '+dayDate(cur):cur!==null?'Ended '+dayDate(cur):'None'}</dd><dt>If approved</dt><dd>Premium until <b>${dayDate(exp)}</b></dd></dl>
-   <div class="row"><button class="btn sm" data-ok>Approve</button><select data-why aria-label="Reason"><option>UTR not found in my bank</option><option>Amount does not match</option><option>Paid to a different account</option><option>Duplicate request</option><option>Other: please contact us</option></select><button class="btn bad sm" data-no>Not approved</button></div><p class="msg" data-m></p>`;
+   ${warns.map(w=>`<p class="warn">⚠ ${esc(w)}</p>`).join('')}
+   <div class="checks"><label><input type="checkbox" data-ck><span>This UTR shows money <b>received</b> in my bank or UPI app (not just a screenshot).</span></label><label><input type="checkbox" data-ck><span>The amount received is exactly <b>₹${esc(x.amount)}</b>.</span></label><label><input type="checkbox" data-ck><span>The payment note shows <b>${esc(ref)}</b>, or I confirmed with the student it is theirs.</span></label></div>
+   <div class="row"><button class="btn sm" data-ok disabled>Approve</button><select data-why aria-label="Reason"><option>UTR not found in my bank</option><option>Amount does not match</option><option>Paid to a different account</option><option>Duplicate request</option><option>Other: please contact us</option></select><button class="btn bad sm" data-no>Not approved</button></div><p class="msg" data-m></p>`;
   const m=c.querySelector('[data-m]'),say=(t,g)=>{m.className='msg '+(g?'good':'bad');m.textContent=t;};
   c.querySelector('[data-copy]').onclick=async e=>{try{await navigator.clipboard.writeText(x.utr);e.target.textContent='Copied';}catch(_){}};
-  c.querySelector('[data-ok]').onclick=async e=>{const b=e.target;if(!b.dataset.arm){b.dataset.arm=1;b.textContent='Tap again: payment checked';return;}b.disabled=true;
-   try{await PQC.commit([{path:'premium/'+x.uid,data:{plan:x.plan,exp,utr:x.utr,at:new Date()}},
-     {path:'payments/'+x.utr,data:{status:'approved',decidedAt:new Date(),exp},mask:['status','decidedAt','exp'],mustExist:true}]);
+  const cks=[...c.querySelectorAll('[data-ck]')],okB=c.querySelector('[data-ok]');cks.forEach(k=>k.onchange=()=>{okB.disabled=!cks.every(z=>z.checked);});
+  okB.onclick=async e=>{const b=e.target;if(!cks.every(z=>z.checked))return;if(!b.dataset.arm){b.dataset.arm=1;b.textContent='Tap again: payment checked';return;}b.disabled=true;
+   try{await PQC.decidePayment(x,true,{exp});
     say('Approved. Premium until '+dayDate(exp)+'.',true);c.querySelectorAll('button,select').forEach(z=>z.disabled=true);}catch(er){b.disabled=false;say(er.message);}};
   c.querySelector('[data-no]').onclick=async e=>{const b=e.target;if(!b.dataset.arm){b.dataset.arm=1;b.textContent='Tap again to refuse';return;}b.disabled=true;const note=c.querySelector('[data-why]').value;
-   try{await PQC.commit([{path:'payments/'+x.utr,data:{status:'rejected',decidedAt:new Date(),note},mask:['status','decidedAt','note'],mustExist:true}]);say('Marked as not approved. The student sees: '+note,true);c.querySelectorAll('button,select').forEach(z=>z.disabled=true);}
+   try{await PQC.decidePayment(x,false,{note});say('Marked as not approved. The student sees: '+note,true);c.querySelectorAll('button,select').forEach(z=>z.disabled=true);}
    catch(er){b.disabled=false;say(er.message);}};}
 
  async function find(){const q=$('#q').value.trim(),out=$('#found');out.innerHTML='<p class="muted" style="margin:0">Searching…</p>';

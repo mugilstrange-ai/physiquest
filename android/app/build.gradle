@@ -10,8 +10,8 @@ android {
         applicationId 'com.physiquest.app'
         minSdk 24
         targetSdk 36
-        versionCode 12
-        versionName '1.9.1'
+        versionCode 13
+        versionName '1.10.0'
     }
 
     // A fixed key for the direct-download APK, so each new version installs over the last one.
