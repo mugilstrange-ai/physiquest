@@ -34,23 +34,27 @@ test('full journey: sign in, details, progress, pay, approve, Premium, delete', 
 
   await assert.rejects(phone.set('premium/' + uid, { plan: 'Y', exp: 9999, utr: 'x', at: new Date() }), e => e.code === 'denied', 'a student cannot grant Premium');
 
-  await phone.create('payments/412345678901', { uid, plan: 'M', amount: 99, utr: '412345678901', status: 'pending', at: new Date(), name: 'Ravi Kumar', email: 'ravi@example.com' });
-  await assert.rejects(phone.create('payments/412345678901', { uid, plan: 'M', amount: 99, utr: '412345678901', status: 'pending', at: new Date(), name: 'Ravi Kumar', email: 'ravi@example.com' }), 'same UTR twice');
+  await phone.requestPayment({ plan: 'M', amount: 99, utr: '412345678901', name: 'Ravi Kumar' });
+  await assert.rejects(phone.requestPayment({ plan: 'M', amount: 99, utr: '512345678901', name: 'Ravi Kumar' }), e => e.code === 'wait', 'a second request within a minute is refused');
+  const q = await phone.get('payq/' + uid);
+  assert.equal(q.open, 1); assert.equal(q.last, '412345678901');
   const mine = await phone.query('payments', { uid });
-  assert.equal(mine.length, 1); assert.equal(mine[0].status, 'pending');
+  assert.equal(mine.length, 1); assert.equal(mine[0].status, 'pending'); assert.ok(mine[0].at instanceof Date, 'server time recorded');
 
   const o = await other.signInGoogle(google('student-2', 'meena@example.com'));
   assert.equal(await other.get('users/' + uid).catch(e => e.code), 'denied', 'another student cannot read Ravi’s details');
   await assert.rejects(other.query('payments', { status: 'pending' }), e => e.code === 'denied');
+  await other.set('users/' + o.uid, { name: 'Meena', cls: '11', city: 'Salem', state: 'Tamil Nadu', phone: '', adult: true, email: 'meena@example.com', v: 1, at: new Date() });
+  await assert.rejects(other.requestPayment({ plan: 'M', amount: 99, utr: '412345678901', name: 'Meena' }), e => e.code === 'exists' || e.code === 'denied', 'the same UTR cannot be used by someone else');
 
   await owner.signInGoogle(google('owner-1', 'mugilstrange@gmail.com'));
   assert.equal(owner.isOwner(), true);
   const pending = await owner.query('payments', { status: 'pending' });
   assert.equal(pending.length, 1); assert.equal(pending[0]._id, '412345678901');
   const exp = today() + 30;
-  await owner.commit([
-    { path: 'premium/' + uid, data: { plan: 'M', exp, utr: '412345678901', at: new Date() } },
-    { path: 'payments/412345678901', data: { status: 'approved', decidedAt: new Date(), exp }, mask: ['status', 'decidedAt', 'exp'], mustExist: true }]);
+  await owner.decidePayment(pending[0], true, { exp });
+  await assert.rejects(owner.decidePayment(pending[0], true, { exp: exp + 30 }), 'the same payment cannot be approved twice');
+  assert.equal((await phone.get('payq/' + uid)).open, 0, 'the queue place is freed');
 
   const prem = await phone.get('premium/' + uid);
   assert.equal(prem.exp, exp); assert.equal(prem.plan, 'M');

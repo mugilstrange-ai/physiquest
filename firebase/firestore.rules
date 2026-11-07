@@ -3,7 +3,9 @@ rules_version = '2';
 // The app talks to the database directly, so these rules ARE the security:
 //  - a student can only read and change their own details, progress and payment requests;
 //  - a payment request is just a request: it cannot switch Premium on;
-//  - only the owner's Google account can approve a payment and grant Premium.
+//  - only the owner's Google account can approve a payment and grant Premium;
+//  - a student may have at most 3 payment requests waiting, sent at least a minute apart;
+//  - Premium can only be written in the same step as approving a waiting payment from that student.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -51,14 +53,38 @@ service cloud.firestore {
 
     // ---------- payment requests: one per UPI transaction ID (UTR), so a UTR can only be used once ----------
     match /payments/{utr} {
+      // written together with the student's queue counter (payq), which limits waiting requests
       allow create: if signedIn() && utr.matches('^[0-9]{12}$')
         && validPayment(request.resource.data, utr)
-        && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && getAfter(/databases/$(database)/documents/payq/$(request.auth.uid)).data.last == utr
+        && getAfter(/databases/$(database)/documents/payq/$(request.auth.uid)).data.at == request.time;
       allow read: if isOwner() || (signedIn() && resource.data.uid == request.auth.uid);
-      allow update: if isOwner()
+      // decided once, by the owner: waiting -> approved or not approved
+      allow update: if isOwner() && resource.data.status == 'pending'
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'decidedAt', 'exp', 'note'])
         && request.resource.data.status in ['approved', 'rejected'];
       allow delete: if false;
+    }
+
+    // ---------- each student's payment queue: how many requests are waiting, and when the last one was sent ----------
+    match /payq/{uid} {
+      allow read: if isMe(uid) || isOwner();
+      allow create: if isMe(uid) && queued(uid, 0);
+      allow update: if (isMe(uid) && queued(uid, resource.data.open)
+                        && request.time > resource.data.at + duration.value(1, 'm'))
+        || (isOwner() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['open'])
+                        && request.resource.data.open == resource.data.open - 1 && request.resource.data.open >= 0);
+      allow delete: if false;
+    }
+    function queued(uid, before) {
+      return request.resource.data.keys().hasOnly(['open', 'last', 'at'])
+        && request.resource.data.keys().hasAll(['open', 'last', 'at'])
+        && request.resource.data.open == before + 1 && request.resource.data.open <= 3
+        && request.resource.data.at == request.time
+        && request.resource.data.last is string && request.resource.data.last.matches('^[0-9]{12}$')
+        && !exists(/databases/$(database)/documents/payments/$(request.resource.data.last))
+        && getAfter(/databases/$(database)/documents/payments/$(request.resource.data.last)).data.uid == uid;
     }
     function validPayment(d, utr) {
       return d.keys().hasOnly(['uid', 'plan', 'amount', 'utr', 'status', 'at', 'name', 'email'])
@@ -71,13 +97,19 @@ service cloud.firestore {
     // ---------- Premium: only the owner can grant, change or remove it ----------
     match /premium/{uid} {
       allow read: if isMe(uid) || isOwner();
+      // only together with approving a waiting payment from this student, for the same plan
       allow create, update: if isOwner()
         && request.resource.data.keys().hasOnly(['plan', 'exp', 'utr', 'at'])
         && request.resource.data.keys().hasAll(['plan', 'exp', 'utr', 'at'])
         && request.resource.data.plan in ['M', 'Y']
         && request.resource.data.exp is int && request.resource.data.exp >= 0 && request.resource.data.exp < 5000
-        && request.resource.data.utr is string && request.resource.data.at is timestamp;
-      allow delete: if isOwner();
+        && request.resource.data.at is timestamp
+        && request.resource.data.utr is string && request.resource.data.utr.matches('^[0-9]{12}$')
+        && get(/databases/$(database)/documents/payments/$(request.resource.data.utr)).data.status == 'pending'
+        && getAfter(/databases/$(database)/documents/payments/$(request.resource.data.utr)).data.status == 'approved'
+        && getAfter(/databases/$(database)/documents/payments/$(request.resource.data.utr)).data.uid == uid
+        && getAfter(/databases/$(database)/documents/payments/$(request.resource.data.utr)).data.plan == request.resource.data.plan;
+      allow delete: if isOwner();   // after a refund
     }
 
     // everything else is closed

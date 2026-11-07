@@ -13,6 +13,7 @@ const PQC=(()=>{
   'signed-out':'Please sign in first.',exists:'That already exists.',expired:'Your sign-in has expired. Please sign in again.'};
  const err=(code,m)=>new CloudErr(code,m||MSG[code]||'Something went wrong. Please try again.');
  let S=null;try{S=JSON.parse(localStorage.getItem(SKEY)||'null');if(!S||typeof S!=='object'||!S.uid||!S.refresh)S=null;}catch(e){S=null;}
+ let ENDED='';  /* why the last sign-in ended: 'expired' (Google needs the person again) or 'out' (they signed out) */
  const keep=()=>{try{if(S)localStorage.setItem(SKEY,JSON.stringify(S));else localStorage.removeItem(SKEY);}catch(e){}};
  const listeners=new Set();const changed=()=>listeners.forEach(f=>{try{f(S);}catch(e){}});
 
@@ -38,13 +39,13 @@ const PQC=(()=>{
  /* a Google ID token (from the Android sign-in sheet or Google's web button) becomes a PhysiQuest sign-in */
  async function signInGoogle(googleIdToken){if(!on())throw err('off','Accounts are not switched on yet.');
   const r=await req('POST',`${C.authUrl}/v1/accounts:signInWithIdp?key=${C.apiKey}`,{postBody:'id_token='+encodeURIComponent(googleIdToken)+'&providerId=google.com',requestUri:'http://localhost',returnSecureToken:true,returnIdpCredential:true});
-  if(!r||!r.idToken)throw err('bad','Google sign-in did not work. Please try again.');setSession(r,null);changed();return S;}
+  if(!r||!r.idToken)throw err('bad','Google sign-in did not work. Please try again.');ENDED='';setSession(r,null);changed();return S;}
  let refreshing=null;
  async function token(){if(!S)throw err('signed-out');if(Date.now()<S.exp&&S.idToken)return S.idToken;
   if(!refreshing)refreshing=(async()=>{try{const r=await req('POST',`${C.tokenUrl}/v1/token?key=${C.apiKey}`,'grant_type=refresh_token&refresh_token='+encodeURIComponent(S.refresh),true);setSession(r,S);}
-   catch(e){if(e.code==='expired'||e.code==='bad'){S=null;keep();changed();}throw e;}finally{refreshing=null;}})();
+   catch(e){if(e.code==='expired'||e.code==='bad'){S=null;ENDED='expired';keep();changed();}throw e;}finally{refreshing=null;}})();
   await refreshing;return S.idToken;}
- function signOut(){S=null;keep();changed();}
+ function signOut(){S=null;ENDED='out';keep();changed();}
 
  /* ---------- the database (Firestore REST) ---------- */
  const root=()=>`projects/${C.projectId}/databases/(default)/documents`;
@@ -76,7 +77,27 @@ const PQC=(()=>{
  /* deletes the sign-in account itself (the database records are removed first by the caller) */
  async function deleteAccount(){const t=await token();await req('POST',`${C.authUrl}/v1/accounts:delete?key=${C.apiKey}`,{idToken:t});signOut();}
 
+ /* ---------- UPI payments: request (student) and decision (owner) ----------
+    The database rules check every step: a student may have at most 3 requests waiting, sent at least a minute apart,
+    and each request is written together with the student's queue counter (payq) in one step, using the server's clock.
+    Premium can only be written in the same step as approving a waiting payment from that student, for that plan. */
+ const MAX_WAITING=3,GAP_MS=60000;
+ const at=f=>({fieldPath:f,setToServerValue:'REQUEST_TIME'});
+ async function requestPayment(p){if(!S)throw err('signed-out');
+  const q=await get('payq/'+S.uid),open=q&&typeof q.open==='number'?q.open:0;
+  if(open>=MAX_WAITING)throw err('limit','You already have 3 payments waiting for approval. Please wait until they are checked.');
+  if(q&&q.at instanceof Date&&Date.now()-q.at.getTime()<GAP_MS)throw err('wait','Please wait a minute before sending another payment.');
+  await req('POST',`${C.fsUrl}/v1/${root()}:commit`,{writes:[
+   {update:{name:`${root()}/payments/${p.utr}`,fields:encFields({uid:S.uid,plan:p.plan,amount:p.amount,utr:p.utr,status:'pending',name:p.name,email:S.email})},updateTransforms:[at('at')],currentDocument:{exists:false}},
+   {update:{name:`${root()}/payq/${S.uid}`,fields:encFields({open:open+1,last:p.utr})},updateTransforms:[at('at')]}]},false,await token());}
+ /* owner only: approve (writes Premium too) or refuse a waiting payment, and free one place in the student's queue */
+ async function decidePayment(x,ok,o){const q=await get('payq/'+x.uid).catch(()=>null);
+  const w=ok?[{path:'premium/'+x.uid,data:{plan:x.plan,exp:o.exp,utr:x.utr,at:new Date()}},{path:'payments/'+x.utr,data:{status:'approved',decidedAt:new Date(),exp:o.exp},mask:['status','decidedAt','exp'],mustExist:true}]
+   :[{path:'payments/'+x.utr,data:{status:'rejected',decidedAt:new Date(),note:o.note},mask:['status','decidedAt','note'],mustExist:true}];
+  if(q&&typeof q.open==='number'&&q.open>0)w.push({path:'payq/'+x.uid,data:{open:q.open-1},mask:['open'],mustExist:true});
+  await commit(w);}
+
  return{C,on,CloudErr,err,user:()=>S,isOwner:()=>!!(S&&S.email&&S.email.toLowerCase()===String(C.owner).toLowerCase()),onChange:f=>listeners.add(f),
-  signInGoogle,signOut,token,get,set,create,del,query,commit,deleteAccount,enc,dec};
+  signInGoogle,signOut,token,get,set,create,del,query,commit,deleteAccount,requestPayment,decidePayment,MAX_WAITING,enc,dec,ended:()=>ENDED};
 })();
 if(typeof module!=='undefined')module.exports=PQC;
