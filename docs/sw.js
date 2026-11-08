@@ -9,6 +9,7 @@ self.addEventListener('activate', e => {
 });
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  if (new URL(e.request.url).pathname.endsWith('.apk')) return;   // app downloads always come fresh from the server
   e.respondWith(
     caches.match(e.request).then(hit => {
       const net = fetch(e.request).then(res => {
