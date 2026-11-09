@@ -205,6 +205,22 @@ public class MainActivity extends Activity {
             main.post(() -> startGoogleSignIn(webClientId));
         }
 
+        /** "Invite friends" and "Share my progress": the phone's own share sheet (WhatsApp, Telegram, SMS…). */
+        @JavascriptInterface
+        public void share(String text) {
+            if (text == null || text.isEmpty()) return;
+            final String t = text.length() > 1000 ? text.substring(0, 1000) : text;
+            main.post(() -> {
+                try {
+                    Intent send = new Intent(Intent.ACTION_SEND);
+                    send.setType("text/plain");
+                    send.putExtra(Intent.EXTRA_TEXT, t);
+                    startActivity(Intent.createChooser(send, "Share PhysiQuest"));
+                } catch (Exception ignored) {
+                }
+            });
+        }
+
         @JavascriptInterface
         public void signOut() {
             main.post(() -> credentials.clearCredentialStateAsync(new ClearCredentialStateRequest(), new CancellationSignal(), onMain,
