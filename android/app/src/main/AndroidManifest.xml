@@ -4,6 +4,12 @@
     <!-- Lessons, simulations and fonts are all inside the app and work offline.
          The internet is used only for the optional account: Google sign-in, saved progress and Premium. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Read aloud: lets the app find the phone's text-to-speech engine (Android 11 and later) -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+    </queries>
 
     <application
         android:allowBackup="true"

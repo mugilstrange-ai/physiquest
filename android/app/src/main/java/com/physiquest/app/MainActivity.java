@@ -1,6 +1,7 @@
 package com.physiquest.app;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -11,6 +12,11 @@ import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.Handler;
 import android.os.Looper;
+import android.print.PrintAttributes;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintManager;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
@@ -42,6 +48,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 
 import org.json.JSONObject;
 
+import java.util.Locale;
 import java.util.concurrent.Executor;
 
 /**
@@ -64,6 +71,9 @@ public class MainActivity extends Activity {
     private String oldProgress;          // progress saved by versions before 1.8, brought across once
     private final Handler main = new Handler(Looper.getMainLooper());
     private final Executor onMain = main::post;
+    private TextToSpeech tts;            // read aloud, started the first time it is used
+    private boolean ttsReady;
+    private String[] ttsPending;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -221,6 +231,33 @@ public class MainActivity extends Activity {
             });
         }
 
+        /** Read aloud: the phone's own text-to-speech voices, in the student's language (falls back to English). */
+        @JavascriptInterface
+        public void speak(String text, String lang, double rate) {
+            if (text == null || text.isEmpty()) return;
+            final String t = text.length() > 60000 ? text.substring(0, 60000) : text;
+            main.post(() -> speakNow(t, lang, (float) rate));
+        }
+
+        @JavascriptInterface
+        public void stopSpeak() {
+            main.post(() -> { if (tts != null) tts.stop(); });
+        }
+
+        /** Save as PDF: the system print screen for this page, which offers "Save as PDF". */
+        @JavascriptInterface
+        public void print(String title) {
+            final String name = title == null || title.isEmpty() ? "PhysiQuest" : (title.length() > 80 ? title.substring(0, 80) : title);
+            main.post(() -> {
+                try {
+                    PrintManager pm = (PrintManager) getSystemService(Context.PRINT_SERVICE);
+                    PrintDocumentAdapter adapter = web.createPrintDocumentAdapter(name);
+                    pm.print(name, adapter, new PrintAttributes.Builder().setMediaSize(PrintAttributes.MediaSize.ISO_A4).build());
+                } catch (Exception ignored) {
+                }
+            });
+        }
+
         @JavascriptInterface
         public void signOut() {
             main.post(() -> credentials.clearCredentialStateAsync(new ClearCredentialStateRequest(), new CancellationSignal(), onMain,
@@ -332,6 +369,69 @@ public class MainActivity extends Activity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (web != null) web.saveState(outState);
+    }
+
+    private void speakNow(String text, String lang, float rate) {
+        if (tts == null) {
+            ttsPending = new String[]{text, lang, String.valueOf(rate)};
+            tts = new TextToSpeech(this, status -> {
+                ttsReady = status == TextToSpeech.SUCCESS;
+                if (!ttsReady) { speakDone("none"); return; }
+                tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                    @Override public void onStart(String id) { }
+                    @Override public void onDone(String id) { if ("pq-end".equals(id)) speakDone(""); }
+                    @Override public void onError(String id) { speakDone(""); }
+                });
+                if (ttsPending != null) { String[] p = ttsPending; ttsPending = null; speakNow(p[0], p[1], Float.parseFloat(p[2])); }
+            });
+            return;
+        }
+        if (!ttsReady) { ttsPending = new String[]{text, lang, String.valueOf(rate)}; return; }
+        String tag = lang == null || lang.isEmpty() ? "en-IN" : lang;
+        boolean ok = hasVoice(tts.setLanguage(Locale.forLanguageTag(tag)));
+        if (!ok && tag.startsWith("en")) ok = hasVoice(tts.setLanguage(Locale.US)) || hasVoice(tts.setLanguage(Locale.ENGLISH));
+        if (!ok) {
+            /* the text is in the student's language: an English voice cannot read it, so say what to install instead */
+            tellPage("window.pqSpeakLang&&window.pqSpeakLang('missing')");
+            return;
+        }
+        tts.setSpeechRate(Math.max(0.5f, Math.min(2f, rate)));
+        /* the engine takes about 4000 characters at a time, so long pages are queued sentence by sentence */
+        java.util.List<String> parts = new java.util.ArrayList<>();
+        StringBuilder cur = new StringBuilder();
+        for (String sentence : text.split("(?<=[.!?\u0964])\\s+")) {
+            String piece = sentence;
+            while (piece.length() > 3000) {
+                if (cur.length() > 0) { parts.add(cur.toString()); cur.setLength(0); }
+                parts.add(piece.substring(0, 3000));
+                piece = piece.substring(3000);
+            }
+            if (cur.length() > 0 && cur.length() + piece.length() + 1 > 3000) { parts.add(cur.toString()); cur.setLength(0); }
+            if (cur.length() > 0) cur.append(' ');
+            cur.append(piece);
+        }
+        if (cur.length() > 0) parts.add(cur.toString());
+        for (int i = 0; i < parts.size(); i++) {
+            tts.speak(parts.get(i), i == 0 ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD, null, i == parts.size() - 1 ? "pq-end" : "pq-" + i);
+        }
+    }
+
+    private static boolean hasVoice(int r) {
+        return r != TextToSpeech.LANG_MISSING_DATA && r != TextToSpeech.LANG_NOT_SUPPORTED;
+    }
+
+    private void speakDone(String why) {
+        tellPage("window.pqSpeakDone&&window.pqSpeakDone(" + JSONObject.quote(why) + ")");
+    }
+
+    private void tellPage(String js) {
+        main.post(() -> { if (web != null) web.evaluateJavascript(js, null); });
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (tts != null) { tts.stop(); tts.shutdown(); tts = null; }
+        super.onDestroy();
     }
 
     @Override
