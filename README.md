@@ -4,6 +4,23 @@ NCERT physics from Class 6 to Class 12, sorted class by class and chapter by cha
 
 Exam papers: full model papers written for PhysiQuest in the NEET (45 questions), JEE Main (20 multiple choice + 5 numerical) and CBSE board patterns for Classes 6 to 12, taken on a timed computer-based-test screen with a question palette and full solutions. The real previous-year papers belong to NTA, CBSE and the IITs, so the app links to their official pages instead of copying them. Every chapter and every NEET and JEE unit has an animated mind map, a flashcard deck with spaced repetition, and one-shot revision videos from YouTube teachers in English, Hindi, Tamil, Telugu and Kannada. Fifteen advanced labs cover Young's double slit, prisms, orbits, PV diagrams, charged particles in fields, Faraday's law, LCR circuits, the photoelectric effect, the Bohr atom, radioactive decay, rectifiers, vectors, graphs, errors and units. Classes 6 to 12 are free; the NEET and JEE papers, mind maps, decks and videos are for Premium members.
 
+## New in version 1.16
+
+The whole app now uses **Deep Royal Violet (#21143D)** as its background and panel colour, with cyan kept for buttons and links (white text on it is about 15:1 contrast).
+
+**Diagram practice** (Diagram studio): all 269 diagrams and graphs on the student's list for Classes 6–12, NEET and JEE — 184 different diagrams once repeats are merged — arranged by class, by Class 12 unit, NEET and JEE, with search. Every diagram can be learnt with numbered labels and key points, labelled from memory and checked, drawn on a sketch pad and compared with a checklist; graphs also have "Pick the right shape". Ray diagrams are computed from the lens and mirror formulas, and field lines and equipotentials are traced numerically.
+
+**Explore** (a new menu item) holds 50 new features:
+
+- Play and compete: challenge arena (speed round, sudden death, boss battle), an online weekly leaderboard (nickname and weekly XP only; needs Google sign-in), estimation (Fermi) challenge.
+- Think like a physicist: mistake detective, concept map of all 52 chapters, two ways to solve, problem strategy coach, predict-then-watch puzzles, misconception buster.
+- Exam skills: derivation studio (12 board derivations), board answer coach, NCERT practicals and viva, right-hand rules trainer, sign-convention drill, circuit solving trainer, instrument reading trainer, significant figures drill, negative-marking calculator.
+- Maths, data and sensors: maths for physics, experiment analyser (best-fit line, slope uncertainty, % error), phone sensor lab.
+- 22 new labs (also in Advanced labs): 3D physics viewer, wave and sound studio, fluid studio, logic gates, capacitor and RC, collisions, rolling race, gas molecules, calorimetry and expansion, galvanometer conversion, relative motion, SHM reference circle, microscope and telescope, EM spectrum, binding energy, lift and apparent weight, pulleys, equipotential mapper, Gauss's law, space explorer and more.
+- Discover and your study space: physics around you, physicists timeline, glossary A–Z, investigatory projects, career guide, doubt notebook, bookmarks and notes on every chapter, weekly goals, display settings (text size, high contrast, reduced motion).
+
+The weekly leaderboard stores `board/{uid}` documents (nickname, weekly XP, week, class, time) under rules in `firebase/firestore.rules`; publish the updated rules in the Firebase console for it to work.
+
 | Class | NCERT book | Physics chapters |
 |---|---|---|
 | 6 | Curiosity | 4 Exploring Magnets · 5 Measurement of Length and Motion · 7 Temperature and its Measurement · 8 A Journey through States of Water · 12 Beyond Earth |

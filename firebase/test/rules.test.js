@@ -216,3 +216,18 @@ test('anything outside these collections is closed', async () => {
   await assertFails(setDoc(doc(stu(), 'config/app'), { open: true }));
   await assertFails(getDoc(doc(owner(), 'secrets/x')));
 });
+
+test('the weekly leaderboard: own row only, nickname and XP only', async () => {
+  const row = (o) => Object.assign({ nick: 'Quantum Tiger', xp: 120, week: 2967, cls: '12', at: now() }, o || {});
+  const anon = env.unauthenticatedContext().firestore();
+  await assertSucceeds(setDoc(doc(stu(), 'board/stu1'), row()));
+  await assertSucceeds(getDocs(query(collection(stu2(), 'board'), where('week', '==', 2967))));   // any signed-in student can read the board
+  await assertFails(getDocs(collection(anon, 'board')));                                            // signed-out visitors cannot
+  await assertFails(setDoc(doc(stu2(), 'board/stu1'), row({ nick: 'Hacker' })));                   // nobody writes another student's row
+  await assertFails(setDoc(doc(stu(), 'board/stu1'), row({ email: 'stu1@example.com' })));        // nothing extra may be stored
+  await assertFails(setDoc(doc(stu(), 'board/stu1'), row({ nick: '<b>x</b>' })));                  // safe nicknames only
+  await assertFails(setDoc(doc(stu(), 'board/stu1'), row({ xp: 999999 })));                        // weekly XP has a ceiling
+  await assertFails(setDoc(doc(stu(), 'board/stu1'), row({ xp: 1.5 })));
+  await assertFails(deleteDoc(doc(stu2(), 'board/stu1')));
+  await assertSucceeds(deleteDoc(doc(owner(), 'board/stu1')));                                     // the owner can remove a row
+});

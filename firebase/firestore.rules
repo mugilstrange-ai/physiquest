@@ -5,7 +5,8 @@ rules_version = '2';
 //  - a payment request is just a request: it cannot switch Premium on;
 //  - only the owner's Google account can approve a payment and grant Premium;
 //  - a student may have at most 3 payment requests waiting, sent at least a minute apart;
-//  - Premium can only be written in the same step as approving a waiting payment from that student.
+//  - Premium can only be written in the same step as approving a waiting payment from that student;
+//  - the weekly leaderboard holds only a nickname and weekly XP, and each student writes only their own row.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -110,6 +111,24 @@ service cloud.firestore {
         && getAfter(/databases/$(database)/documents/payments/$(request.resource.data.utr)).data.uid == uid
         && getAfter(/databases/$(database)/documents/payments/$(request.resource.data.utr)).data.plan == request.resource.data.plan;
       allow delete: if isOwner();   // after a refund
+    }
+
+    // ---------- weekly leaderboard: a nickname and this week's XP, nothing else ----------
+    // any signed-in student may read the board; each student writes only their own row;
+    // the owner may remove a row (for example an unsuitable nickname)
+    match /board/{uid} {
+      allow read: if signedIn();
+      allow create, update: if isMe(uid) && validBoard(request.resource.data);
+      allow delete: if isMe(uid) || isOwner();
+    }
+    function validBoard(d) {
+      return d.keys().hasOnly(['nick', 'xp', 'week', 'cls', 'at'])
+        && d.keys().hasAll(['nick', 'xp', 'week', 'cls', 'at'])
+        && d.nick is string && d.nick.matches('^[A-Za-z0-9 _.-]{2,20}$')
+        && d.xp is int && d.xp >= 0 && d.xp <= 20000
+        && d.week is int && d.week >= 2900 && d.week <= 5000
+        && d.cls is string && d.cls.size() <= 3
+        && d.at is timestamp;
     }
 
     // everything else is closed
