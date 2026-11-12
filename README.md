@@ -4,6 +4,20 @@ NCERT physics from Class 6 to Class 12, sorted class by class and chapter by cha
 
 Exam papers: full model papers written for PhysiQuest in the NEET (45 questions), JEE Main (20 multiple choice + 5 numerical) and CBSE board patterns for Classes 6 to 12, taken on a timed computer-based-test screen with a question palette and full solutions. The real previous-year papers belong to NTA, CBSE and the IITs, so the app links to their official pages instead of copying them. Every chapter and every NEET and JEE unit has an animated mind map, a flashcard deck with spaced repetition, and one-shot revision videos from YouTube teachers in English, Hindi, Tamil, Telugu and Kannada. Fifteen advanced labs cover Young's double slit, prisms, orbits, PV diagrams, charged particles in fields, Faraday's law, LCR circuits, the photoelectric effect, the Bohr atom, radioactive decay, rectifiers, vectors, graphs, errors and units. Classes 6 to 12 are free; the NEET and JEE papers, mind maps, decks and videos are for Premium members.
 
+## New in version 1.18
+
+**Simpler to use.**
+- The menu has 8 main items (Home, Classes 6–12, NEET, JEE, Practice, Labs, Diagrams, Explore). Everything else sits under **More**, grouped into Learn, Practise, Labs and You. Blueprint is no longer in the menu.
+- **Start here** on Home: the student picks their class (or NEET / JEE) once, and Home then always shows one clear next step: the next chapter to learn, a practice set, and mistakes to fix.
+- Each page's tools sit behind one **Tools for this page** button instead of a row of chips. Seven tools that repeated another tool were removed (115 remain).
+- **Labs** opens one page with the Visual lab, Circuit lab and all advanced labs.
+
+**Accuracy.** Every question bank and generator was checked by script (2,383 questions, generators run 40 times each, plus all multiple-choice questions in the new pages): exactly one right answer, no repeated options, an explanation for every right answer. No real errors were found. Every answered question now has a **Report a mistake** link that opens Feedback with the question filled in.
+
+**Speed.** On a simulated budget phone (CPU slowed 6×) the app is ready in about 1.8 s behind the launch screen and pages open in about 0.4–0.7 s.
+
+**Tamil.** Menus, titles, buttons, labels and short texts of all the new pages (Explore, labs, diagrams, Advanced physics, tools) are now in Tamil, including text drawn inside simulations.
+
 ## New in version 1.17
 
 **A light look with Deep Royal Violet.** Pages are now light lavender and white, and Deep Royal Violet (#21143D) is the top bar, the main buttons and the headings, so the colour change is easy to see. Simulations, diagrams and the launch screen stay on dark violet panels so their animations keep their glow. Text and controls were re-checked for contrast.
