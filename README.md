@@ -4,6 +4,20 @@ NCERT physics from Class 6 to Class 12, sorted class by class and chapter by cha
 
 Exam papers: full model papers written for PhysiQuest in the NEET (45 questions), JEE Main (20 multiple choice + 5 numerical) and CBSE board patterns for Classes 6 to 12, taken on a timed computer-based-test screen with a question palette and full solutions. The real previous-year papers belong to NTA, CBSE and the IITs, so the app links to their official pages instead of copying them. Every chapter and every NEET and JEE unit has an animated mind map, a flashcard deck with spaced repetition, and one-shot revision videos from YouTube teachers in English, Hindi, Tamil, Telugu and Kannada. Fifteen advanced labs cover Young's double slit, prisms, orbits, PV diagrams, charged particles in fields, Faraday's law, LCR circuits, the photoelectric effect, the Bohr atom, radioactive decay, rectifiers, vectors, graphs, errors and units. Classes 6 to 12 are free; the NEET and JEE papers, mind maps, decks and videos are for Premium members.
 
+## New in version 1.17
+
+**A light look with Deep Royal Violet.** Pages are now light lavender and white, and Deep Royal Violet (#21143D) is the top bar, the main buttons and the headings, so the colour change is easy to see. Simulations, diagrams and the launch screen stay on dark violet panels so their animations keep their glow. Text and controls were re-checked for contrast.
+
+**Advanced physics** (a new menu item): 20 topics past Class 12, each with a live simulation, a challenge (+10 XP), key ideas, formulas, three questions and links back to the NCERT chapters they build on.
+
+- Beyond Class 12: time dilation, spacetime diagrams, black holes and light bending (rays traced with the Schwarzschild equation), gravitational waves, quantum tunnelling (exact transmission formula), particle in a box, the uncertainty principle, hydrogen orbitals, quarks and the Standard Model, antimatter, chaos (double pendulum), dark matter (rotation curves), the expanding universe, how a laser works.
+- Future technology: qubits and quantum computers (Bloch sphere and gates), fusion power (tokamak and the Lawson criterion), superconductors and maglev, solar sails vs rockets, quantum dots, wireless charging.
+- Tools on the tab: space trip calculator, photon and matter waves, E = mc² calculator, powers of ten, advanced quiz mix.
+
+**New tools on every page.** A "New tools" row under each page header, about five per page (122 in all): today's plan, question of the day and study calendar on Home; chapter status, revision tracker and class formula sheet on Classes; exam countdown, daily 10 (+4/−1), unit checklist and strength map on NEET and JEE; custom tests and chapter drills on Practice; revision timetable and spaced review on Revise; retry and pattern analysis on My mistakes; OMR sheet and pace planner on Exam papers; resistor colour code and electricity bill on Circuit lab; diagram of the day and label sprint on Diagram studio; unit converter, constants, graph plotter, calculator and error propagation on Tools; and more on every other page, including Plans (cost comparison, Premium status, payment help) and Feedback (what's new, questions and answers, bug report helper).
+
+**Payments.** The owner approves a payment with one tap; Premium then switches on in the student's app by itself (no code or OTP), with a toast on whatever page they are on. A ₹ pill in the top bar shows the owner how many payments are waiting. Students get renewal reminders 7, 3 and 1 days before Premium ends, and the Plans page explains where to find the UTR and what to do if a UPI app declines a payment. The chat preview of the app points students to the app or website to buy, since it can't sign in.
+
 ## New in version 1.16
 
 The whole app now uses **Deep Royal Violet (#21143D)** as its background and panel colour, with cyan kept for buttons and links (white text on it is about 15:1 contrast).
