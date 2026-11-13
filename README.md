@@ -4,6 +4,12 @@ NCERT physics from Class 6 to Class 12, sorted class by class and chapter by cha
 
 Exam papers: full model papers written for PhysiQuest in the NEET (45 questions), JEE Main (20 multiple choice + 5 numerical) and CBSE board patterns for Classes 6 to 12, taken on a timed computer-based-test screen with a question palette and full solutions. The real previous-year papers belong to NTA, CBSE and the IITs, so the app links to their official pages instead of copying them. Every chapter and every NEET and JEE unit has an animated mind map, a flashcard deck with spaced repetition, and one-shot revision videos from YouTube teachers in English, Hindi, Tamil, Telugu and Kannada. Fifteen advanced labs cover Young's double slit, prisms, orbits, PV diagrams, charged particles in fields, Faraday's law, LCR circuits, the photoelectric effect, the Bohr atom, radioactive decay, rectifiers, vectors, graphs, errors and units. Classes 6 to 12 are free; the NEET and JEE papers, mind maps, decks and videos are for Premium members.
 
+## New in version 1.18.1
+
+**Full Tamil.** All the longer texts of the new pages are now in Tamil too: explanations in Explore, every lab and Advanced physics topic, the tool help texts, the Transformer lesson, NEET tips, Plans and Feedback (about 6,100 texts and 360 number patterns, roughly 33,000 words). On the main pages about 99.5% of the words now show in Tamil; the question banks are still in English.
+
+**Fix.** The Plans page no longer fails if a Premium record arrives without a plan name.
+
 ## New in version 1.18
 
 **Simpler to use.**
