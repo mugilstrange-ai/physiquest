@@ -444,5 +444,17 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         if (web != null) web.onResume();
+        // Back from Razorpay's payment page in the browser: check at once whether Premium has switched on.
+        tellPage("window.PQPAY&&PQPAY.resume&&PQPAY.resume()");
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        Uri data = intent.getData();
+        if (data != null && "physiquest".equals(data.getScheme())) {
+            tellPage("window.PQPAY&&PQPAY.resume&&PQPAY.resume()");
+        }
     }
 }

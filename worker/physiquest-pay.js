@@ -369,14 +369,19 @@ async function done(req, c) {
   const id = q.get('razorpay_payment_link_id') || '', ref = q.get('razorpay_payment_link_reference_id') || '';
   const status = q.get('razorpay_payment_link_status') || '', pid = q.get('razorpay_payment_id') || '';
   const sig = q.get('razorpay_signature') || '';
+  // Razorpay's signature proves these details came from Razorpay, so the page may show them.
   const valid = !!(id && pid && c.keySecret) && same(sig, await hmacHex(c.keySecret, `${id}|${ref}|${status}|${pid}`));
-  if (!valid || status !== 'paid') return page(c, app, { kind: 'fail', pid: valid ? pid : '' });
+  if (!/^plink_[A-Za-z0-9]{6,40}$/.test(id)) return page(c, app, { kind: 'fail' });
+  // Whatever the address says, the payment's real state comes from Razorpay itself, asked with the secret key.
+  let link;
+  try { link = await razorpay(c, 'GET', '/payment_links/' + id); }
+  catch (e) { return page(c, app, valid && status === 'paid' ? { kind: 'wait', pid } : { kind: 'fail' }); }
+  if (link.status !== 'paid') return page(c, app, { kind: 'fail', pid: valid ? pid : '' });
   try {
-    const link = await razorpay(c, 'GET', '/payment_links/' + id);
-    const r = await activate(c, link, { id: pid }, 'return');
-    return page(c, app, { kind: 'ok', pid: r.pid || pid, plan: r.plan, exp: r.exp, amount: r.amount });
+    const r = await activate(c, link, valid ? { id: pid } : null, 'return');
+    return page(c, app, valid ? { kind: 'ok', pid: r.pid || pid, plan: r.plan, exp: r.exp, amount: r.amount } : { kind: 'ok' });
   } catch (e) {
-    return page(c, app, { kind: 'wait', pid });
+    return page(c, app, { kind: 'wait', pid: valid ? pid : '' });
   }
 }
 
@@ -386,8 +391,10 @@ function page(c, app, o) {
     : c.site + '#plans';
   const P = PLANS[o.plan] || {};
   const head = { ok: ['Payment successful', 'Premium is on'], wait: ['Payment received', 'Premium is switching on'], fail: ['Payment not completed', 'No Premium was added'] }[o.kind];
-  const body = o.kind === 'ok'
+  const body = o.kind === 'ok' && typeof o.exp === 'number'
     ? `<p class="big">Premium is on until <b>${esc(dayDate(o.exp))}</b>.</p><p>${esc(P.label || 'Premium')} · ₹${esc(o.amount)}. NEET and JEE practice and mocks are open now, on every phone you sign in to.</p>`
+    : o.kind === 'ok'
+      ? `<p class="big">Premium is on.</p><p>Go back to PhysiQuest to see it. NEET and JEE practice and mocks are open now, on every phone you sign in to.</p>`
     : o.kind === 'wait'
       ? `<p class="big">Your money reached us safely.</p><p>Premium usually switches on within a minute. Go back to PhysiQuest and it will appear by itself. If it is not on after 15 minutes, write to us with the payment ID below.</p>`
       : `<p class="big">The payment did not go through.</p><p>If money left your account, the bank returns it automatically, usually within 5–7 days. Go back to PhysiQuest and tap Upgrade to try again.</p>`;
@@ -411,7 +418,7 @@ small{color:var(--mute)}
 ${o.pid ? `<p>Payment ID</p><div class="id">${esc(o.pid)}</div>` : ''}
 <a class="btn" href="${esc(back)}">${app ? 'Back to the PhysiQuest app' : 'Back to PhysiQuest'}</a>
 ${app ? '<small>If the button does nothing, just switch back to the PhysiQuest app. Premium shows there by itself.</small>' : ''}
-${o.kind !== 'ok' && c.support ? `<small>Questions about a payment? Write to ${esc(c.support)} with the payment ID.</small>` : ''}
+${o.kind !== 'ok' && c.support ? `<small>Questions about a payment? Write to ${esc(c.support)}${o.pid ? ' with the payment ID above' : ''}.</small>` : ''}
 <small>Payments are handled by Razorpay. PhysiQuest never sees your card, UPI PIN or bank details.</small>
 </main>${!app && o.kind === 'ok' ? `<script>setTimeout(function(){location.href=${JSON.stringify(back)}},4000)</script>` : ''}</body></html>`;
   return new Response(html, { status: 200, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'referrer-policy': 'no-referrer' } });
@@ -444,3 +451,4 @@ export default {
   },
 };
 function withHeaders(res, h) { for (const k in h) res.headers.set(k, h[k]); return res; }
+export { page as resultPage };   // for tests and previews

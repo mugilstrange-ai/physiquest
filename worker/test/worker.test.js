@@ -306,14 +306,24 @@ test('the return page checks Razorpay\'s signature, then shows Premium switched 
   assert.ok(html.includes('https://mugilstrange-ai.github.io/physiquest/#plans'));
 });
 
-test('a forged return page link shows "not completed" and adds nothing', async () => {
-  const id = await newLink('stu1'); const pid = payLink(id); const l = links.get(id);
-  const q = `?src=web&razorpay_payment_id=${pid}&razorpay_payment_link_id=${id}&razorpay_payment_link_reference_id=${l.reference_id}&razorpay_payment_link_status=paid&razorpay_signature=${'0'.repeat(64)}`;
-  const r = await req('GET', '/done' + q);
-  assert.match(await r.text(), /Payment not completed/);
+test('the return page trusts Razorpay, not the address: forged or unpaid links add nothing', async () => {
+  const id = await newLink('stu1'); const l = links.get(id);
+  // the link is not paid, but the address claims it is, with a made-up signature
+  let q = `?src=web&razorpay_payment_id=pay_FAKE&razorpay_payment_link_id=${id}&razorpay_payment_link_reference_id=${l.reference_id}&razorpay_payment_link_status=paid&razorpay_signature=${'0'.repeat(64)}`;
+  let html = await (await req('GET', '/done' + q)).text();
+  assert.match(html, /Payment not completed/);
   assert.equal(fsDocs.has('premium/stu1'), false);
-  const r2 = await req('GET', '/done?src=web&razorpay_payment_link_status=failed');
-  assert.match(await r2.text(), /Payment not completed/);
+  html = await (await req('GET', '/done?src=web&razorpay_payment_link_status=failed')).text();
+  assert.match(html, /Payment not completed/);
+  html = await (await req('GET', '/done?src=web&razorpay_payment_link_id=plink_NOSUCHLINK&razorpay_payment_link_status=paid')).text();
+  assert.match(html, /Payment not completed/);
+  // a really paid link with a bad signature: Premium still switches on (Razorpay says it is paid), but no details are shown
+  const pid = payLink(id);
+  q = `?src=web&razorpay_payment_id=${pid}&razorpay_payment_link_id=${id}&razorpay_payment_link_reference_id=${l.reference_id}&razorpay_payment_link_status=paid&razorpay_signature=bad`;
+  html = await (await req('GET', '/done' + q)).text();
+  assert.match(html, /Payment successful/);
+  assert.ok(!html.includes(pid) && !html.includes('until <b>'));
+  assert.equal(field('premium/stu1', 'exp'), today() + 30);
 });
 
 test('the return page escapes everything it shows', async () => {

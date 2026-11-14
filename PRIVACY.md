@@ -1,6 +1,6 @@
 # PhysiQuest privacy policy
 
-_Last updated: 6 November 2026 (version 1.8)_
+_Last updated: 14 November 2026 (app version 1.19)_
 
 PhysiQuest is a physics-learning app made by Mugilan. Contact for questions, corrections and complaints: **mugilstrange@gmail.com**.
 
@@ -36,16 +36,20 @@ These records are stored with **Google Firebase**, a service run by Google. Each
 
 ## Payments
 
-Premium is paid for by UPI. Tapping **Pay with GPay / UPI** opens your own UPI app (such as Google Pay, PhonePe or Paytm). The payment happens entirely inside that app: PhysiQuest never sees your UPI PIN, card or bank details.
+Premium is paid for on **Razorpay's** secure payment page, by UPI, card, net banking or wallet. Razorpay (Razorpay Software Private Limited) handles the payment: PhysiQuest never sees your card, UPI PIN or bank details. What you enter on Razorpay's page is covered by Razorpay's own privacy policy: <https://razorpay.com/privacy/>.
 
-After paying, you send the 12-digit UPI transaction ID (UTR) from the app. We store the UTR, the plan, the amount, the date, your name and your email so the payment can be checked against the bank record and Premium switched on. If you are under 18, we may call or message your parent or guardian to confirm the payment.
+When you tap **Upgrade**, the PhysiQuest payment server (which runs on Cloudflare and keeps no records itself) checks your sign-in and gives Razorpay your name, your email address, the plan and the price, so Razorpay can show them on the payment page and send you its receipt.
+
+When Razorpay confirms the payment, we store the payment ID, the plan, the amount, how you paid (for example UPI or card), the date and your email with your account, and switch Premium on. Nothing is charged again automatically.
+
+Payment requests sent with a UPI transaction ID (UTR) in earlier versions of the app are kept as they were: the UTR, the plan, the amount, the date, your name and your email.
 
 The Google Play version of PhysiQuest does not take payments.
 
 ## Your choices and rights
 
 - **See and correct** your details: **Account → Edit details**.
-- **Delete your account**: **Account → Delete my account**. This removes your details, your saved progress and your sign-in. Records of payments (UTR, plan, amount, date, name and email) are kept for as long as the law requires for financial records, and are used for nothing else.
+- **Delete your account**: **Account → Delete my account**. This removes your details, your saved progress and your sign-in. Records of payments (payment ID or UTR, plan, amount, date, name and email) are kept for as long as the law requires for financial records, and are used for nothing else.
 - **Withdraw a parent's agreement**: the parent or the student can delete the account in the app, or email us and we will delete it.
 - Any other request or complaint: email **mugilstrange@gmail.com**. We aim to reply within 7 days.
 
