@@ -258,6 +258,20 @@ public class MainActivity extends Activity {
             });
         }
 
+        /** "Pay with a UPI app": opens GPay, PhonePe, Paytm, BHIM… with the amount filled in, then tells the page how it went. */
+        @JavascriptInterface
+        public void payUpi(String link) {
+            if (link == null || !link.startsWith("upi://pay?") || link.length() > 600) return;
+            main.post(() -> {
+                try {
+                    Intent pay = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+                    startActivityForResult(Intent.createChooser(pay, "Pay with"), REQ_UPI);
+                } catch (Exception e) {
+                    upiDone("noapp", "");
+                }
+            });
+        }
+
         @JavascriptInterface
         public void signOut() {
             main.post(() -> credentials.clearCredentialStateAsync(new ClearCredentialStateRequest(), new CancellationSignal(), onMain,
@@ -422,6 +436,41 @@ public class MainActivity extends Activity {
 
     private void speakDone(String why) {
         tellPage("window.pqSpeakDone&&window.pqSpeakDone(" + JSONObject.quote(why) + ")");
+    }
+
+    private static final int REQ_UPI = 4107;
+
+    /** The UPI app's answer, for example "txnId=…&responseCode=00&Status=SUCCESS&txnRef=…". Some apps send nothing. */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != REQ_UPI) return;
+        String raw = "";
+        if (data != null) {
+            String r = data.getStringExtra("response");
+            if (r == null && data.getExtras() != null) {
+                Object o = data.getExtras().get("Status");
+                if (o != null) r = "Status=" + o;
+            }
+            if (r != null) raw = r;
+        }
+        String low = raw.toLowerCase(Locale.ROOT);
+        String status = low.contains("status=success") ? "success"
+                : (low.contains("status=submitted") || low.contains("status=pending")) ? "submitted"
+                : (low.contains("status=failure") || low.contains("status=failed")) ? "failure"
+                : raw.isEmpty() ? "unknown" : "other";
+        upiDone(status, raw);
+    }
+
+    private void upiDone(String status, String raw) {
+        try {
+            JSONObject m = new JSONObject();
+            m.put("type", "upi");
+            m.put("status", status);
+            m.put("raw", raw.length() > 300 ? raw.substring(0, 300) : raw);
+            tellPage("window.pqNative&&window.pqNative(" + JSONObject.quote(m.toString()) + ")");
+        } catch (Exception ignored) {
+        }
     }
 
     private void tellPage(String js) {
