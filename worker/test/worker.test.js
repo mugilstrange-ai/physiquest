@@ -2,7 +2,7 @@
    Run with: node --test worker/test/  (Node 20 or later, no packages needed) */
 import { test, before, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
-import worker, { hmacHex, today, PLANS, dayDate } from '../physiquest-pay.js';
+import worker, { hmacHex, today, PLANS, dayDate } from './load.js';
 
 const PROJECT = 'physiquest-1e225';
 const te = new TextEncoder();

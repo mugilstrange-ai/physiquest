@@ -28,14 +28,14 @@
  */
 
 /* Prices live here, in paise (₹99 = 9900). Change them here and in the app together. */
-export const PLANS = {
+const PLANS = {
   M: { label: 'Premium · monthly', amount: 9900, days: 31 },
   Y: { label: 'Premium · yearly', amount: 89900, days: 366 },
 };
 /* Premium end dates are day numbers counted from 1 January 2026 (UTC), the same as in the app. */
-export const DAY0 = Date.UTC(2026, 0, 1) / 864e5;
-export const today = (now = Date.now()) => Math.floor(now / 864e5) - DAY0;
-export const newEnd = (cur, plan, now = Date.now()) => {
+const DAY0 = Date.UTC(2026, 0, 1) / 864e5;
+const today = (now = Date.now()) => Math.floor(now / 864e5) - DAY0;
+const newEnd = (cur, plan, now = Date.now()) => {
   const start = Math.max(today(now), typeof cur === 'number' ? cur + 1 : 0);
   return { start, exp: start + PLANS[plan].days - 1 };
 };
@@ -53,7 +53,7 @@ const DEFAULTS = {
 };
 
 /* ---------------------------------------------------------------- settings */
-export function settings(env = {}) {
+function settings(env = {}) {
   let sa = null, saErr = '';
   if (env.FIREBASE_SERVICE_ACCOUNT) {
     try {
@@ -88,7 +88,7 @@ const ready = c => ({
 });
 
 /* ---------------------------------------------------------------- small helpers */
-export class HttpErr extends Error {
+class HttpErr extends Error {
   constructor(status, message, code) { super(message); this.status = status; this.code = code || ''; }
 }
 class Conflict extends Error {}
@@ -104,7 +104,7 @@ const unb64url = s => {
   const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u;
 };
 const hex = buf => [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2, '0')).join('');
-export async function hmacHex(secret, msg) {
+async function hmacHex(secret, msg) {
   const k = await crypto.subtle.importKey('raw', te.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   return hex(await crypto.subtle.sign('HMAC', k, te.encode(msg)));
 }
@@ -117,7 +117,7 @@ function same(a, b) {
 }
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-export const dayDate = n => { const d = new Date((n + DAY0) * 864e5); return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
+const dayDate = n => { const d = new Date((n + DAY0) * 864e5); return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
 
 /* ---------------------------------------------------------------- the student's sign-in (Firebase ID token) */
 let KEYS = { list: null, until: 0 };
@@ -130,7 +130,7 @@ async function googleKeys(c, fresh) {
   KEYS = { list: Array.isArray(j.keys) ? j.keys : [], until: Date.now() + Math.min(m ? +m[1] : 3600, 21600) * 1000 };
   return KEYS.list;
 }
-export async function verifyIdToken(token, c) {
+async function verifyIdToken(token, c) {
   const bad = why => new HttpErr(401, 'Please sign in again.', why);
   const parts = String(token || '').split('.');
   if (parts.length !== 3) throw bad('format');
@@ -209,7 +209,7 @@ async function fs(c, method, path, body) {
   if (r.status === 403 || r.status === 401) throw new HttpErr(503, 'The Firebase service account cannot write to the database.', 'setup');
   throw new HttpErr(503, 'The database is busy. Try again in a minute.');
 }
-export async function getDoc(c, path) {
+async function getDoc(c, path) {
   const j = await fs(c, 'GET', `${docRoot(c)}/${path}`);
   if (!j) return null;
   const data = {}; for (const k in (j.fields || {})) data[k] = dec(j.fields[k]);
@@ -243,7 +243,7 @@ const notesOf = link => (link && link.notes && !Array.isArray(link.notes) ? link
 
 /* Writes Premium for a fully paid PhysiQuest payment link. Safe to call many times for the same link:
    the payment record gwpay/{link id} is created together with Premium, and only if it does not exist yet. */
-export async function activate(c, link, payment, via) {
+async function activate(c, link, payment, via) {
   const n = notesOf(link), plan = n.plan, uid = n.uid, P = PLANS[plan];
   if (n.app !== 'physiquest' || !P || typeof uid !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(uid)) throw new HttpErr(422, 'This is not a PhysiQuest payment.', 'foreign');
   const amount = +link.amount;
@@ -451,4 +451,3 @@ export default {
   },
 };
 function withHeaders(res, h) { for (const k in h) res.headers.set(k, h[k]); return res; }
-export { page as resultPage };   // for tests and previews

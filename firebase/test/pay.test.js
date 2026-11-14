@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebase/rules-unit-testing';
 import { doc, setDoc, getDoc, collection, query, where, getDocs, Timestamp, writeBatch } from 'firebase/firestore';
-import { activate, settings, today, getDoc as serverGet } from '../../worker/physiquest-pay.js';
+import { activate, settings, today, getDoc as serverGet } from '../../worker/test/load.js';
 
 let env;
 const OWNER = 'mugilstrange@gmail.com';
