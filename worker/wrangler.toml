@@ -1,0 +1,5 @@
+# Only needed if you deploy from a computer with `npx wrangler deploy`.
+# Pasting physiquest-pay.js into the Cloudflare dashboard editor works just as well.
+name = "physiquest-pay"
+main = "physiquest-pay.js"
+compatibility_date = "2025-09-01"

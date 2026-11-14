@@ -6,7 +6,9 @@ rules_version = '2';
 //  - only the owner's Google account can approve a payment and grant Premium;
 //  - a student may have at most 3 payment requests waiting, sent at least a minute apart;
 //  - Premium can only be written in the same step as approving a waiting payment from that student;
-//  - the weekly leaderboard holds only a nickname and weekly XP, and each student writes only their own row.
+//  - the weekly leaderboard holds only a nickname and weekly XP, and each student writes only their own row;
+//  - Razorpay payments are written only by the PhysiQuest payment server (worker/physiquest-pay.js), which uses
+//    Google admin access after Razorpay confirms the payment; the app can only read a student's own records.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -129,6 +131,20 @@ service cloud.firestore {
         && d.week is int && d.week >= 2900 && d.week <= 5000
         && d.cls is string && d.cls.size() <= 3
         && d.at is timestamp;
+    }
+
+    // ---------- Razorpay payments (gwpay/{payment link id}): written only by the payment server ----------
+    // The server writes the payment record and Premium together, with admin access that these rules do not limit.
+    // Students read only their own records (for receipts); nobody can write them from the app.
+    match /gwpay/{id} {
+      allow read: if isOwner() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow write: if false;
+    }
+
+    // ---------- app settings, such as the payment server's address: read by the app, changed only in the Firebase console ----------
+    match /config/{id} {
+      allow read: if true;
+      allow write: if false;
     }
 
     // everything else is closed

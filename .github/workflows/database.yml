@@ -1,9 +1,9 @@
-name: Test database rules
+name: Test database rules and payments
 
 on:
   push:
     branches: [main, 'test/**']
-    paths: ['firebase/**', '.github/workflows/database.yml']
+    paths: ['firebase/**', 'worker/**', '.github/workflows/database.yml']
   workflow_dispatch:
 
 jobs:
@@ -18,6 +18,8 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - name: Payment Worker tests (fake Razorpay, Google and Firestore)
+        run: node --test worker/test/*.test.js
       - name: Install test packages
         working-directory: firebase
         run: npm install --no-audit --no-fund

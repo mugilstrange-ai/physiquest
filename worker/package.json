@@ -1,0 +1,7 @@
+{
+  "name": "physiquest-pay",
+  "private": true,
+  "description": "PhysiQuest payments: Razorpay checkout that switches Premium on by itself. Runs on Cloudflare Workers.",
+  "type": "module",
+  "scripts": { "test": "node --test test/*.test.js" }
+}
