@@ -10756,7 +10756,8 @@ async function gwCheck(ask){const c=ST.chk;if(!c||GW.checking||!signedIn())retur
   toast('Premium is on!',typeof exp==='number'?'Premium lasts until '+dayDate(exp)+'. NEET and JEE are open.':'NEET and JEE are open.');try{burst(1.6);}catch(e){}
   try{renewBanner();}catch(e){}if(curView==='plans'){renderPlansSecure();gwShow('.gw-done');}return true;}
  finally{GW.checking=false;}}
-const gwShow=sel=>{try{const el=$('#plansBox '+sel);if(el)el.scrollIntoView({block:'start',behavior:RM?'auto':'smooth'});}catch(e){}};
+const gwShow=sel=>{try{const el=$('#plansBox '+sel);if(!el)return;const bar=$('.top'),off=(bar?bar.getBoundingClientRect().height:0)+12;   /* clear the sticky top bar */
+ window.scrollTo({top:Math.max(0,el.getBoundingClientRect().top+window.scrollY-off),behavior:RM?'auto':'smooth'});}catch(e){}};
 /* back from the payment page: the app comes to the front again, or the website loads again */
 function gwResume(){if(ST.chk&&signedIn()){gwCheck(true);gwWatch();}}
 
