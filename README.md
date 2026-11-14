@@ -12,7 +12,7 @@ Behind it is a small payment server ([`worker/physiquest-pay.js`](worker/physiqu
 
 Also: after paying in the phone's browser, **Back to the PhysiQuest app** returns to the open app, which checks for Premium straight away. All new text is in Tamil too.
 
-**Fix.** The website's offline cache no longer keeps copies of database answers, so Premium, progress and the leaderboard always show the latest state.
+**Fix.** The website's offline cache no longer keeps copies of database answers, so Premium, progress and the leaderboard always show the latest state, and the website now opens its newest version straight away when online (the saved copy is used only offline). Google sign-in on the website works again: the website's address is now registered with Google.
 
 ## New in version 1.18.1
 
