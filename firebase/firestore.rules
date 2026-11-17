@@ -8,7 +8,8 @@ rules_version = '2';
 //  - Premium can only be written in the same step as approving a waiting payment from that student;
 //  - the weekly leaderboard holds only a nickname and weekly XP, and each student writes only their own row;
 //  - Razorpay payments are written only by the PhysiQuest payment server (worker/physiquest-pay.js), which uses
-//    Google admin access after Razorpay confirms the payment; the app can only read a student's own records.
+//    Google admin access after Razorpay confirms the payment; the app can only read a student's own records;
+//  - Premium content (prem/...) can be downloaded only while the student's Premium is active.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -145,6 +146,30 @@ service cloud.firestore {
     match /config/{id} {
       allow read: if true;
       allow write: if false;
+    }
+
+    // ---------- Premium content (NEET and JEE tips, Premium papers, the JEE question maker) ----------
+    // It is not inside the app: the app downloads it from here, and only while the student's Premium is active.
+    // Premium "exp" is a day number counted from 1 January 2026 (UTC), the same count the app and payment server use.
+    // Each pack is written once by the owner and never changed; a new app version brings a new pack.
+    function dayNow() { return math.floor((request.time.toMillis() - 1767225600000) / 86400000); }
+    function premiumActive() {
+      return signedIn()
+        && get(/databases/$(database)/documents/premium/$(request.auth.uid)).data.exp >= dayNow();
+    }
+    match /prem/{id} {
+      allow get: if isOwner() || premiumActive();
+      allow list: if false;
+      allow create: if isOwner() && id.matches('^[0-9a-f]{16}-[0-9]{1,2}$')
+        && request.resource.data.keys().hasOnly(['d', 'i', 'n', 'h', 'at'])
+        && request.resource.data.keys().hasAll(['d', 'i', 'n', 'h', 'at'])
+        && request.resource.data.d is string && request.resource.data.d.size() > 0
+        && request.resource.data.i is int && request.resource.data.n is int
+        && request.resource.data.i >= 1 && request.resource.data.i <= request.resource.data.n
+        && request.resource.data.h is string && request.resource.data.h.matches('^[0-9a-f]{64}$')
+        && request.resource.data.at is timestamp;
+      allow update: if false;
+      allow delete: if isOwner();
     }
 
     // everything else is closed
