@@ -1,6 +1,7 @@
 package com.physiquest.app;
 
 import android.app.Activity;
+import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -272,6 +273,20 @@ public class MainActivity extends Activity {
             });
         }
 
+        /** App lock: "ok" when the phone has a screen lock (fingerprint, face, PIN, pattern or password) that can confirm its owner. */
+        @JavascriptInterface
+        public String lockState() {
+            KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+            return km != null && km.isDeviceSecure() ? "ok" : "none";
+        }
+
+        /** App lock: the phone's own check. The page gets {type:'lock', ok, why}; PhysiQuest never sees the fingerprint or the PIN. */
+        @JavascriptInterface
+        public void unlock(String title) {
+            final String t = title == null || title.isEmpty() ? "Unlock PhysiQuest" : (title.length() > 60 ? title.substring(0, 60) : title);
+            main.post(() -> startUnlock(t));
+        }
+
         @JavascriptInterface
         public void signOut() {
             main.post(() -> credentials.clearCredentialStateAsync(new ClearCredentialStateRequest(), new CancellationSignal(), onMain,
@@ -439,11 +454,53 @@ public class MainActivity extends Activity {
     }
 
     private static final int REQ_UPI = 4107;
+    private static final int REQ_LOCK = 4108;
+
+    /** Fingerprint or face, with the phone's PIN, pattern or password as the fallback (Android 10 and later);
+     *  on older phones, the phone's own lock-screen check. */
+    @SuppressWarnings("deprecation")
+    private void startUnlock(String title) {
+        KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+        if (km == null || !km.isDeviceSecure()) { lockDone(false, "nolock"); return; }
+        if (Build.VERSION.SDK_INT >= 29) {
+            try {
+                android.hardware.biometrics.BiometricPrompt.Builder b = new android.hardware.biometrics.BiometricPrompt.Builder(this).setTitle(title);
+                if (Build.VERSION.SDK_INT >= 30) {
+                    b.setAllowedAuthenticators(android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_WEAK
+                            | android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL);
+                } else {
+                    b.setDeviceCredentialAllowed(true);
+                }
+                b.build().authenticate(new CancellationSignal(), onMain, new android.hardware.biometrics.BiometricPrompt.AuthenticationCallback() {
+                    @Override public void onAuthenticationSucceeded(android.hardware.biometrics.BiometricPrompt.AuthenticationResult r) { lockDone(true, ""); }
+                    @Override public void onAuthenticationError(int code, CharSequence msg) { lockDone(false, "cancel"); }
+                });
+                return;
+            } catch (Exception ignored) {
+                // fall back to the lock-screen check below
+            }
+        }
+        Intent i = km.createConfirmDeviceCredentialIntent(title, "Use your phone's fingerprint, PIN, pattern or password.");
+        if (i == null) { lockDone(false, "nolock"); return; }
+        try { startActivityForResult(i, REQ_LOCK); } catch (Exception e) { lockDone(false, "error"); }
+    }
+
+    private void lockDone(boolean ok, String why) {
+        try {
+            JSONObject m = new JSONObject();
+            m.put("type", "lock");
+            m.put("ok", ok);
+            m.put("why", why);
+            tellPage("window.pqNative&&window.pqNative(" + JSONObject.quote(m.toString()) + ")");
+        } catch (Exception ignored) {
+        }
+    }
 
     /** The UPI app's answer, for example "txnId=…&responseCode=00&Status=SUCCESS&txnRef=…". Some apps send nothing. */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQ_LOCK) { lockDone(resultCode == RESULT_OK, resultCode == RESULT_OK ? "" : "cancel"); return; }
         if (requestCode != REQ_UPI) return;
         String raw = "";
         if (data != null) {

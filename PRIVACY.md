@@ -7,7 +7,7 @@ PhysiQuest is a physics-learning app made by Mugilan. Contact for questions, cor
 ## In short
 
 - You can use PhysiQuest **without an account**. Then nothing about you leaves your device.
-- If you **sign in with Google**, we keep only what is needed to run your account, save your progress and manage Premium.
+- If you **sign in** (with Google, or with your email and a PhysiQuest password), we keep only what is needed to run your account, save your progress and manage Premium.
 - We **never sell** your details, show **no ads**, use **no analytics or tracking**, and build **no profiles** of students.
 - You can **edit or delete** your account at any time inside the app.
 
@@ -18,6 +18,10 @@ Your progress (XP, badges, finished activities and mock-test scores) is saved on
 ## With an account (optional)
 
 When you choose **Continue with Google**, Google tells PhysiQuest your name, your email address and a Google account ID. PhysiQuest never sees your Google password.
+
+When you choose **Continue with email**, you give your email address and make a password just for PhysiQuest. The password is checked and stored only by Google Firebase's sign-in service (PhysiQuest never sees it). Firebase sends you an email to confirm your address, and an email to choose a new password if you forget it.
+
+**App lock** (optional) never leaves your device: on Android your phone checks your fingerprint, face or screen lock; on the website a 4-digit PIN is kept in your browser only as a scrambled (hashed) value.
 
 You then fill in a short form. We store:
 
