@@ -6,7 +6,7 @@ Exam papers: full model papers written for PhysiQuest in the NEET (45 questions)
 
 ## New in version 1.19.2
 
-**Premium content is kept on the server.** The NEET and JEE unit tips, the NEET and JEE model papers and the JEE question maker are no longer inside the app or the website. After a student's Premium is confirmed, the app downloads them once from the database (the rules open them only while that student's Premium is active), checks them against a fingerprint built into the app, and keeps them on the phone so they work offline. When Premium ends, the copy on the phone is removed. **The old unlock codes are retired**: Premium now comes only from the student's account. The Google Play version follows the account too, and has no buy button until Play payments are set up.
+**Premium content is kept on the server.** The NEET and JEE unit tips, the NEET and JEE model papers and the JEE question maker are no longer inside the app or the website. After a student's Premium is confirmed, the app downloads them once from the database (the rules open them only while that student's Premium is active), checks them against a fingerprint built into the app, and keeps them on the phone so they work offline. When Premium ends, the copy on the phone is removed. **The old unlock codes are retired**: Premium now comes only from the student's account. The Google Play version follows the account too, and has no buy button until Play payments are set up. The owner uploads each version's Premium content once, from the owner page (**Owner** at the top of the app): it shows whether this version's content is uploaded and takes the `physiquest-premium-<id>.json` file made by the build.
 
 ## New in version 1.19.1
 

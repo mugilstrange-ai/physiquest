@@ -10767,6 +10767,26 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 if(typeof accRefresh==='function'){const _ar=accRefresh;accRefresh=async function(){const r=await _ar.apply(this,arguments);
   try{if(isPremium())packFetch();else if(!ACC.err)packForget();}catch(e){}return r;};}
 window.addEventListener('hashchange',()=>{if(packNeeded()&&isPremium())packFetch();});
+/* the owner page: upload the Premium content for this version (needed once for each version whose Premium content changed).
+   The file comes from the build (physiquest-premium-<id>.json); it is checked against PREM_PACK before anything is written. */
+async function packOwnerPanel(){const box=$('#ownerBox');if(!box||!PACK.meta||typeof PQC==='undefined'||!PQC.user()||!PQC.isOwner())return;
+ const id=PACK.meta.id,n=PACK.meta.n;let el=$('#packOwn');if(!el){el=H('div',{id:'packOwn',class:'panel stack'});box.prepend(el);}
+ const head=`<h2 style="margin:0">Premium content · version ${APP_VER}</h2>`;el.innerHTML=head+'<p class="muted" style="margin:0">Checking…</p>';
+ let have=0;try{for(let i=1;i<=n;i++){if(await PQC.get(`prem/${id}-${i}`))have++;}}catch(e){el.innerHTML=head+`<p class="note bad" style="margin:0">Could not check: ${e&&e.code==='offline'?'no internet connection':'the database refused'}.</p>`;return;}
+ if(have===n){el.innerHTML=head+`<p class="note good" style="margin:0"><b>Uploaded.</b> Premium students can download it. <span class="faint" data-noi18n>(${id})</span></p>`;return;}
+ el.innerHTML=head+`<p class="note warn" style="margin:0"><b>Not uploaded yet.</b> Until you upload it, Premium students see “Premium content is being updated”.</p>
+  <p class="muted" style="margin:0">Choose the file <b data-noi18n>physiquest-premium-${id}.json</b> that Claude sent you.</p>
+  <input type="file" id="packFile" accept=".json,application/json"><p id="packMsg" role="status" style="margin:0"></p>`;
+ const msg=(t,bad)=>{const m=$('#packMsg');if(m)m.innerHTML=`<span style="color:var(--${bad?'bad':'good'})">${t}</span>`;};
+ $('#packFile').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;msg('Checking the file…');
+  let P=null;try{P=JSON.parse(await f.text());}catch(_){}
+  if(!P||!P.meta||!Array.isArray(P.parts)){msg('That is not a PhysiQuest Premium file.',1);return;}
+  if(P.meta.id!==id||P.meta.h!==PACK.meta.h||P.parts.length!==n){msg(`This file is for a different version (${String(P.meta.id).slice(0,16)}). This version needs ${id}.`,1);return;}
+  if(await packHash(P.parts.join(''))!==PACK.meta.h){msg('This file is damaged. Download it again.',1);return;}
+  try{for(let i=1;i<=n;i++){try{await PQC.create(`prem/${id}-${i}`,{d:P.parts[i-1],i,n,h:PACK.meta.h,at:new Date()});}catch(x){if(!x||x.code!=='exists')throw x;}}
+   msg('Uploaded. Premium students can download it now.');PACK.state='';packFetch(true);setTimeout(packOwnerPanel,1200);}
+  catch(x){msg(x&&x.code==='offline'?'No internet connection. Try again.':x&&x.code==='denied'?'The database refused. Publish the latest database rules, then try again.':'Upload failed. Try again.',1);}});}
+if(typeof ownerView==='function'){const _ov=ownerView;ownerView=function(){const r=_ov.apply(this,arguments);try{packOwnerPanel();}catch(e){logErr(e,'owner pack panel');}return r;};}
 /* the Plans page in the Google Play version: Premium follows the account; no buying inside this version yet */
 function plansPlay(){const box=$('#plansBox');if(!box)return;const u=accountsOn()&&PQC.user(),prem=isPremium(),e=premExp();
  const lead=$('#v-plans .v-head p');if(lead)lead.textContent='Premium follows your PhysiQuest account.';
