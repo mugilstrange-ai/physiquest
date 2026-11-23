@@ -7161,6 +7161,7 @@ html.rm .ns-sw,html.rm .ns-sw::after{transition:none}
 .xu-meta{line-height:1.5}
 .xu-act{gap:8px}
 .xu-sum{margin:0}
+.xu-fb .xu-l{display:block;margin-top:6px}
 
 /* ===== 1.21 night mode ===== */
 html.night{--ink:#21143d;--night:#291a4a;--night-2:#322158;--cyan:#19e0dc;--text:#f4efff;--muted:#bfb2e4;--faint:#a397d4;--line:rgba(191,178,228,.16);--line-2:rgba(191,178,228,.28);--grid:rgba(120,90,210,.10);--amber:#ffb547;--magenta:#ff5bd6;--lime:#a8f060;--coral:#ff8a65;--gold:#ffe06b;--good:#4cf0a0;--warn:#ffd25e;--bad:#ff6b8a;--good-bg:rgba(76,240,160,.10);--bad-bg:rgba(255,107,138,.10);--warn-bg:rgba(255,210,94,.10);--on-cyan:#21143d;--pri:#19e0dc;--blue:#7aa8ff;--violet:#c39bff;--cy-rgb:25,224,220;--dk-rgb:33,20,61;--mu-rgb:191,178,228;--wh-rgb:255,255,255;--go-rgb:255,224,107;--gd-rgb:76,240,160;--bd-rgb:255,107,138;--li-rgb:168,240,96;--am-rgb:255,181,71;--wa-rgb:255,210,94;--co-rgb:255,138,101;color-scheme:dark;--ink:#160c2c;--night:#231644;--night-2:#2c1d52}
@@ -10719,10 +10720,11 @@ function xuPanel(ex){const mock=$(ex==='neet'?'#neetMock':'#jeeMock');if(!mock)r
    if(S.done){b.disabled=true;if(o.ok)b.classList.add('right');else if(S.pick===i)b.classList.add('wrong');}
    b.addEventListener('click',()=>{if(!S.done)xuMark(ex,!!o.ok,i);});L.appendChild(b);});ans.appendChild(L);}
  if(S.done){const right=q.type==='int'?null:q.options.find(o=>o.ok),mine=q.type==='int'||S.pick===undefined?null:q.options[S.pick];
-  if(S.pick===undefined)fb.innerHTML=`<div class="fb"><b>Skipped: 0 marks.</b> <span>Answer:</span> <b data-noi18n>${q.type==='int'?q.answer+(q.unitTxt?' '+q.unitTxt:''):right.t}</b>. ${q.type==='int'?q.explain:right.why}</div>`;
-  else if(S.ok)fb.innerHTML=`<div class="fb good"><b>Right: +4.</b>${q.type==='int'?q.explain:right.why}</div>`;
+  const L=t=>`<span class="xu-l">${t}</span>`,ansL=L(`<span>Answer:</span> <strong data-noi18n>${q.type==='int'?q.answer+(q.unitTxt?' '+q.unitTxt:''):right.t}</strong>`),why=L(q.type==='int'?q.explain:right.why);
+  if(S.pick===undefined)fb.innerHTML=`<div class="fb"><b>Skipped: 0 marks.</b>${ansL}${why}</div>`;
+  else if(S.ok)fb.innerHTML=`<div class="fb good"><b>Right: +4.</b>${why}</div>`;
   else{let msg='';if(q.type==='int'){for(const m of q.mistakes){if(Math.abs(S.pick-m.v)<=Math.abs(m.v)*0.03+0.5){msg=m.why;break;}}}else msg=mine.why;
-   fb.innerHTML=`<div class="fb bad"><b>Not right: −1.</b>${msg?msg+' ':''}<span>Answer:</span> <b data-noi18n>${q.type==='int'?q.answer+(q.unitTxt?' '+q.unitTxt:''):right.t}</b>. ${q.type==='int'?q.explain:right.why}</div>`;}
+   fb.innerHTML=`<div class="fb bad"><b>Not right: −1.</b>${msg?L(msg):''}${ansL}${why}</div>`;}
   const nx=box.querySelector('[data-xu-next]');nx.addEventListener('click',()=>xuNext(ex));setTimeout(()=>{try{nx.focus({preventScroll:true});}catch(e){}},0);}
  else{box.querySelector('[data-xu-skip]').addEventListener('click',()=>{S.s++;S.n++;S.done=true;S.pick=undefined;xuKeep(ex,q.unit,'s');xuPanel(ex);});
   box.querySelector('[data-xu-hint]').addEventListener('click',e=>{fb.innerHTML=`<div class="fb"><b>Hint.</b>${q.hint}</div>`;e.currentTarget.disabled=true;});}
