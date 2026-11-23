@@ -1,6 +1,6 @@
 # PhysiQuest privacy policy
 
-_Last updated: 14 November 2026 (app version 1.19)_
+_Last updated: 23 November 2026 (app version 1.21)_
 
 PhysiQuest is a physics-learning app made by Mugilan. Contact for questions, corrections and complaints: **mugilstrange@gmail.com**.
 
@@ -14,6 +14,10 @@ PhysiQuest is a physics-learning app made by Mugilan. Contact for questions, cor
 ## Without an account
 
 Your progress (XP, badges, finished activities and mock-test scores) is saved only on your device. Uninstalling the app, or **Badges → Reset my progress**, deletes it. The app does not ask for your location, contacts, camera, microphone, photos or files.
+
+**Daily study reminder** (optional, Android app) never leaves your device: the phone keeps your chosen time, your last study day and your streak so it can stay quiet on days you have already studied. PhysiQuest asks to show notifications only when you switch the reminder on, and you can switch it off at any time.
+
+**Night mode** and the other display settings are saved only on your device.
 
 ## With an account (optional)
 

@@ -1,10 +1,13 @@
 package com.physiquest.app;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Insets;
 import android.net.Uri;
@@ -16,6 +19,7 @@ import android.os.Looper;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
+import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.view.View;
@@ -287,6 +291,65 @@ public class MainActivity extends Activity {
             main.post(() -> startUnlock(t));
         }
 
+        /** Night mode: "1" when the phone is in dark mode. The page view cannot tell on its own. */
+        @JavascriptInterface
+        public String isNight() {
+            int m = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+            return m == Configuration.UI_MODE_NIGHT_YES ? "1" : "0";
+        }
+
+        /** Daily reminder: {on, h, m, can}, where can says whether notifications are allowed. */
+        @JavascriptInterface
+        public String remState() {
+            SharedPreferences p = getSharedPreferences(Reminder.PREFS, MODE_PRIVATE);
+            try {
+                JSONObject o = new JSONObject();
+                o.put("on", p.getBoolean("rem_on", false));
+                o.put("h", p.getInt("rem_h", 19));
+                o.put("m", p.getInt("rem_m", 0));
+                o.put("can", Reminder.allowed(MainActivity.this));
+                return o.toString();
+            } catch (Exception e) {
+                return "{}";
+            }
+        }
+
+        /** Daily reminder on or off at h:m. The page gets {type:'rem', ok, why}; the phone may ask to allow notifications. */
+        @JavascriptInterface
+        public void remSet(boolean on, int h, int m) {
+            final int hh = Math.max(0, Math.min(23, h)), mm = Math.max(0, Math.min(59, m));
+            main.post(() -> setReminder(on, hh, mm));
+        }
+
+        /** The last study day and the streak, and the reminder's words in the student's language. */
+        @JavascriptInterface
+        public void remInfo(double lastDay, int streak, String title, String body0, String bodyN) {
+            getSharedPreferences(Reminder.PREFS, MODE_PRIVATE).edit()
+                    .putLong("rem_last", (long) lastDay)
+                    .putInt("rem_streak", Math.max(0, streak))
+                    .putString("rem_t", clip(title, 120, "Time for today’s physics"))
+                    .putString("rem_b0", clip(body0, 300, "5 minutes is enough: one question, one animation or one card to revise."))
+                    .putString("rem_bn", clip(bodyN, 300, "Keep your {n}-day streak going. 5 minutes of physics is enough today."))
+                    .apply();
+        }
+
+        @JavascriptInterface
+        public void remOpenSettings() {
+            main.post(() -> {
+                try {
+                    Intent i;
+                    if (Build.VERSION.SDK_INT >= 26) {
+                        i = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                        i.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+                    } else {
+                        i = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName()));
+                    }
+                    startActivity(i);
+                } catch (Exception ignored) {
+                }
+            });
+        }
+
         @JavascriptInterface
         public void signOut() {
             main.post(() -> credentials.clearCredentialStateAsync(new ClearCredentialStateRequest(), new CancellationSignal(), onMain,
@@ -455,6 +518,7 @@ public class MainActivity extends Activity {
 
     private static final int REQ_UPI = 4107;
     private static final int REQ_LOCK = 4108;
+    private static final int REQ_NOTIFY = 4109;
 
     /** Fingerprint or face, with the phone's PIN, pattern or password as the fallback (Android 10 and later);
      *  on older phones, the phone's own lock-screen check. */
@@ -528,6 +592,72 @@ public class MainActivity extends Activity {
             tellPage("window.pqNative&&window.pqNative(" + JSONObject.quote(m.toString()) + ")");
         } catch (Exception ignored) {
         }
+    }
+
+    private static String clip(String s, int max, String fallback) {
+        if (s == null || s.trim().isEmpty()) return fallback;
+        return s.length() > max ? s.substring(0, max) : s;
+    }
+
+    private int[] pendingReminder;   // the time chosen while the phone asks to allow notifications
+
+    private void setReminder(boolean on, int h, int m) {
+        if (!on) {
+            getSharedPreferences(Reminder.PREFS, MODE_PRIVATE).edit().putBoolean("rem_on", false).apply();
+            Reminder.cancel(this);
+            reminderDone(true, "");
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= 33
+                && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            pendingReminder = new int[]{h, m};
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQ_NOTIFY);
+            return;
+        }
+        reminderOn(h, m);
+    }
+
+    private void reminderOn(int h, int m) {
+        Reminder.channel(this);
+        if (!Reminder.allowed(this)) {
+            reminderDone(false, "blocked");
+            return;
+        }
+        getSharedPreferences(Reminder.PREFS, MODE_PRIVATE).edit()
+                .putBoolean("rem_on", true).putInt("rem_h", h).putInt("rem_m", m).apply();
+        Reminder.schedule(this);
+        reminderDone(true, "");
+    }
+
+    private void reminderDone(boolean ok, String why) {
+        try {
+            JSONObject m = new JSONObject();
+            m.put("type", "rem");
+            m.put("ok", ok);
+            m.put("why", why);
+            tellPage("window.pqNative&&window.pqNative(" + JSONObject.quote(m.toString()) + ")");
+        } catch (Exception ignored) {
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode != REQ_NOTIFY || pendingReminder == null) return;
+        int[] t = pendingReminder;
+        pendingReminder = null;
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            reminderOn(t[0], t[1]);
+        } else {
+            reminderDone(false, "denied");
+        }
+    }
+
+    /** The phone switched between light and dark mode while the app is open. */
+    @Override
+    public void onConfigurationChanged(Configuration c) {
+        super.onConfigurationChanged(c);
+        tellPage("window.pqThemeChanged&&pqThemeChanged()");
     }
 
     private void tellPage(String js) {

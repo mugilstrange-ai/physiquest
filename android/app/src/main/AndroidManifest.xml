@@ -4,6 +4,10 @@
     <!-- Lessons, simulations and fonts are all inside the app and work offline.
          The internet is used only for the optional account: Google sign-in, saved progress and Premium. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- The optional daily study reminder: one notification a day at the student's time,
+         set again after the phone restarts. Asked for only when the student switches it on. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Read aloud: lets the app find the phone's text-to-speech engine (Android 11 and later) -->
     <queries>
         <intent>
@@ -37,5 +41,17 @@
                 <data android:scheme="physiquest" android:host="pay" />
             </intent-filter>
         </activity>
+
+        <!-- The daily study reminder (see Reminder.java). Not open to other apps. -->
+        <receiver
+            android:name=".Reminder"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
