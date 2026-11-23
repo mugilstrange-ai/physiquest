@@ -1,6 +1,6 @@
 # PhysiQuest privacy policy
 
-_Last updated: 23 November 2026 (app version 1.21)_
+_Last updated: 23 November 2026 (app version 1.22)_
 
 PhysiQuest is a physics-learning app made by Mugilan. Contact for questions, corrections and complaints: **mugilstrange@gmail.com**.
 
@@ -37,6 +37,7 @@ You then fill in a short form. We store:
 | For students under 18: parent or guardian's name and mobile number, and that they agreed | To record the parent's agreement and, if needed, confirm a payment with them |
 | Your progress | So it is not lost if you change or lose your phone |
 | Your Premium plan and its end date | So Premium works on every phone you sign in to |
+| Only if you join the weekly leaderboard: a nickname you choose, your weekly XP and your class | To show the leaderboard; other signed-in students see the nickname, XP and class, never your name or email. You can leave it at any time |
 
 We do **not** ask for or store your home address or date of birth.
 
@@ -68,6 +69,10 @@ PhysiQuest follows the NCERT physics books from Class 6 to Class 12, so many lea
 ## Feedback
 
 Bug reports and topic ideas are sent only if you choose to, from your own email app, to mugilstrange@gmail.com. A bug report may include the app version, your phone's browser version and the last few error messages from the app, to help fix the problem.
+
+## Ratings on Google Play
+
+In the Google Play version, Google may show its own rating card inside the app after a good moment, such as a strong mock test. PhysiQuest only asks Google to show it; your rating and review go to Google Play, and PhysiQuest receives nothing from that card.
 
 ## Internet use
 

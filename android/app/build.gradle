@@ -10,8 +10,8 @@ android {
         applicationId 'com.physiquest.app'
         minSdk 24
         targetSdk 36
-        versionCode 27
-        versionName '1.21.0'
+        versionCode 28
+        versionName '1.22.0'
     }
 
     // A fixed key for the direct-download APK, so each new version installs over the last one.
@@ -50,4 +50,6 @@ dependencies {
     implementation 'androidx.credentials:credentials:1.3.0'
     implementation 'androidx.credentials:credentials-play-services-auth:1.3.0'
     implementation 'com.google.android.libraries.identity.googleid:googleid:1.1.1'
+    // Google Play's own rating card, shown inside the app at a good moment (Play installs only)
+    implementation 'com.google.android.play:review:2.0.1'
 }

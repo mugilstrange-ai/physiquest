@@ -20,6 +20,10 @@ import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
 import android.provider.Settings;
+
+import com.google.android.play.core.review.ReviewInfo;
+import com.google.android.play.core.review.ReviewManager;
+import com.google.android.play.core.review.ReviewManagerFactory;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.view.View;
@@ -289,6 +293,23 @@ public class MainActivity extends Activity {
         public void unlock(String title) {
             final String t = title == null || title.isEmpty() ? "Unlock PhysiQuest" : (title.length() > 60 ? title.substring(0, 60) : title);
             main.post(() -> startUnlock(t));
+        }
+
+        /** Google Play's rating card. Google decides whether it appears (and how often); it never appears
+         *  outside a Play install. The page asks only after a good moment, at most a few times a year. */
+        @JavascriptInterface
+        public void askReview() {
+            main.post(() -> {
+                try {
+                    ReviewManager rm = ReviewManagerFactory.create(MainActivity.this);
+                    rm.requestReviewFlow().addOnCompleteListener(t -> {
+                        if (!t.isSuccessful() || isFinishing()) return;
+                        ReviewInfo info = t.getResult();
+                        rm.launchReviewFlow(MainActivity.this, info);
+                    });
+                } catch (Exception ignored) {
+                }
+            });
         }
 
         /** Night mode: "1" when the phone is in dark mode. The page view cannot tell on its own. */

@@ -35,12 +35,33 @@ jobs:
           cp android/app/build/outputs/apk/release/app-release.apk PhysiQuest.apk
           cp android/app/build/outputs/bundle/play/app-play.aab PhysiQuest-play-unsigned.aab
 
+      # Google Play needs the bundle signed with your private upload key. It is kept only in this
+      # repository's secrets (Settings > Secrets and variables > Actions), never in the code:
+      # PLAY_UPLOAD_KEYSTORE (the .jks file in base64), PLAY_UPLOAD_PASSWORD and PLAY_UPLOAD_ALIAS.
+      # Until they are added, the bundle stays unsigned, as before.
+      - name: Sign the Google Play bundle (when the upload key is set up)
+        env:
+          KS: ${{ secrets.PLAY_UPLOAD_KEYSTORE }}
+          KS_PASS: ${{ secrets.PLAY_UPLOAD_PASSWORD }}
+          KS_ALIAS: ${{ secrets.PLAY_UPLOAD_ALIAS }}
+        run: |
+          if [ -n "$KS" ]; then
+            echo "$KS" | base64 -d > "$RUNNER_TEMP/upload.jks"
+            jarsigner -keystore "$RUNNER_TEMP/upload.jks" -storepass "$KS_PASS" -sigalg SHA256withRSA -digestalg SHA-256 \
+              PhysiQuest-play-unsigned.aab "${KS_ALIAS:-upload}"
+            jarsigner -verify PhysiQuest-play-unsigned.aab | tail -1
+            mv PhysiQuest-play-unsigned.aab PhysiQuest-play.aab
+            rm -f "$RUNNER_TEMP/upload.jks"
+          else
+            echo "No upload key in the secrets yet: the Play bundle stays unsigned."
+          fi
+
       - uses: actions/upload-artifact@v4
         with:
           name: PhysiQuest
           path: |
             PhysiQuest.apk
-            PhysiQuest-play-unsigned.aab
+            PhysiQuest-play*.aab
 
       - name: Publish the download link (main branch only)
         if: github.ref == 'refs/heads/main'
@@ -48,6 +69,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete android-latest --yes --cleanup-tag || true
-          gh release create android-latest PhysiQuest.apk PhysiQuest-play-unsigned.aab \
+          gh release create android-latest PhysiQuest.apk PhysiQuest-play*.aab \
             --title "PhysiQuest for Android" \
-            --notes "Download **PhysiQuest.apk** on your Android phone and open it to install. PhysiQuest-play-unsigned.aab is the Google Play bundle before signing. Built from commit ${GITHUB_SHA::7}."
+            --notes "Download **PhysiQuest.apk** on your Android phone and open it to install. The .aab file is the Google Play bundle (PhysiQuest-play.aab once your upload key is in the repository secrets). Built from commit ${GITHUB_SHA::7}."
