@@ -14,7 +14,7 @@ Until steps 1 to 6 are done, the Plans page shows **Opening soon** instead of th
 
 **Time needed:** about 30 minutes. Start in **test mode**: no real money moves and Razorpay does not need your documents yet.
 
-**Keep these three things secret:** the Razorpay key secret, the webhook secret and the Firebase key file. They go only into Cloudflare (step 4). Never put them in the app, in GitHub, in a chat or in a screenshot.
+**Keep these three things secret:** the Razorpay key secret, the webhook secret and the Firebase key file. They go only into Cloudflare (step 4). The Firebase key file may also go into GitHub's encrypted **Secrets** for the automatic Premium upload (see the main README). Never put them in the app, in a file in the repository, in a chat or in a screenshot.
 
 ---
 

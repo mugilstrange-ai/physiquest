@@ -1,0 +1,39 @@
+name: Upload Premium content
+
+# Puts each new Premium file into the database by itself (see tools/pack-upload.mjs).
+# Needs the repository secret FIREBASE_SERVICE_ACCOUNT; without it, it only prints a notice.
+on:
+  push:
+    branches: [main]
+    paths: ['premium/**', 'tools/pack-upload.mjs', '.github/workflows/premium.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency: premium-upload
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Publish the public lock key (safe to share)
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          out=$(node tools/pack-upload.mjs key); echo "$out"
+          if echo "$out" | grep -q '^CHANGED'; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add premium/pack-key.pem
+            git commit -m "Publish the Premium upload lock key"
+            git push
+          fi
+      - name: Upload new Premium content
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node tools/pack-upload.mjs upload
