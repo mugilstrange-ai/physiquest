@@ -1,6 +1,6 @@
 # PhysiQuest privacy policy
 
-_Last updated: 23 November 2026 (app version 1.23)_
+_Last updated: 23 November 2026 (app version 1.24)_
 
 PhysiQuest is a physics-learning app made by Mugilan. Contact for questions, corrections and complaints: **mugilstrange@gmail.com**.
 
