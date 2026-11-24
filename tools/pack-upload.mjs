@@ -11,7 +11,8 @@ import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 
 import crypto from 'node:crypto';
 const raw = process.env.FIREBASE_SERVICE_ACCOUNT || '';
 if (!raw.trim()) { console.log('::notice::FIREBASE_SERVICE_ACCOUNT is not set, so Premium content is not uploaded automatically. Upload it on the Owner screen instead.'); process.exit(0); }
-let sa; try { sa = JSON.parse(raw); } catch (e) { console.log('::error::FIREBASE_SERVICE_ACCOUNT is not valid JSON. Paste the whole key file again.'); process.exit(1); }
+let sa; try { sa = JSON.parse(raw); } catch (e) { console.log(`::error::FIREBASE_SERVICE_ACCOUNT is not valid JSON (${raw.trim().length} characters, starts with "${raw.trim().slice(0, 1)}", ends with "${raw.trim().slice(-1)}"). Paste the whole key file again, from the first { to the last }.`); process.exit(1); }
+if (sa && typeof sa === 'object' && !sa.private_key) console.log(`::error::FIREBASE_SERVICE_ACCOUNT is valid JSON but is not a service account key: it has ${Object.keys(sa).slice(0, 6).join(', ') || 'no fields'}. Use Firebase, Project settings, Service accounts, Generate new private key.`);
 if (!sa.private_key || !sa.client_email || !sa.project_id) { console.log('::error::FIREBASE_SERVICE_ACCOUNT is missing private_key, client_email or project_id.'); process.exit(1); }
 const priv = crypto.createPrivateKey(String(sa.private_key).replace(/\\n/g, '\n'));
 const DIR = process.env.PACK_DIR || 'premium';
