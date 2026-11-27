@@ -156,11 +156,11 @@ function home(){
 /* ---------------- student ---------------- */
 const S = { active:false, phase:"intro", data:null, order:[], ans:[], idx:0, start:0, end:0, name:"", vio:[], armed:false, baseW:0, baseH:0, timer:null, room:null, result:null };
 function shuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
-function pres(extra){ if (!S.room) return; const answered = S.ans.filter(x => x != null).length; const rv = (S.review || []).filter(Boolean).length; S.room.presence(Object.assign({ role:"student", name:S.name.slice(0,40), st:S.phase, q:S.idx + 1, n:P.n, ans:answered, rv, left: S.phase === "exam" ? Math.round((S.end - Date.now())/1000) : null, fs: !!document.fullscreenElement, vio:S.vio.length, last: S.vio.length ? S.vio[S.vio.length-1].m : null, at:Date.now() }, extra || {})).catch(() => {}); }
+function pres(extra){ if (!S.room) return; const answered = S.ans.filter(x => x != null).length; const rv = (S.review || []).filter(Boolean).length; S.room.presence(Object.assign({ role:"student", name:S.name.slice(0,40), st:S.phase, q:S.idx + 1, n:P.n, ans:answered, rv, left: S.phase === "exam" ? Math.round((S.end - Date.now())/1000) : null, fs: !!document.fullscreenElement, vio:S.vio.length, mal:!!S.mal, last: S.vio.length ? S.vio[S.vio.length-1].m : null, at:Date.now() }, extra || {})).catch(() => {}); }
 
 function student(){
   sub.textContent = "Student";
-  const prev = store.get("sq2_result");
+  const prev = store.get("sq3_result");
   if (prev && prev.code) { S.result = prev; return renderResult(); }
   const fsOK = !!(document.fullscreenEnabled && document.documentElement.requestFullscreen);
   const touchSmall = matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 820;
@@ -174,6 +174,7 @@ function student(){
   if (!fsOK) blocks.push("This browser cannot open full screen here. Use a laptop or desktop with Chrome or Edge.");
   if (touchSmall) blocks.push("Phones and tablets are not allowed. Open this link on a laptop or desktop.");
   if (extended) blocks.push("A second monitor is connected. Disconnect it, reload this page and try again.");
+  if (STANDALONE && foreignNodes().length) blocks.push("A browser extension is changing this page. Open the exam in a Chrome Incognito window (Ctrl+Shift+N) and try again.");
   if (blocks.length) startB.disabled = true;
   app.replaceChildren(h("div", {class:"stack"},
     h("h1", null, "Sports Quiz"),
@@ -183,6 +184,8 @@ function student(){
         h("ul", {class:"rules"},
           h("li", null, "The exam runs in full screen. ", h("b", null, "Leaving full screen (Esc) submits your exam at once.")),
           h("li", null, h("b", null, "Switching to another tab, window or app, or clicking outside the exam, submits it at once.")),
+          h("li", null, h("b", null, "Using any AI app, screen helper, sidebar, screenshot, copy, paste or right-click is malpractice: the test is auto-submitted and marked MALPRACTICE.")),
+          h("li", null, "Open this exam in a Chrome Incognito window (Ctrl+Shift+N) so no extensions run."),
           h("li", null, "Copy, paste, right-click and developer tools are blocked and recorded."),
           h("li", null, "Do not use AI apps, phones, books or other people. Your invigilator watches you on a video call."),
           h("li", null, "The exam submits by itself when the 20 minutes end."),
@@ -233,20 +236,32 @@ function startExam(data){
   pres();
 }
 function violation(m){ S.vio.push({ t: Math.round((Date.now() - S.start)/1000), m }); pres(); }
-function guard(reason){ if (S.phase === "exam" && S.armed) { violation(reason); submit(reason); } }
-document.addEventListener("fullscreenchange", () => { if (S.phase === "exam" && !document.fullscreenElement) { violation("Left full screen"); submit("Left full screen"); } });
+const STANDALONE = !(window.claude && window.claude.use);
+function mal(reason){ if (S.phase !== "exam") return; S.mal = true; violation("MALPRACTICE: " + reason); submit("Malpractice: " + reason); }
+function guard(reason){ if (S.phase === "exam" && S.armed) mal(reason); }
+document.addEventListener("fullscreenchange", () => { if (S.phase === "exam" && !document.fullscreenElement) mal("Left full screen"); });
 document.addEventListener("visibilitychange", () => { if (document.hidden) guard("Switched to another tab or app"); });
-window.addEventListener("blur", () => { setTimeout(() => { if (!document.hasFocus()) guard("Exam window lost focus (another app or screen)"); }, 250); });
-window.addEventListener("resize", () => { if (S.phase === "exam" && S.armed && (innerWidth < S.baseW * 0.85 || innerHeight < S.baseH * 0.85)) guard("Screen size changed (developer tools or split screen)"); });
-["contextmenu","copy","cut","paste","dragstart","selectstart"].forEach(ev => document.addEventListener(ev, e => { if (S.phase === "exam") { e.preventDefault(); if (ev !== "selectstart" && ev !== "dragstart") { violation("Tried to " + (ev === "contextmenu" ? "right-click" : ev)); showBanner("Not allowed in the exam: " + (ev === "contextmenu" ? "right-click" : ev) + ". This has been recorded."); } } }));
+window.addEventListener("blur", () => { setTimeout(() => { if (!document.hasFocus()) guard("Exam window lost focus (AI helper, overlay or other app)"); }, 250); });
+window.addEventListener("resize", () => { if (S.phase === "exam" && S.armed && (innerWidth < S.baseW * 0.85 || innerHeight < S.baseH * 0.85)) guard("Screen size changed (side panel, AI sidebar or developer tools)"); });
+setInterval(() => { if (S.phase === "exam" && S.armed) { if (!document.hasFocus()) { S.nf = (S.nf || 0) + 1; if (S.nf >= 2) mal("Exam window lost focus (AI helper, overlay or other app)"); } else S.nf = 0; } }, 600);
+document.documentElement.addEventListener("mouseleave", () => { if (S.phase === "exam" && S.armed) { clearTimeout(S.mlT); S.mlT = setTimeout(() => guard("Mouse moved off the exam screen (second screen or overlay)"), 1500); } });
+document.documentElement.addEventListener("mouseenter", () => clearTimeout(S.mlT));
+["contextmenu","copy","cut","paste","dragstart","selectstart"].forEach(ev => document.addEventListener(ev, e => { if (S.phase === "exam") { e.preventDefault(); if (ev !== "selectstart" && ev !== "dragstart") guard("Tried to " + (ev === "contextmenu" ? "right-click" : ev) + " (possible AI use)"); } }));
+const OURS = n => !!(n.closest && n.closest("#app, #banner, .mark, .modal, .bar"));
+const SAFE_TAGS = /^(SCRIPT|STYLE|LINK|META|TITLE|NOSCRIPT|TEMPLATE)$/;
+function foreignNodes(){ const out = []; for (const root of [document.documentElement, document.body]) { if (!root) continue; for (const c of root.children) { if (c === document.head || c === document.body || SAFE_TAGS.test(c.tagName) || OURS(c) || c.classList.contains("bar") || c.id === "app" || c.id === "banner" || c.classList.contains("mark") || c.classList.contains("modal")) continue; out.push(c); } } return out; }
+if (STANDALONE && window.MutationObserver) new MutationObserver(muts => { if (S.phase !== "exam" || !S.armed) return; for (const m of muts) for (const n of m.addedNodes) { if (n.nodeType !== 1 || SAFE_TAGS.test(n.tagName)) continue; const el = n; if (OURS(el) || el.classList.contains("mark") || el.classList.contains("modal")) continue; if (el.parentElement && OURS(el.parentElement)) continue; mal("Unknown content added to the exam page (AI or browser extension)"); return; } }).observe(document.documentElement, { childList:true, subtree:true });
 document.addEventListener("keydown", e => {
   if (S.phase !== "exam") return;
   const k = (e.key || "").toLowerCase(), mod = e.ctrlKey || e.metaKey;
   const dev = k === "f12" || (mod && e.shiftKey && ["i","j","c","k"].includes(k)) || (mod && e.altKey && ["i","j","c"].includes(k)) || (mod && k === "u");
-  const blocked = dev || (mod && ["c","v","x","a","p","s","f","r","t","n","w","l"].includes(k)) || k === "f5" || k === "f11" || (e.altKey && k === "tab");
-  if (blocked) { e.preventDefault(); e.stopPropagation(); violation("Blocked key: " + (mod ? (e.metaKey ? "Cmd+" : "Ctrl+") : "") + (e.shiftKey ? "Shift+" : "") + (e.altKey ? "Alt+" : "") + e.key); showBanner(dev ? "Developer tools are not allowed. This has been recorded." : "That shortcut is disabled during the exam."); }
+  const ai = k === "meta" || k === "os" || (e.altKey && k === " ") || (mod && k === " ") || (mod && k === "enter") || (mod && k === "\\") || (mod && e.shiftKey && ["s","3","4","5"].includes(k)) || (e.altKey && k === "c");
+  if (dev) { e.preventDefault(); e.stopPropagation(); guard("Developer tools shortcut pressed"); return; }
+  if (ai) { e.preventDefault(); e.stopPropagation(); guard("AI assistant or screenshot shortcut pressed (" + (e.metaKey ? "Win/Cmd+" : "") + (e.ctrlKey ? "Ctrl+" : "") + (e.altKey ? "Alt+" : "") + (e.shiftKey ? "Shift+" : "") + (e.key === " " ? "Space" : e.key) + ")"); return; }
+  const blocked = (mod && ["c","v","x","a","p","s","f","r","t","n","w","l"].includes(k)) || k === "f5" || k === "f11" || (e.altKey && k === "tab");
+  if (blocked) { e.preventDefault(); e.stopPropagation(); if (mod && ["c","v","x"].includes(k)) guard("Tried to copy or paste (possible AI use)"); else { violation("Blocked key: " + (mod ? "Ctrl/Cmd+" : "") + e.key); showBanner("That shortcut is disabled during the exam."); } }
 }, true);
-document.addEventListener("keyup", e => { if (S.phase === "exam" && (e.key === "PrintScreen")) { violation("Pressed Print Screen"); showBanner("Screenshots are not allowed. This has been recorded."); } });
+document.addEventListener("keyup", e => { if (S.phase === "exam" && (e.key === "PrintScreen")) guard("Screenshot key pressed"); });
 
 function qStatus(i){ const a = S.ans[i] != null, r = S.review[i]; return a && r ? "ar" : r ? "rv" : a ? "an" : S.visited[i] ? "na" : "nv"; }
 function qCounts(){ const c = {an:0, na:0, nv:0, rv:0, ar:0}; S.order.forEach(x => c[qStatus(x.i)]++); return c; }
@@ -293,11 +308,11 @@ async function submit(reason){
   if (S.phase !== "exam") return;
   S.phase = "done"; S.active = false; clearInterval(S.timer); clearInterval(S.presTimer);
   const d = S.data; let score = 0; const a = d.q.map((q, i) => { const x = S.ans[i]; if (x === q.a) score++; return x == null ? "-" : String(x); }).join("");
-  const body = { n:S.name, s:score, T:d.q.length, r:reason, d:Math.round((Date.now() - S.start)/1000), a, v:S.vio.slice(0,12).map(x => [x.t, x.m.slice(0,60)]), ts:new Date().toISOString() };
+  const body = { n:S.name, s:score, T:d.q.length, r:reason, d:Math.round((Date.now() - S.start)/1000), a, m:S.mal ? 1 : 0, v:S.vio.slice(0,12).map(x => [x.t, x.m.slice(0,60)]), ts:new Date().toISOString() };
   const sig = (await sha(d.secret + "|" + JSON.stringify(body))).slice(0,12);
   const code = toB64u(body) + "." + sig;
-  S.result = { name:S.name, score, total:d.q.length, reason, secs:body.d, code, vio:S.vio.length, ts:body.ts };
-  store.set("sq2_result", S.result);
+  S.result = { name:S.name, score, total:d.q.length, reason, mal:!!S.mal, secs:body.d, code, vio:S.vio.length, ts:body.ts };
+  store.set("sq3_result", S.result);
   if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
   document.body.classList.remove("exam"); if (S.mark) S.mark.remove(); document.querySelectorAll(".modal").forEach(x => x.remove());
   pres({ st:"submitted", score, total:d.q.length, reason, rc:code, left:null });
@@ -311,6 +326,7 @@ function renderResult(){
     h("h1", null, "Exam submitted"),
     h("div", {class:"grid2"},
       h("div", {class:"card stack"}, h("span", {class:"note"}, r.name), h("div", {class:"score"}, r.score + " / " + r.total), h("div", null, "Time used: " + mmss(r.secs)),
+        r.mal ? h("div", {class:"msg bad", style:"font-size:1.15rem;font-weight:800"}, "MALPRACTICE DETECTED · test auto-submitted") : null,
         h("div", {class:"msg " + (auto ? "bad" : "ok")}, (auto ? "Auto-submitted: " : "") + r.reason),
         r.vio ? h("div", {class:"note"}, r.vio + " rule event(s) were recorded and sent to your invigilator.") : null),
       h("div", {class:"card stack"}, h("h3", null, "Result code"), h("p", {class:"note"}, "Show this screen to your invigilator, or copy this code and send it to them. They use it to check your result."), h("div", {class:"code"}, r.code), copyB))
@@ -399,6 +415,7 @@ async function checkCode(str, out, data){
   let score = 0; const rows = data.q.map((q, i) => { const c = body.a && body.a[i]; const ci = c === "-" || c == null ? null : Number(c); const ok = ci === q.a; if (ok) score++; return h("tr", null, h("td", null, String(i+1)), h("td", null, q.t), h("td", {class: ci == null ? "" : ok ? "right" : "wrong"}, ci == null ? "Not answered" : q.o[ci] || "?"), h("td", null, q.o[q.a])); });
   out.append(
     h("div", {class:"msg " + (good && score === body.s ? "ok" : "bad")}, good && score === body.s ? "Genuine result code." : "Warning: this code does not match the exam. It may have been edited."),
+    body.m ? h("div", {class:"msg bad", style:"font-size:1.15rem;font-weight:800"}, "MALPRACTICE: " + String(body.r || "")) : null,
     h("div", {class:"kv"}, h("b", null, "Name"), h("span", null, String(body.n || "")), h("b", null, "Score"), h("span", {class:"right"}, score + " / " + data.q.length), h("b", null, "How it ended"), h("span", null, String(body.r || "")), h("b", null, "Time used"), h("span", null, mmss(body.d || 0)), h("b", null, "Submitted at"), h("span", null, body.ts ? new Date(body.ts).toLocaleString() : "")),
     Array.isArray(body.v) && body.v.length ? h("div", null, h("h3", null, "Rule events"), h("ul", {class:"rules"}, body.v.map(v => h("li", null, mmss(v[0]) + " · " + v[1])))) : h("p", {class:"note"}, "No rule events recorded."),
     h("div", {class:"tbl"}, h("table", null, h("tr", null, h("th", null, "#"), h("th", null, "Question"), h("th", null, "Student's answer"), h("th", null, "Correct answer")), rows)));
