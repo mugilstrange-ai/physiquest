@@ -1,0 +1,68 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<title>Exam Monitor Test 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1411;--card:#16211c;--ink:#e9efe9;--mut:#9fb1a8;--line:#2a3832;--go:#2fa776;--bad:#ff8a7a;--amber:#f0b445;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;font-size:15px}
+.top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px max(16px,env(safe-area-inset-left,0px));background:#08100c;border-bottom:1px solid var(--line)}
+h1{font-family:"Barlow Condensed",sans-serif;font-size:1.6rem;letter-spacing:.04em;text-transform:uppercase;margin:0}
+.sp{flex:1}.pill{border-radius:99px;padding:3px 12px;font-weight:700;font-size:.8rem;background:#24332b}.pill.ok{background:#173a2a;color:#7fe3b5}.pill.bad{background:#3a1d1a;color:var(--bad)}.pill.rec{background:#5a1010;color:#ffd0d0}
+button{font:inherit;font-weight:700;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 14px;cursor:pointer}button.go{background:var(--go);border-color:var(--go);color:#04130c}button.red{background:#7a1c1c;border-color:#a33;color:#fff}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;padding:14px max(16px,env(safe-area-inset-left,0px))}
+@media (max-width:900px){.wrap{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
+.screen{position:relative;background:#000;border-radius:12px;overflow:hidden;aspect-ratio:16/9;display:grid;place-items:center;color:var(--mut)}
+.screen video{width:100%;height:100%;object-fit:contain;background:#000}
+.cam{position:absolute;right:10px;bottom:10px;width:24%;min-width:140px;border-radius:10px;border:2px solid var(--go);background:#000}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:.92rem}.kv b{color:var(--mut);font-weight:600}
+.log{max-height:260px;overflow:auto;font-size:.85rem}.log div{padding:4px 0;border-bottom:1px dashed var(--line)}.log .m{color:var(--bad);font-weight:700}
+.big{font-family:"Barlow Condensed",sans-serif;font-size:2rem;color:var(--amber)}
+.code{font-family:ui-monospace,Consolas,monospace;font-size:.75rem;word-break:break-all;background:#0b120e;border:1px dashed var(--line);border-radius:8px;padding:8px;user-select:all}
+.mal{background:#5a1010;color:#fff;font-weight:800;border-radius:10px;padding:10px;font-size:1.1rem}
+a{color:var(--amber)}.note{color:var(--mut);font-size:.85rem}
+</style></head><body>
+<div class="top"><h1>Exam monitor · Test 3</h1><span class="pill" id="link">Not started</span><span class="pill" id="recp" hidden>● REC</span><div class="sp"></div><button class="go" id="startB">Start monitoring</button><button class="red" id="stopB" hidden>Stop &amp; save recording</button></div>
+<div class="wrap">
+ <div class="card"><div class="screen" id="scr"><span id="scrMsg">Click "Start monitoring", then ask the student to open the exam and click "Share screen and camera".</span><video id="sv" autoplay playsinline muted hidden></video><video class="cam" id="cv" autoplay playsinline hidden></video></div>
+  <div id="saved" class="note" style="margin-top:10px"></div></div>
+ <div class="stack" style="display:flex;flex-direction:column;gap:14px">
+  <div class="card"><div class="kv" id="kv"><b>Student</b><span>—</span></div><div id="malBox"></div></div>
+  <div class="card"><b>Events</b><div class="log" id="log"></div></div>
+  <div class="card" id="resCard" hidden><b>Result code</b><p class="note">Paste it on your invigilator page ("Check a result code") to see every answer.</p><div class="code" id="rc"></div></div>
+ </div>
+</div>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+(function(){
+const INV_ID="pqexam-3-766456cbbd";
+const ICE={iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"},{urls:"turn:openrelay.metered.ca:80",username:"openrelayproject",credential:"openrelayproject"},{urls:"turn:openrelay.metered.ca:443",username:"openrelayproject",credential:"openrelayproject"},{urls:"turn:openrelay.metered.ca:443?transport=tcp",username:"openrelayproject",credential:"openrelayproject"}]};
+const $=id=>document.getElementById(id); const link=$("link"), sv=$("sv"), cv=$("cv"), log=$("log"), kv=$("kv");
+let peer=null, recs=[], chunks={}, last={}, started=false;
+const mm=s=>{s=Math.max(0,Math.round(s||0));return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")};
+function L(t,m){const d=document.createElement("div");if(m)d.className="m";d.textContent=new Date().toLocaleTimeString()+" · "+t;log.prepend(d);}
+function setLink(t,c){link.textContent=t;link.className="pill "+(c||"");}
+function row(k,v,cls){const b=document.createElement("b");b.textContent=k;const s=document.createElement("span");s.textContent=v;if(cls)s.style.color=cls;kv.append(b,s);}
+function render(d){kv.replaceChildren();row("Student",String(d.name||"Student"));row("Status",d.st==="exam"?"In exam":d.st==="submitted"?"Submitted":"On start page");if(d.st==="exam"){row("Question",(d.q||"?")+" of "+(d.n||30));row("Time left",mm(d.left));}
+ row("Answered",(d.ans??0)+" of "+(d.n||30));row("Marked for review",String(d.rv??0));row("Full screen",d.fs?"Yes":"No",d.fs?"#7fe3b5":(d.st==="exam"?"#ff8a7a":""));row("Rule events",String(d.vio||0),(d.vio?"#ff8a7a":""));
+ if(d.st==="submitted"){row("Score",(d.score??"?")+" / "+(d.total??30),"#7fe3b5");}
+ $("malBox").replaceChildren(); if(d.mal){const m=document.createElement("div");m.className="mal";m.textContent="MALPRACTICE: "+String(d.reason||d.last||"");$("malBox").append(m);}
+ if(d.rc){$("resCard").hidden=false;$("rc").textContent=String(d.rc);}
+ if(last.st!==d.st)L(d.st==="exam"?"Student started the exam":d.st==="submitted"?"Submitted: "+String(d.reason||""):"Student is on the start page",d.st==="submitted"&&d.mal);
+ if((d.vio||0)>(last.vio||0)&&d.last)L("⚠ "+String(d.last),true);
+ last={st:d.st,vio:d.vio||0};}
+function record(stream,kind){try{const mime=["video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"].find(t=>MediaRecorder.isTypeSupported(t));const r=new MediaRecorder(stream,mime?{mimeType:mime}:{});chunks[kind]=[];r.ondataavailable=e=>{if(e.data&&e.data.size)chunks[kind].push(e.data)};r.onstop=()=>save(kind);r.start(2000);recs.push(r);$("recp").hidden=false;$("recp").className="pill rec";$("stopB").hidden=false;L("Recording "+(kind==="screen"?"screen":"camera + voice")+" started");}catch(e){L("Recording could not start: "+e.message,true)}}
+function save(kind){const parts=chunks[kind]||[];if(!parts.length)return;const blob=new Blob(parts,{type:"video/webm"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);const nm=(kind==="screen"?"student-screen":"student-camera-voice")+"-"+new Date().toISOString().slice(0,16).replace(/[:T]/g,"-")+".webm";a.download=nm;a.textContent="Download "+nm+" ("+(blob.size/1048576).toFixed(1)+" MB)";const p=document.createElement("div");p.append(a);$("saved").append(p);a.click();}
+$("stopB").addEventListener("click",()=>{recs.forEach(r=>{try{if(r.state!=="inactive")r.stop()}catch(e){}});recs=[];$("recp").hidden=true;$("stopB").hidden=true;L("Recording stopped and saved");});
+function start(){
+ if(!window.Peer){setLink("Live link library did not load. Check internet and reload.","bad");return;}
+ setLink("Connecting…");peer=new Peer(INV_ID,{config:ICE});
+ peer.on("open",()=>{setLink("Waiting for student","");L("Monitor online. Ask the student to share screen and camera.");});
+ peer.on("connection",c=>{c.on("open",()=>{setLink("Student connected","ok");L("Student connected: "+String((c.metadata&&c.metadata.name)||"Student"));});c.on("data",d=>{if(d&&typeof d==="object"&&d.t==="status")render(d)});c.on("close",()=>{setLink("Student disconnected","bad");L("Student disconnected (page closed or network)",true);});});
+ peer.on("call",call=>{const kind=call.metadata&&call.metadata.kind;call.answer();call.on("stream",st=>{if(kind==="screen"){sv.srcObject=st;sv.hidden=false;$("scrMsg").hidden=true;sv.play().catch(()=>{});if(!chunks.screen||!recs.length||true)record(st,"screen");L("Live screen is showing");}else{cv.srcObject=st;cv.hidden=false;cv.muted=false;cv.play().catch(()=>{});record(st,"cam");L("Live camera and voice are on");}});call.on("close",()=>L((kind==="screen"?"Screen":"Camera")+" stream ended",true));});
+ peer.on("error",e=>{if(e&&e.type==="unavailable-id"){setLink("This monitor is already open in another tab. Close the other tab and reload.","bad");}else{setLink("Link problem: "+((e&&e.type)||"error")+" · reconnecting","bad");if(peer&&peer.disconnected)setTimeout(()=>{try{peer.reconnect()}catch(x){}},3000);}});
+ peer.on("disconnected",()=>{setTimeout(()=>{try{peer.reconnect()}catch(x){}},2000);});
+}
+$("startB").addEventListener("click",()=>{if(started)return;started=true;$("startB").hidden=true;start();});
+window.addEventListener("beforeunload",e=>{if(recs.length){e.preventDefault();e.returnValue="";}});
+})();
+</script></body></html>

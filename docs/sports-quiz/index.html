@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Sports Quiz Exam</title></head><body style="margin:0"><title>Sports Quiz Exam 2</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Sports Quiz Exam</title></head><body style="margin:0"><title>Sports Quiz Exam</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -98,13 +98,15 @@ button.revb{background:var(--card);color:var(--rev);border-color:var(--rev)}
 .legend .pb{display:inline-grid;place-items:center;flex:none;width:32px;height:28px;font-size:.78rem;cursor:default}
 .modal{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.45);display:grid;place-items:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px}
 .modal .card{max-width:520px;width:100%}
+#selfcam{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));width:160px;max-width:30vw;border-radius:10px;border:2px solid var(--turf);z-index:15;background:#000;transform:scaleX(-1)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
 <div class="bar"><div class="in"><div class="brand">Sports Quiz<small id="sub">Online exam</small></div><div class="sp"></div><div id="barRight"></div></div></div>
 <div class="wrap" id="app"></div>
 <div class="banner" id="banner" hidden></div>
-<script>if(!location.hash)location.hash="#student";</script>
+<script>if(!location.hash)location.hash="#student";window.__INV="pqexam-2-ac137632ce";</script>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script id="payload" type="application/json">{"salt":"QG3SYBHZfNmiSYmOVpfcrw==","iv":"9bpDL/08iDxg2lk9","ct":"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","n":30}</script>
 <script>
 (function(){
@@ -156,7 +158,7 @@ function home(){
 /* ---------------- student ---------------- */
 const S = { active:false, phase:"intro", data:null, order:[], ans:[], idx:0, start:0, end:0, name:"", vio:[], armed:false, baseW:0, baseH:0, timer:null, room:null, result:null };
 function shuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
-function pres(extra){ if (!S.room) return; const answered = S.ans.filter(x => x != null).length; const rv = (S.review || []).filter(Boolean).length; S.room.presence(Object.assign({ role:"student", name:S.name.slice(0,40), st:S.phase, q:S.idx + 1, n:P.n, ans:answered, rv, left: S.phase === "exam" ? Math.round((S.end - Date.now())/1000) : null, fs: !!document.fullscreenElement, vio:S.vio.length, mal:!!S.mal, last: S.vio.length ? S.vio[S.vio.length-1].m : null, at:Date.now() }, extra || {})).catch(() => {}); }
+function pres(extra){ if (!S.room && !(LIVE.conn && LIVE.conn.open)) return; const answered = S.ans.filter(x => x != null).length; const rv = (S.review || []).filter(Boolean).length; const _o = Object.assign({ role:"student", name:S.name.slice(0,40), st:S.phase, q:S.idx + 1, n:P.n, ans:answered, rv, left: S.phase === "exam" ? Math.round((S.end - Date.now())/1000) : null, fs: !!document.fullscreenElement, vio:S.vio.length, mal:!!S.mal, last: S.vio.length ? S.vio[S.vio.length-1].m : null, at:Date.now() }, extra || {}); if (S.room) S.room.presence(_o).catch(() => {}); if (LIVE.conn && LIVE.conn.open) { try { LIVE.conn.send(Object.assign({ t:"status" }, _o)); } catch(e){} } }
 
 function student(){
   sub.textContent = "Student";
@@ -186,6 +188,7 @@ function student(){
           h("li", null, h("b", null, "Switching to another tab, window or app, or clicking outside the exam, submits it at once.")),
           h("li", null, h("b", null, "Using any AI app, screen helper, sidebar, screenshot, copy, paste or right-click is malpractice: the test is auto-submitted and marked MALPRACTICE.")),
           h("li", null, "Open this exam in a Chrome Incognito window (Ctrl+Shift+N) so no extensions run."),
+          STANDALONE ? h("li", null, h("b", null, "Your entire screen, camera and microphone are streamed live to the invigilator and recorded. Stopping the screen share or turning off the camera is malpractice.")) : null,
           h("li", null, "Copy, paste, right-click and developer tools are blocked and recorded."),
           h("li", null, "Do not use AI apps, phones, books or other people. Your invigilator watches you on a video call."),
           h("li", null, "The exam submits by itself when the 20 minutes end."),
@@ -195,6 +198,7 @@ function student(){
         h("div", {class:"stack"}, h("label", {for:"sname"}, "Name"), nameI),
         h("div", {class:"stack"}, h("label", {for:"scode"}, "Exam code (your invigilator reads it out)"), codeI),
         h("label", {class:"row", style:"font-weight:500"}, agree, "I have read the rules and will follow them."),
+        STANDALONE ? liveBox(startB) : null,
         blocks.map(b => h("div", {class:"msg bad"}, b)), err, startB,
         h("p", {class:"note"}, "Before starting: close other apps, keep your camera and microphone on in the video call, and share your entire screen there.")))
   ));
@@ -202,6 +206,7 @@ function student(){
   nameI.addEventListener("input", () => { S.name = nameI.value.trim(); pres({st:"intro"}); });
   startB.addEventListener("click", async () => {
     err.hidden = true;
+    if (STANDALONE && !(LIVE.screen && LIVE.cam)) { err.textContent = "First click \"Share screen and camera\" and share your ENTIRE screen."; err.hidden = false; return; }
     const name = nameI.value.trim(), code = codeI.value;
     if (!name) { err.textContent = "Enter your name."; err.hidden = false; return; }
     if (norm(code).length < 9) { err.textContent = "Enter the 9-character exam code from your invigilator."; err.hidden = false; return; }
@@ -247,9 +252,9 @@ setInterval(() => { if (S.phase === "exam" && S.armed) { if (!document.hasFocus(
 document.documentElement.addEventListener("mouseleave", () => { if (S.phase === "exam" && S.armed) { clearTimeout(S.mlT); S.mlT = setTimeout(() => guard("Mouse moved off the exam screen (second screen or overlay)"), 1500); } });
 document.documentElement.addEventListener("mouseenter", () => clearTimeout(S.mlT));
 ["contextmenu","copy","cut","paste","dragstart","selectstart"].forEach(ev => document.addEventListener(ev, e => { if (S.phase === "exam") { e.preventDefault(); if (ev !== "selectstart" && ev !== "dragstart") guard("Tried to " + (ev === "contextmenu" ? "right-click" : ev) + " (possible AI use)"); } }));
-const OURS = n => !!(n.closest && n.closest("#app, #banner, .mark, .modal, .bar"));
+const OURS = n => !!(n.closest && n.closest("#app, #banner, .mark, .modal, .bar, #selfcam"));
 const SAFE_TAGS = /^(SCRIPT|STYLE|LINK|META|TITLE|NOSCRIPT|TEMPLATE)$/;
-function foreignNodes(){ const out = []; for (const root of [document.documentElement, document.body]) { if (!root) continue; for (const c of root.children) { if (c === document.head || c === document.body || SAFE_TAGS.test(c.tagName) || OURS(c) || c.classList.contains("bar") || c.id === "app" || c.id === "banner" || c.classList.contains("mark") || c.classList.contains("modal")) continue; out.push(c); } } return out; }
+function foreignNodes(){ const out = []; for (const root of [document.documentElement, document.body]) { if (!root) continue; for (const c of root.children) { if (c === document.head || c === document.body || SAFE_TAGS.test(c.tagName) || OURS(c) || c.classList.contains("bar") || c.id === "app" || c.id === "banner" || c.classList.contains("mark") || c.classList.contains("modal") || c.id === "selfcam") continue; out.push(c); } } return out; }
 if (STANDALONE && window.MutationObserver) new MutationObserver(muts => { if (S.phase !== "exam" || !S.armed) return; for (const m of muts) for (const n of m.addedNodes) { if (n.nodeType !== 1 || SAFE_TAGS.test(n.tagName)) continue; const el = n; if (OURS(el) || el.classList.contains("mark") || el.classList.contains("modal")) continue; if (el.parentElement && OURS(el.parentElement)) continue; mal("Unknown content added to the exam page (AI or browser extension)"); return; } }).observe(document.documentElement, { childList:true, subtree:true });
 document.addEventListener("keydown", e => {
   if (S.phase !== "exam") return;
@@ -420,6 +425,59 @@ async function checkCode(str, out, data){
     Array.isArray(body.v) && body.v.length ? h("div", null, h("h3", null, "Rule events"), h("ul", {class:"rules"}, body.v.map(v => h("li", null, mmss(v[0]) + " · " + v[1])))) : h("p", {class:"note"}, "No rule events recorded."),
     h("div", {class:"tbl"}, h("table", null, h("tr", null, h("th", null, "#"), h("th", null, "Question"), h("th", null, "Student's answer"), h("th", null, "Correct answer")), rows)));
 }
+/* ---------------- live screen + camera to the invigilator (standalone page only) ---------------- */
+const INV_ID = window.__INV || "pqexam-none";
+const LIVE = { peer:null, conn:null, screen:null, cam:null, calls:[], ok:false, tries:0, ui:null };
+const ICE = { iceServers: [ {urls:"stun:stun.l.google.com:19302"}, {urls:"stun:stun1.l.google.com:19302"}, {urls:"turn:openrelay.metered.ca:80", username:"openrelayproject", credential:"openrelayproject"}, {urls:"turn:openrelay.metered.ca:443", username:"openrelayproject", credential:"openrelayproject"}, {urls:"turn:openrelay.metered.ca:443?transport=tcp", username:"openrelayproject", credential:"openrelayproject"} ] };
+function liveSet(k, ok, text){ if (!LIVE.ui) return; const el = LIVE.ui[k]; if (!el) return; el.className = "msg " + (ok === true ? "ok" : ok === false ? "bad" : "info"); el.textContent = text; }
+function liveBox(startB){
+  const scr = h("div", {class:"msg info"}, "Screen: not shared"), cam = h("div", {class:"msg info"}, "Camera and microphone: not shared"), net = h("div", {class:"msg info"}, "Invigilator link: waiting");
+  LIVE.ui = { scr, cam, net };
+  const b = h("button", {class:"go"}, "Share screen and camera");
+  b.addEventListener("click", async () => {
+    b.disabled = true;
+    try {
+      const ds = await navigator.mediaDevices.getDisplayMedia({ video:{ displaySurface:"monitor", frameRate:{ ideal:10, max:15 } }, audio:false, selfBrowserSurface:"exclude", surfaceSwitching:"exclude", monitorTypeSurfaces:"include" });
+      const tr = ds.getVideoTracks()[0], surf = tr && tr.getSettings ? tr.getSettings().displaySurface : "monitor";
+      if (surf && surf !== "monitor") { ds.getTracks().forEach(t => t.stop()); liveSet("scr", false, "You shared a window or tab. Click again and choose \"Entire screen\"."); b.disabled = false; return; }
+      LIVE.screen = ds; liveSet("scr", true, "Screen: entire screen shared ✓");
+      tr.addEventListener("ended", () => { LIVE.screen = null; liveSet("scr", false, "Screen sharing stopped"); if (S.phase === "exam") mal("Stopped sharing the screen"); });
+    } catch(e){ liveSet("scr", false, "Screen sharing was cancelled or blocked. Click the button again and choose \"Entire screen\"."); b.disabled = false; return; }
+    try {
+      const cs = await navigator.mediaDevices.getUserMedia({ video:{ width:{ ideal:640 }, height:{ ideal:480 }, facingMode:"user" }, audio:true });
+      LIVE.cam = cs; liveSet("cam", true, "Camera and microphone: on ✓");
+      cs.getTracks().forEach(t => t.addEventListener("ended", () => { LIVE.cam = null; liveSet("cam", false, "Camera or microphone turned off"); if (S.phase === "exam") mal("Turned off the camera or microphone"); }));
+      let v = document.getElementById("selfcam");
+      if (!v) { v = h("video", {id:"selfcam", autoplay:true, muted:true, playsinline:true}); v.muted = true; document.body.append(v); }
+      v.srcObject = cs; v.play().catch(()=>{});
+    } catch(e){ liveSet("cam", false, "Camera or microphone was blocked. Allow them in Chrome (camera icon in the address bar) and click again."); b.disabled = false; return; }
+    b.textContent = "Shared ✓"; liveConnect();
+  });
+  return h("div", {class:"card stack", style:"background:var(--bg)"}, h("h3", null, "Step 1: share your screen and camera"), h("p", {class:"note"}, "Choose \"Entire screen\" when Chrome asks. Your invigilator sees your screen, face and voice live and records them."), b, scr, cam, net, h("h3", null, "Step 2: start the exam"));
+}
+function liveConnect(){
+  if (!window.Peer) { liveSet("net", false, "Live link could not load. Check your internet and reload the page."); return; }
+  if (LIVE.peer) { try { LIVE.peer.destroy(); } catch(e){} }
+  liveSet("net", null, "Invigilator link: connecting…");
+  const peer = new Peer(undefined, { config: ICE }); LIVE.peer = peer;
+  peer.on("open", () => {
+    const conn = peer.connect(INV_ID, { reliable:true, metadata:{ name: S.name || "Student" } }); LIVE.conn = conn;
+    conn.on("open", () => {
+      LIVE.ok = true; liveSet("net", true, "Invigilator link: connected ✓ (your invigilator can see you)");
+      const meta = n => ({ metadata:{ kind:n, name: S.name || "Student" } });
+      if (LIVE.screen) LIVE.calls.push(peer.call(INV_ID, LIVE.screen, meta("screen")));
+      if (LIVE.cam) LIVE.calls.push(peer.call(INV_ID, LIVE.cam, meta("cam")));
+      pres();
+    });
+    conn.on("close", () => { LIVE.ok = false; liveSet("net", false, "Invigilator link lost. Reconnecting…"); setTimeout(liveConnect, 4000); });
+  });
+  peer.on("error", e => {
+    LIVE.ok = false;
+    const t = e && e.type === "peer-unavailable" ? "Waiting for your invigilator to open the monitor page… retrying" : "Live link problem (" + ((e && e.type) || "error") + "). Retrying…";
+    liveSet("net", false, t); setTimeout(liveConnect, 5000);
+  });
+}
+
 route();
 })();
 </script>
