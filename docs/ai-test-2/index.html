@@ -1,0 +1,493 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>AI Test 2</title></head><body style="margin:0"><title>Sports Quiz Exam</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: a scoreboard-style top bar, one centred working column; exam mode fills the screen. */
+:root{--bg:#f3f5f1;--card:#ffffff;--ink:#14201b;--mut:#5c6b64;--line:#d9e0d9;--turf:#17694a;--turf-ink:#ffffff;--amber:#c77d0a;--soft:#e6f0ea;--bad:#b42318;--bad-soft:#fdecea;--ok:#13795b;--ok-soft:#e3f4ec;--board:#10231b;--board-ink:#f4f7f2;--ans:#1a7f37;--nans:#c23b22;--rev:#6b4bc4;--nv:#e9ece8;
+--display:"Barlow Condensed","Arial Narrow",sans-serif;--body:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--board)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--board);color:var(--board-ink)}
+.bar .in{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.brand{font-family:var(--display);font-size:1.5rem;letter-spacing:.04em;text-transform:uppercase}
+.brand small{font-family:var(--body);font-size:.75rem;letter-spacing:.08em;opacity:.7;margin-left:8px}
+.sp{flex:1}
+.clock{font-family:var(--display);font-size:1.7rem;letter-spacing:.05em;font-variant-numeric:tabular-nums;background:rgba(255,255,255,.08);border-radius:8px;padding:0 12px}
+.clock.low{color:#ffb4a8}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+h1,h2,h3{font-family:var(--display);letter-spacing:.02em;text-wrap:balance;margin:0}
+h1{font-size:2.4rem;line-height:1.05}h2{font-size:1.6rem}h3{font-size:1.2rem}
+.lead{color:var(--mut);max-width:62ch}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.stack{display:flex;flex-direction:column;gap:12px}
+label{font-weight:600;font-size:.9rem}
+input[type=text],textarea{width:100%;font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+input:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+button{font:inherit;font-weight:600;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 16px;cursor:pointer}
+button.go{background:var(--turf);color:var(--turf-ink);border-color:var(--turf)}
+button.warn{background:var(--bad-soft);color:var(--bad);border-color:var(--bad)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.rules{margin:0;padding-left:20px}.rules li{margin:4px 0}
+.note{font-size:.85rem;color:var(--mut)}
+.msg{border-radius:10px;padding:10px 12px;font-size:.92rem}
+.msg.bad{background:var(--bad-soft);color:var(--bad)}.msg.ok{background:var(--ok-soft);color:var(--ok)}.msg.info{background:var(--soft)}
+.pill{display:inline-block;border-radius:99px;padding:2px 10px;font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.pill.live{background:var(--ok-soft);color:var(--ok)}.pill.done{background:var(--soft);color:var(--turf)}.pill.bad{background:var(--bad-soft);color:var(--bad)}.pill.wait{background:var(--soft);color:var(--mut)}
+/* exam */
+.exam{user-select:none;-webkit-user-select:none}
+.qhead{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.qnum{font-family:var(--display);font-size:1.2rem;color:var(--amber);letter-spacing:.06em;text-transform:uppercase}
+.qtext{font-size:1.35rem;font-weight:600;margin:6px 0 16px;line-height:1.35}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;padding:12px 14px;border-radius:12px;font-weight:500}
+.opt .k{font-family:var(--display);font-size:1.2rem;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--soft);flex:none}
+.opt.sel{border-color:var(--turf);background:var(--soft)}.opt.sel .k{background:var(--turf);color:var(--turf-ink)}
+.nav{display:flex;gap:10px;justify-content:space-between;margin-top:16px;flex-wrap:wrap}
+.pal{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+.pal button{padding:6px 0;font-size:.85rem;font-variant-numeric:tabular-nums}
+.pal button.an{background:var(--turf);color:var(--turf-ink);border-color:var(--turf)}
+.pal button.cur{outline:3px solid var(--amber);outline-offset:1px}
+.examgrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px}
+@media (max-width:760px){.examgrid{grid-template-columns:1fr}}
+.mark{position:fixed;inset:0;pointer-events:none;z-index:1;display:grid;place-items:center;opacity:.05;font-family:var(--display);font-size:5vw;transform:rotate(-24deg);color:var(--ink);text-align:center;white-space:pre}
+.banner{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 70px);z-index:20;max-width:min(560px,92vw)}
+/* result */
+.score{font-family:var(--display);font-size:5rem;line-height:1;color:var(--turf)}
+.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.78rem;word-break:break-all;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:10px;user-select:all;-webkit-user-select:all}
+/* invigilator */
+.big{font-family:var(--display);font-size:2.6rem;letter-spacing:.12em}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:.92rem}.kv b{color:var(--mut);font-weight:600}
+.log{max-height:220px;overflow:auto;font-size:.85rem;border-top:1px solid var(--line);margin-top:8px;padding-top:6px}
+.log div{padding:3px 0;border-bottom:1px dashed var(--line)}
+.tbl{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.86rem}th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}th{color:var(--mut);font-weight:600}
+.right{color:var(--ok);font-weight:700}.wrong{color:var(--bad);font-weight:700}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* test layout */
+.tl{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;align-items:start}
+@media (max-width:820px){.tl{grid-template-columns:1fr}}
+.qpanel{display:flex;flex-direction:column;min-height:60vh}
+.qtop{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding-bottom:10px;flex-wrap:wrap}
+.qmeta{display:flex;gap:8px;flex-wrap:wrap}.qmeta span{font-size:.78rem;border:1px solid var(--line);border-radius:99px;padding:2px 10px;color:var(--mut)}
+.qbody{flex:1;padding:16px 0}
+.opt{width:100%}
+.opt .rad{width:20px;height:20px;border-radius:50%;border:2px solid var(--mut);flex:none;display:grid;place-items:center}
+.opt.sel .rad{border-color:var(--turf)}.opt.sel .rad::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--turf)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;border-top:1px solid var(--line);padding-top:12px}
+.actions .l,.actions .r{display:flex;gap:8px;flex-wrap:wrap}
+button.revb{background:var(--card);color:var(--rev);border-color:var(--rev)}
+.cand{display:flex;gap:10px;align-items:center}
+.ava{width:42px;height:42px;border-radius:10px;background:var(--board);color:var(--board-ink);display:grid;place-items:center;font-family:var(--display);font-size:1.3rem;flex:none}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.8rem}
+.legend div{display:flex;gap:8px;align-items:center}
+.pal5{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
+.pb{position:relative;font:inherit;font-weight:700;font-size:.85rem;padding:0;height:36px;border-radius:8px;border:1px solid var(--line);cursor:pointer;font-variant-numeric:tabular-nums}
+.pb.nv{background:var(--nv);color:var(--ink)}
+.pb.na{background:var(--nans);color:#fff;border-color:var(--nans);border-radius:8px 8px 18px 18px}
+.pb.an{background:var(--ans);color:#fff;border-color:var(--ans);border-radius:18px 18px 8px 8px}
+.pb.rv{background:var(--rev);color:#fff;border-color:var(--rev);border-radius:50%}
+.pb.ar{background:var(--rev);color:#fff;border-color:var(--rev);border-radius:50%}
+.pb.ar::after{content:"✓";position:absolute;right:-5px;bottom:-5px;width:17px;height:17px;border-radius:50%;background:var(--ans);color:#fff;font-size:10px;line-height:1;display:grid;place-items:center;border:2px solid var(--card)}
+.pb.cur{outline:3px solid var(--amber);outline-offset:2px}
+.legend .pb{display:inline-grid;place-items:center;flex:none;width:32px;height:28px;font-size:.78rem;cursor:default}
+.modal{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.45);display:grid;place-items:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px}
+.modal .card{max-width:520px;width:100%}
+#selfcam{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));width:160px;max-width:30vw;border-radius:10px;border:2px solid var(--turf);z-index:15;background:#000;transform:scaleX(-1)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="bar"><div class="in"><div class="brand">AI Test 2<small id="sub">Online exam</small></div><div class="sp"></div><div id="barRight"></div></div></div>
+<div class="wrap" id="app"></div>
+<div class="banner" id="banner" hidden></div>
+<script>if(!location.hash)location.hash="#student";window.__INV="pqexam-ai2-3a259b0f02";</script>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script id="payload" type="application/json">{"salt":"uGdpGvKEm5MIYz/t6wpeeQ==","iv":"iCpC0T3vN3f+0Yw0","ct":"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","n":60}</script>
+<script>
+(function(){
+"use strict";
+const P = JSON.parse(document.getElementById("payload").textContent);
+const app = document.getElementById("app"), barRight = document.getElementById("barRight"), sub = document.getElementById("sub"), banner = document.getElementById("banner");
+const h = (tag, attrs, ...kids) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs || {})) { if (k === "class") e.className = v; else if (k.startsWith("on")) e.addEventListener(k.slice(2), v); else if (v !== false && v != null) e.setAttribute(k, v === true ? "" : v); } for (const c of kids.flat()) { if (c == null || c === false) continue; e.append(c instanceof Node ? c : document.createTextNode(String(c))); } return e; };
+const store = { get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } }, set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
+const b64d = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const norm = c => String(c || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+async function decrypt(code){
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(norm(code)), "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey({name:"PBKDF2", salt:b64d(P.salt), iterations:200000, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["decrypt"]);
+  const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64d(P.iv)}, key, b64d(P.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+async function sha(s){ const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2,"0")).join(""); }
+const toB64u = obj => { const bytes = new TextEncoder().encode(JSON.stringify(obj)); let s = ""; bytes.forEach(b => s += String.fromCharCode(b)); return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); };
+const fromB64u = str => { const s = atob(str.replace(/-/g,"+").replace(/_/g,"/")); return JSON.parse(new TextDecoder().decode(Uint8Array.from(s, c => c.charCodeAt(0)))); };
+const mmss = s => { s = Math.max(0, Math.round(s)); return String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0"); };
+function showBanner(text, kind){ banner.replaceChildren(h("div", {class:"msg " + (kind||"bad"), role:"alert"}, text)); banner.hidden = false; clearTimeout(showBanner.t); showBanner.t = setTimeout(() => banner.hidden = true, 6000); }
+async function copyText(text, btn){ try { await navigator.clipboard.writeText(text); btn.textContent = "Copied"; } catch(e){ btn.textContent = "Select the text and copy it"; } }
+let roomP = null; const getRoom = () => roomP || (roomP = (window.claude && claude.use ? claude.use("room").catch(() => null) : Promise.resolve(null)));
+
+/* ---------------- routing ---------------- */
+function route(){
+  const v = (location.hash || "").replace("#","");
+  barRight.replaceChildren();
+  if (v === "student") return student();
+  if (v === "invigilator") return invigilator();
+  home();
+}
+window.addEventListener("hashchange", () => { if (!S.active) route(); });
+
+function home(){
+  sub.textContent = "Online exam";
+  app.replaceChildren(
+    h("div", {class:"stack"},
+      h("h1", null, "Artificial Intelligence Test 2"),
+      h("p", {class:"lead"}, "60 questions · 60 minutes · full screen only. Pick your role."),
+      h("div", {class:"grid2"},
+        h("div", {class:"card stack"}, h("h2", null, "Student"), h("p", {class:"note"}, "Take the exam. You need a laptop or desktop with Chrome or Edge, and the exam code from your invigilator."), h("a", {href:"#student"}, h("button", {class:"go"}, "Open student page"))),
+        h("div", {class:"card stack"}, h("h2", null, "Invigilator"), h("p", {class:"note"}, "Exam code, live monitoring, force submit and result checking. Only the owner of this page can use it."), h("a", {href:"#invigilator"}, h("button", null, "Open invigilator page")))
+      )
+    )
+  );
+}
+
+/* ---------------- student ---------------- */
+const S = { active:false, phase:"intro", data:null, order:[], ans:[], idx:0, start:0, end:0, name:"", vio:[], armed:false, baseW:0, baseH:0, timer:null, room:null, result:null };
+function shuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function pres(extra){ if (!S.room && !(LIVE.conn && LIVE.conn.open)) return; const answered = S.ans.filter(x => x != null).length; const rv = (S.review || []).filter(Boolean).length; const _o = Object.assign({ role:"student", name:S.name.slice(0,40), st:S.phase, q:S.idx + 1, n:P.n, ans:answered, rv, left: S.phase === "exam" ? Math.round((S.end - Date.now())/1000) : null, fs: !!document.fullscreenElement, vio:S.vio.length, mal:!!S.mal, last: S.vio.length ? S.vio[S.vio.length-1].m : null, at:Date.now() }, extra || {}); if (S.room) S.room.presence(_o).catch(() => {}); if (LIVE.conn && LIVE.conn.open) { try { LIVE.conn.send(Object.assign({ t:"status" }, _o)); } catch(e){} } }
+
+function student(){
+  sub.textContent = "Student";
+  const prev = store.get("ai2_result");
+  if (prev && prev.code) { S.result = prev; return renderResult(); }
+  const fsOK = !!(document.fullscreenEnabled && document.documentElement.requestFullscreen);
+  const touchSmall = matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 820;
+  const extended = !!(window.screen && screen.isExtended);
+  const err = h("div", {class:"msg bad", role:"alert", hidden:true});
+  const nameI = h("input", {type:"text", id:"sname", autocomplete:"name", placeholder:"Your full name", maxlength:"40"});
+  const codeI = h("input", {type:"text", id:"scode", autocomplete:"off", placeholder:"e.g. ABC-123-XYZ", maxlength:"20", spellcheck:"false"});
+  const agree = h("input", {type:"checkbox", id:"sagree"});
+  const startB = h("button", {class:"go", id:"sstart"}, "Start exam in full screen");
+  const blocks = [];
+  if (!fsOK) blocks.push("This browser cannot open full screen here. Use a laptop or desktop with Chrome or Edge.");
+  if (touchSmall) blocks.push("Phones and tablets are not allowed. Open this link on a laptop or desktop.");
+  if (extended) blocks.push("A second monitor is connected. Disconnect it, reload this page and try again.");
+  if (STANDALONE && foreignNodes().length) blocks.push("A browser extension is changing this page. Open the exam in a Chrome Incognito window (Ctrl+Shift+N) and try again.");
+  if (blocks.length) startB.disabled = true;
+  let lockEl = null;
+  if (window.__OPEN_AT) {
+    lockEl = h("div", {class:"msg info", style:"font-weight:700"});
+    let lockT = null;
+    const tick = () => { const left = window.__OPEN_AT - (Date.now() + (window.__TOFF || 0));
+      if (left > 0) { lockEl.className = "msg info"; lockEl.textContent = "The test opens at " + (window.__OPEN_LABEL || "the start time") + ". It opens in " + mmss(left/1000) + ". Share your screen and camera now, then wait."; startB.disabled = true; }
+      else { lockEl.className = "msg ok"; lockEl.textContent = "The test is open. Enter the exam code your invigilator gives you."; startB.disabled = blocks.length > 0; if (lockT) clearInterval(lockT); } };
+    lockT = setInterval(tick, 1000); tick();
+  }
+  app.replaceChildren(h("div", {class:"stack"},
+    h("h1", null, "Artificial Intelligence Test 2"),
+    h("p", {class:"lead"}, "60 multiple-choice questions · 1 mark each · 60 minutes · no negative marks."),
+    h("div", {class:"grid2"},
+      h("div", {class:"card stack"}, h("h3", null, "Exam rules"),
+        h("ul", {class:"rules"},
+          h("li", null, "The exam runs in full screen. ", h("b", null, "Leaving full screen (Esc) submits your exam at once.")),
+          h("li", null, h("b", null, "Switching to another tab, window or app, or clicking outside the exam, submits it at once.")),
+          h("li", null, h("b", null, "Using any AI app, screen helper, sidebar, screenshot, copy, paste or right-click is malpractice: the test is auto-submitted and marked MALPRACTICE.")),
+          h("li", null, "Open this exam in a Chrome Incognito window (Ctrl+Shift+N) so no extensions run."),
+          STANDALONE ? h("li", null, h("b", null, "Your entire screen, camera and microphone are streamed live to the invigilator and recorded. Stopping the screen share or turning off the camera is malpractice.")) : null,
+          h("li", null, "Copy, paste, right-click and developer tools are blocked and recorded."),
+          h("li", null, "Do not use AI apps, phones, books or other people. Your invigilator watches you on a video call."),
+          h("li", null, "The exam submits by itself when the 60 minutes end."),
+          h("li", null, "Use Save & Next, Mark for Review & Next and Clear Response; the coloured palette on the right shows each question's status."),
+          h("li", null, "You can attempt the exam only once on this device."))),
+      h("div", {class:"card stack"}, h("h3", null, "Start"),
+        h("div", {class:"stack"}, h("label", {for:"sname"}, "Name"), nameI),
+        h("div", {class:"stack"}, h("label", {for:"scode"}, "Exam code (your invigilator reads it out)"), codeI),
+        h("label", {class:"row", style:"font-weight:500"}, agree, "I have read the rules and will follow them."),
+        STANDALONE ? liveBox(startB) : null,
+        blocks.map(b => h("div", {class:"msg bad"}, b)), lockEl, err, startB,
+        h("p", {class:"note"}, "Before starting: close other apps, keep your camera and microphone on in the video call, and share your entire screen there.")))
+  ));
+  getRoom().then(r => { S.room = r; if (r) { S.name = nameI.value || "Student"; pres({st:"intro"}); r.on("ctl", m => { if (m.isMe) return; const d = m.data || {}; if (d.action === "warn" && typeof d.msg === "string") showBanner("Invigilator: " + d.msg.slice(0,200)); if (d.action === "submit") submit("Submitted by the invigilator"); }); } });
+  nameI.addEventListener("input", () => { S.name = nameI.value.trim(); pres({st:"intro"}); });
+  startB.addEventListener("click", async () => {
+    err.hidden = true;
+    if (window.__OPEN_AT && Date.now() + (window.__TOFF || 0) < window.__OPEN_AT) { err.textContent = "The test has not opened yet. Please wait."; err.hidden = false; return; }
+    if (STANDALONE && !(LIVE.screen && LIVE.cam)) { err.textContent = "First click \"Share screen and camera\" and share your ENTIRE screen."; err.hidden = false; return; }
+    const name = nameI.value.trim(), code = codeI.value;
+    if (!name) { err.textContent = "Enter your name."; err.hidden = false; return; }
+    if (norm(code).length < 9) { err.textContent = "Enter the 9-character exam code from your invigilator."; err.hidden = false; return; }
+    if (!agree.checked) { err.textContent = "Tick the box to accept the rules."; err.hidden = false; return; }
+    startB.disabled = true; startB.textContent = "Opening full screen…";
+    let fsErr = null;
+    try { await document.documentElement.requestFullscreen({navigationUI:"hide"}); } catch(e){ fsErr = e; }
+    let data = null;
+    try { data = await decrypt(code); } catch(e){ data = null; }
+    if (!data) { if (document.fullscreenElement) document.exitFullscreen().catch(()=>{}); err.textContent = "That exam code is not correct. Check it with your invigilator."; err.hidden = false; startB.disabled = false; startB.textContent = "Start exam in full screen"; return; }
+    if (fsErr || !document.fullscreenElement) { err.textContent = "Full screen was blocked, so the exam cannot start. Allow full screen in your browser and try again."; err.hidden = false; startB.disabled = false; startB.textContent = "Start exam in full screen"; return; }
+    S.name = name; startExam(data);
+  });
+}
+
+function startExam(data){
+  S.data = data; S.active = true; S.phase = "exam";
+  S.order = shuffle(data.q.map((q, i) => ({ i, perm: shuffle([0,1,2,3]) })));
+  S.ans = new Array(data.q.length).fill(null); S.review = new Array(data.q.length).fill(false); S.visited = new Array(data.q.length).fill(false); S.idx = 0; S.vio = [];
+  S.start = Date.now(); S.end = S.start + data.mins * 60000;
+  document.body.classList.add("exam");
+  const mark = h("div", {class:"mark", "aria-hidden":"true"}, S.name + "\n" + new Date().toLocaleDateString()); document.body.append(mark); S.mark = mark;
+  const clock = h("div", {class:"clock", id:"clock"}, mmss(data.mins*60)); barRight.replaceChildren(h("span", {class:"note", style:"color:inherit;opacity:.8;margin-right:10px"}, S.name), clock);
+  sub.textContent = "Exam in progress";
+  renderQ();
+  setTimeout(() => { S.armed = true; S.baseW = innerWidth; S.baseH = innerHeight; }, 1200);
+  S.timer = setInterval(() => {
+    const left = (S.end - Date.now())/1000; clock.textContent = mmss(left); clock.classList.toggle("low", left < 120);
+    if (left <= 0) submit("Time is up");
+  }, 500);
+  S.presTimer = setInterval(() => pres(), 5000);
+  pres();
+}
+function violation(m){ S.vio.push({ t: Math.round((Date.now() - S.start)/1000), m }); pres(); }
+const STANDALONE = !(window.claude && window.claude.use);
+function mal(reason){ if (S.phase !== "exam") return; S.mal = true; violation("MALPRACTICE: " + reason); submit("Malpractice: " + reason); }
+function guard(reason){ if (S.phase === "exam" && S.armed) mal(reason); }
+document.addEventListener("fullscreenchange", () => { if (S.phase === "exam" && !document.fullscreenElement) mal("Left full screen"); });
+document.addEventListener("visibilitychange", () => { if (document.hidden) guard("Switched to another tab or app"); });
+window.addEventListener("blur", () => { setTimeout(() => { if (!document.hasFocus()) guard("Exam window lost focus (AI helper, overlay or other app)"); }, 250); });
+window.addEventListener("resize", () => { if (S.phase === "exam" && S.armed && (innerWidth < S.baseW * 0.85 || innerHeight < S.baseH * 0.85)) guard("Screen size changed (side panel, AI sidebar or developer tools)"); });
+setInterval(() => { if (S.phase === "exam" && S.armed) { if (!document.hasFocus()) { S.nf = (S.nf || 0) + 1; if (S.nf >= 2) mal("Exam window lost focus (AI helper, overlay or other app)"); } else S.nf = 0; } }, 600);
+document.documentElement.addEventListener("mouseleave", () => { if (S.phase === "exam" && S.armed) { clearTimeout(S.mlT); S.mlT = setTimeout(() => guard("Mouse moved off the exam screen (second screen or overlay)"), 1500); } });
+document.documentElement.addEventListener("mouseenter", () => clearTimeout(S.mlT));
+["contextmenu","copy","cut","paste","dragstart","selectstart"].forEach(ev => document.addEventListener(ev, e => { if (S.phase === "exam") { e.preventDefault(); if (ev !== "selectstart" && ev !== "dragstart") guard("Tried to " + (ev === "contextmenu" ? "right-click" : ev) + " (possible AI use)"); } }));
+const OURS = n => !!(n.closest && n.closest("#app, #banner, .mark, .modal, .bar, #selfcam"));
+const SAFE_TAGS = /^(SCRIPT|STYLE|LINK|META|TITLE|NOSCRIPT|TEMPLATE)$/;
+function foreignNodes(){ const out = []; for (const root of [document.documentElement, document.body]) { if (!root) continue; for (const c of root.children) { if (c === document.head || c === document.body || SAFE_TAGS.test(c.tagName) || OURS(c) || c.classList.contains("bar") || c.id === "app" || c.id === "banner" || c.classList.contains("mark") || c.classList.contains("modal") || c.id === "selfcam") continue; out.push(c); } } return out; }
+if (STANDALONE && window.MutationObserver) new MutationObserver(muts => { if (S.phase !== "exam" || !S.armed) return; for (const m of muts) for (const n of m.addedNodes) { if (n.nodeType !== 1 || SAFE_TAGS.test(n.tagName)) continue; const el = n; if (OURS(el) || el.classList.contains("mark") || el.classList.contains("modal")) continue; if (el.parentElement && OURS(el.parentElement)) continue; mal("Unknown content added to the exam page (AI or browser extension)"); return; } }).observe(document.documentElement, { childList:true, subtree:true });
+document.addEventListener("keydown", e => {
+  if (S.phase !== "exam") return;
+  const k = (e.key || "").toLowerCase(), mod = e.ctrlKey || e.metaKey;
+  const dev = k === "f12" || (mod && e.shiftKey && ["i","j","c","k"].includes(k)) || (mod && e.altKey && ["i","j","c"].includes(k)) || (mod && k === "u");
+  const ai = k === "meta" || k === "os" || (e.altKey && k === " ") || (mod && k === " ") || (mod && k === "enter") || (mod && k === "\\") || (mod && e.shiftKey && ["s","3","4","5"].includes(k)) || (e.altKey && k === "c");
+  if (dev) { e.preventDefault(); e.stopPropagation(); guard("Developer tools shortcut pressed"); return; }
+  if (ai) { e.preventDefault(); e.stopPropagation(); guard("AI assistant or screenshot shortcut pressed (" + (e.metaKey ? "Win/Cmd+" : "") + (e.ctrlKey ? "Ctrl+" : "") + (e.altKey ? "Alt+" : "") + (e.shiftKey ? "Shift+" : "") + (e.key === " " ? "Space" : e.key) + ")"); return; }
+  const blocked = (mod && ["c","v","x","a","p","s","f","r","t","n","w","l"].includes(k)) || k === "f5" || k === "f11" || (e.altKey && k === "tab");
+  if (blocked) { e.preventDefault(); e.stopPropagation(); if (mod && ["c","v","x"].includes(k)) guard("Tried to copy or paste (possible AI use)"); else { violation("Blocked key: " + (mod ? "Ctrl/Cmd+" : "") + e.key); showBanner("That shortcut is disabled during the exam."); } }
+}, true);
+document.addEventListener("keyup", e => { if (S.phase === "exam" && (e.key === "PrintScreen")) guard("Screenshot key pressed"); });
+
+function qStatus(i){ const a = S.ans[i] != null, r = S.review[i]; return a && r ? "ar" : r ? "rv" : a ? "an" : S.visited[i] ? "na" : "nv"; }
+function qCounts(){ const c = {an:0, na:0, nv:0, rv:0, ar:0}; S.order.forEach(x => c[qStatus(x.i)]++); return c; }
+function goQ(j){ S.idx = Math.max(0, Math.min(S.order.length - 1, j)); renderQ(); pres(); }
+const LEG = [["an","Answered"],["na","Not answered"],["nv","Not visited"],["rv","Marked for review"],["ar","Answered & marked for review (will be evaluated)"]];
+function renderQ(){
+  const o = S.order[S.idx], q = S.data.q[o.i], letters = "ABCD", last = S.idx === S.order.length - 1;
+  S.visited[o.i] = true;
+  const c = qCounts();
+  const opts = o.perm.map((oi, pos) => h("button", {class:"opt" + (S.ans[o.i] === oi ? " sel" : ""), role:"radio", "aria-checked": S.ans[o.i] === oi ? "true" : "false", onclick: () => { S.ans[o.i] = oi; renderQ(); pres(); }}, h("span", {class:"rad"}), h("span", {class:"k"}, letters[pos]), q.o[oi]));
+  const pal = S.order.map((x, j) => h("button", {class:"pb " + qStatus(x.i) + (j === S.idx ? " cur" : ""), "aria-label":"Question " + (j+1) + ", " + (LEG.find(l => l[0] === qStatus(x.i)) || ["",""])[1], onclick: () => goQ(j)}, String(j+1)));
+  app.replaceChildren(h("div", {class:"tl"},
+    h("div", {class:"card qpanel"},
+      h("div", {class:"qtop"}, h("span", {class:"qnum"}, "Question " + (S.idx+1) + " of " + S.order.length), h("div", {class:"qmeta"}, h("span", null, "Single correct"), h("span", null, "+1 mark"), h("span", null, "No negative marking"))),
+      h("div", {class:"qbody"}, h("p", {class:"qtext"}, q.t), h("div", {class:"opts", role:"radiogroup"}, opts)),
+      h("div", {class:"actions"},
+        h("div", {class:"l"},
+          h("button", {class:"revb", onclick: () => { S.review[o.i] = true; if (!last) goQ(S.idx + 1); else { renderQ(); pres(); } }}, "Mark for Review & Next"),
+          h("button", {onclick: () => { S.ans[o.i] = null; renderQ(); pres(); }, disabled: S.ans[o.i] == null}, "Clear Response")),
+        h("div", {class:"r"},
+          h("button", {onclick: () => goQ(S.idx - 1), disabled: S.idx === 0}, "← Previous"),
+          h("button", {class:"go", onclick: () => { if (S.ans[o.i] != null) S.review[o.i] = false; if (!last) goQ(S.idx + 1); else openSummary(); }}, last ? "Save & Finish" : "Save & Next")))),
+    h("div", {class:"card stack"},
+      h("div", {class:"cand"}, h("div", {class:"ava", "aria-hidden":"true"}, (S.name.trim()[0] || "S").toUpperCase()), h("div", null, h("div", {style:"font-weight:700"}, S.name), h("div", {class:"note"}, "Candidate"))),
+      h("div", {class:"legend"}, LEG.map(([k, t]) => h("div", {style: k === "ar" ? "grid-column:1/-1" : ""}, h("span", {class:"pb " + k}, String(c[k])), t))),
+      h("div", {style:"font-weight:700"}, "AI Test 2 · choose a question"),
+      h("div", {class:"pal5"}, pal),
+      h("button", {class:"warn", onclick: openSummary}, "Submit test"),
+      h("p", {class:"note"}, "Your answers save as soon as you pick an option. Stay in full screen: leaving it submits your test."))
+  ));
+}
+function openSummary(){
+  const c = qCounts(), total = S.order.length;
+  const rows = [["Total questions", total], ["Answered", c.an], ["Answered & marked for review", c.ar], ["Marked for review (no answer)", c.rv], ["Not answered", c.na], ["Not visited", c.nv]];
+  const m = h("div", {class:"modal", role:"dialog", "aria-modal":"true", "aria-label":"Submit test"},
+    h("div", {class:"card stack"},
+      h("h2", null, "Submit your test?"),
+      h("div", {class:"tbl"}, h("table", null, rows.map(r => h("tr", null, h("td", null, r[0]), h("td", {style:"text-align:right;font-weight:700"}, String(r[1])))))),
+      h("p", {class:"note"}, "Answered & marked questions are evaluated. Marked questions with no answer, not answered and not visited get 0. You cannot change answers after submitting."),
+      h("div", {class:"row", style:"justify-content:flex-end"}, h("button", {onclick: () => m.remove()}, "Back to test"), h("button", {class:"go", onclick: () => { m.remove(); submit("Submitted by the student"); }}, "Submit test"))));
+  document.body.append(m);
+}
+async function submit(reason){
+  if (S.phase !== "exam") return;
+  S.phase = "done"; S.active = false; clearInterval(S.timer); clearInterval(S.presTimer);
+  const d = S.data; let score = 0; const a = d.q.map((q, i) => { const x = S.ans[i]; if (x === q.a) score++; return x == null ? "-" : String(x); }).join("");
+  const body = { n:S.name, s:score, T:d.q.length, r:reason, d:Math.round((Date.now() - S.start)/1000), a, m:S.mal ? 1 : 0, v:S.vio.slice(0,12).map(x => [x.t, x.m.slice(0,60)]), ts:new Date().toISOString() };
+  const sig = (await sha(d.secret + "|" + JSON.stringify(body))).slice(0,12);
+  const code = toB64u(body) + "." + sig;
+  S.result = { name:S.name, score, total:d.q.length, reason, mal:!!S.mal, secs:body.d, code, vio:S.vio.length, ts:body.ts };
+  store.set("ai2_result", S.result);
+  if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  document.body.classList.remove("exam"); if (S.mark) S.mark.remove(); document.querySelectorAll(".modal").forEach(x => x.remove());
+  pres({ st:"submitted", score, total:d.q.length, reason, rc:code, left:null });
+  renderResult();
+}
+function renderResult(){
+  const r = S.result; sub.textContent = "Result"; barRight.replaceChildren();
+  const copyB = h("button", null, "Copy result code"); copyB.addEventListener("click", () => copyText(r.code, copyB));
+  const auto = r.reason !== "Submitted by the student" && r.reason !== "Time is up";
+  app.replaceChildren(h("div", {class:"stack"},
+    h("h1", null, "Exam submitted"),
+    h("div", {class:"grid2"},
+      h("div", {class:"card stack"}, h("span", {class:"note"}, r.name), h("div", {class:"score"}, r.score + " / " + r.total), h("div", null, "Time used: " + mmss(r.secs)),
+        r.mal ? h("div", {class:"msg bad", style:"font-size:1.15rem;font-weight:800"}, "MALPRACTICE DETECTED · test auto-submitted") : null,
+        h("div", {class:"msg " + (auto ? "bad" : "ok")}, (auto ? "Auto-submitted: " : "") + r.reason),
+        r.vio ? h("div", {class:"note"}, r.vio + " rule event(s) were recorded and sent to your invigilator.") : null),
+      h("div", {class:"card stack"}, h("h3", null, "Result code"), h("p", {class:"note"}, "Show this screen to your invigilator, or copy this code and send it to them. They use it to check your result."), h("div", {class:"code"}, r.code), copyB))
+  ));
+  pres({ st:"submitted", score:r.score, total:r.total, reason:r.reason, rc:r.code, left:null });
+}
+
+/* ---------------- invigilator ---------------- */
+async function invigilator(){
+  sub.textContent = "Invigilator";
+  app.replaceChildren(h("p", {class:"note"}, "Checking that you are the owner…"));
+  let user = null; try { user = window.claude && claude.use ? await claude.use("user") : null; } catch(e){}
+  const owner = user ? ((await user.isOwner().catch(() => false)) ?? false) : false;
+  if (!owner) { app.replaceChildren(h("div", {class:"card stack"}, h("h2", null, "Invigilator page"), h("p", null, "Only the owner of this exam can open this page. If you are the student, open the student page."), h("a", {href:"#student"}, h("button", {class:"go"}, "Go to the student page")))); return; }
+  let code = null; let db = null;
+  try { db = await claude.use("db"); const snap = db ? await db.doc("exam/secret").get() : null; code = snap && snap.exists ? String((snap.data() || {}).code || "") : null; } catch(e){ code = null; }
+  let data = null; if (code) { try { data = await decrypt(code); } catch(e){ data = null; } }
+  const codeBox = h("div", {class:"big"}, code || "—");
+  const copyB = h("button", null, "Copy code"); copyB.addEventListener("click", () => copyText(code || "", copyB));
+  const monitor = h("div", {class:"stack"}, h("p", {class:"note"}, "Connecting to live monitoring…"));
+  const logEl = h("div", {class:"log"});
+  const keyWrap = h("div", {class:"tbl", hidden:true});
+  const keyB = h("button", null, "Show answer key"); keyB.addEventListener("click", () => { if (!data) return; keyWrap.hidden = !keyWrap.hidden; keyB.textContent = keyWrap.hidden ? "Show answer key" : "Hide answer key"; });
+  if (data) keyWrap.append(h("table", null, h("tr", null, h("th", null, "#"), h("th", null, "Question"), h("th", null, "Answer")), data.q.map((q, i) => h("tr", null, h("td", null, String(i+1)), h("td", null, q.t), h("td", {class:"right"}, q.o[q.a])))));
+  const rcIn = h("textarea", {id:"rcin", rows:"3", placeholder:"Paste the student's result code"});
+  const rcOut = h("div", {class:"stack"});
+  const rcB = h("button", {class:"go"}, "Check result"); rcB.addEventListener("click", () => checkCode(rcIn.value.trim(), rcOut, data));
+  app.replaceChildren(h("div", {class:"stack"},
+    h("h1", null, "Invigilator"),
+    h("div", {class:"grid2"},
+      h("div", {class:"card stack"}, h("h3", null, "Exam code"), codeBox,
+        h("p", {class:"note"}, code ? "Read this code to the student only when you are ready to start. The questions stay locked until it is typed in." : "The exam code could not be loaded. Reload this page; if it still fails, ask Claude to reset the code."), copyB),
+      h("div", {class:"card stack"}, h("h3", null, "Before you start"),
+        h("ol", {class:"rules"},
+          h("li", null, "Start a video call (Google Meet or Zoom) with the student. Ask them to keep camera and microphone on and to share their ", h("b", null, "entire screen"), ". Record the call there."),
+          h("li", null, "Ask them to close every other app and tab."),
+          h("li", null, "Send them the student link (the same link ending in #student)."),
+          h("li", null, "When they are on the start page, read out the exam code."),
+          h("li", null, "Watch the live panel below. It updates while the student's page is open.")))),
+    h("div", {class:"card stack"}, h("div", {class:"row", style:"justify-content:space-between"}, h("h2", null, "Live monitor"), h("span", {class:"note"}, "Updates every few seconds")), monitor, h("h3", null, "Event log"), logEl),
+    h("div", {class:"card stack"}, h("h2", null, "Check a result code"), h("p", {class:"note"}, "If live monitoring is not available, ask the student to copy the result code from their result screen and send it to you."), rcIn, rcB, rcOut),
+    h("div", {class:"card stack"}, h("div", {class:"row", style:"justify-content:space-between"}, h("h2", null, "Answer key"), keyB), keyWrap)
+  ));
+  const room = await getRoom();
+  if (!room) { monitor.replaceChildren(h("div", {class:"msg info"}, "Live monitoring is not available in this view. Use the video call to watch the student and check their result code below.")); return; }
+  const seen = new Map();
+  const log = (who, text) => { logEl.prepend(h("div", null, new Date().toLocaleTimeString() + " · " + who + ": " + text)); };
+  const render = (peers) => {
+    const studs = peers.filter(p => !p.isMe && p.presence && p.presence.role === "student");
+    if (!studs.length) { monitor.replaceChildren(h("div", {class:"msg info"}, "No student connected yet. When the student opens the student page while signed in to Claude, they appear here.")); return; }
+    monitor.replaceChildren(...studs.map(p => {
+      const s = p.presence, name = typeof s.name === "string" && s.name ? s.name : "Student", st = String(s.st || "");
+      const prev = seen.get(p.peer) || {};
+      if (prev.st !== st) log(name, st === "exam" ? "started the exam" : st === "submitted" ? "submitted (" + (s.reason || "") + ")" : st === "intro" ? "is on the start page" : st);
+      if ((s.vio || 0) > (prev.vio || 0) && s.last) log(name, "⚠ " + s.last);
+      seen.set(p.peer, { st, vio: s.vio || 0 });
+      const pill = st === "exam" ? h("span", {class:"pill live"}, "In exam") : st === "submitted" ? h("span", {class:"pill done"}, "Submitted") : h("span", {class:"pill wait"}, "Waiting");
+      const warnI = h("input", {type:"text", placeholder:"Message to the student", maxlength:"200"});
+      const sendB = h("button", null, "Send warning"); sendB.addEventListener("click", () => { const m = warnI.value.trim(); if (!m) return; room.emit("ctl", { action:"warn", msg:m, to:p.peer }).catch(() => {}); log(name, "warning sent: " + m); warnI.value = ""; });
+      const forceB = h("button", {class:"warn", disabled: st !== "exam"}, "Force submit");
+      const sure = h("div", {class:"row", hidden:true}, h("span", {class:"note"}, "Submit this student's exam now?"), h("button", {class:"warn", onclick: () => { room.emit("ctl", { action:"submit", to:p.peer }).catch(() => {}); log(name, "force submit sent"); sure.hidden = true; }}, "Yes, submit"), h("button", {onclick: () => { sure.hidden = true; }}, "Cancel"));
+      forceB.addEventListener("click", () => { sure.hidden = false; });
+      const rcBox = s.rc ? h("button", {onclick: () => { rcIn.value = String(s.rc); checkCode(String(s.rc), rcOut, data); rcOut.scrollIntoView({behavior:"smooth", block:"start"}); }}, "Check this result") : null;
+      return h("div", {class:"card stack", style:"background:var(--bg)"},
+        h("div", {class:"row", style:"justify-content:space-between"}, h("h3", null, name), pill),
+        h("div", {class:"kv"},
+          h("b", null, "Question"), h("span", null, st === "exam" ? (s.q || "?") + " of " + (s.n || 30) : "—"),
+          h("b", null, "Answered"), h("span", null, (s.ans ?? 0) + " of " + (s.n || 30)),
+          h("b", null, "Marked for review"), h("span", null, String(s.rv ?? 0)),
+          h("b", null, "Time left"), h("span", null, typeof s.left === "number" ? mmss(s.left) : "—"),
+          h("b", null, "Full screen"), h("span", {class: s.fs ? "right" : (st === "exam" ? "wrong" : "")}, s.fs ? "Yes" : "No"),
+          h("b", null, "Rule events"), h("span", {class:(s.vio || 0) ? "wrong" : ""}, String(s.vio || 0) + (s.last ? " · last: " + s.last : "")),
+          st === "submitted" ? [h("b", null, "Score"), h("span", {class:"right"}, (s.score ?? "?") + " / " + (s.total ?? 30) + " · " + (s.reason || ""))] : null),
+        st === "exam" ? h("div", {class:"row"}, warnI, sendB, forceB) : null, sure, rcBox);
+    }));
+  };
+  room.onPeers(ch => { ch.left.forEach(p => { if (p.presence && p.presence.role === "student") log(typeof p.presence.name === "string" ? p.presence.name : "Student", p.presence.st === "submitted" ? "closed the result page" : "disconnected (page closed or reloaded)"); }); render(ch.peers); }, () => monitor.replaceChildren(h("div", {class:"msg info"}, "Live monitoring stopped. Reload this page to reconnect.")));
+}
+async function checkCode(str, out, data){
+  out.replaceChildren();
+  if (!data) { out.append(h("div", {class:"msg bad"}, "The answer key is not loaded, so the code cannot be checked.")); return; }
+  const [p1, sig] = String(str).split(".");
+  let body = null; try { body = fromB64u(p1); } catch(e){}
+  if (!body || !sig) { out.append(h("div", {class:"msg bad"}, "This is not a valid result code. Ask the student to copy it again.")); return; }
+  const good = (await sha(data.secret + "|" + JSON.stringify(body))).slice(0,12) === sig;
+  let score = 0; const rows = data.q.map((q, i) => { const c = body.a && body.a[i]; const ci = c === "-" || c == null ? null : Number(c); const ok = ci === q.a; if (ok) score++; return h("tr", null, h("td", null, String(i+1)), h("td", null, q.t), h("td", {class: ci == null ? "" : ok ? "right" : "wrong"}, ci == null ? "Not answered" : q.o[ci] || "?"), h("td", null, q.o[q.a])); });
+  out.append(
+    h("div", {class:"msg " + (good && score === body.s ? "ok" : "bad")}, good && score === body.s ? "Genuine result code." : "Warning: this code does not match the exam. It may have been edited."),
+    body.m ? h("div", {class:"msg bad", style:"font-size:1.15rem;font-weight:800"}, "MALPRACTICE: " + String(body.r || "")) : null,
+    h("div", {class:"kv"}, h("b", null, "Name"), h("span", null, String(body.n || "")), h("b", null, "Score"), h("span", {class:"right"}, score + " / " + data.q.length), h("b", null, "How it ended"), h("span", null, String(body.r || "")), h("b", null, "Time used"), h("span", null, mmss(body.d || 0)), h("b", null, "Submitted at"), h("span", null, body.ts ? new Date(body.ts).toLocaleString() : "")),
+    Array.isArray(body.v) && body.v.length ? h("div", null, h("h3", null, "Rule events"), h("ul", {class:"rules"}, body.v.map(v => h("li", null, mmss(v[0]) + " · " + v[1])))) : h("p", {class:"note"}, "No rule events recorded."),
+    h("div", {class:"tbl"}, h("table", null, h("tr", null, h("th", null, "#"), h("th", null, "Question"), h("th", null, "Student's answer"), h("th", null, "Correct answer")), rows)));
+}
+/* ---------------- live screen + camera to the invigilator (standalone page only) ---------------- */
+const INV_ID = window.__INV || "pqexam-none";
+const LIVE = { peer:null, conn:null, screen:null, cam:null, calls:[], ok:false, tries:0, ui:null };
+const ICE = { iceServers: [ {urls:"stun:stun.l.google.com:19302"}, {urls:"turn:freestun.net:3478",username:"free",credential:"free"},{urls:"turns:freestun.net:5349",username:"free",credential:"free"}, {urls:"stun:stun1.l.google.com:19302"}, {urls:"turn:openrelay.metered.ca:80", username:"openrelayproject", credential:"openrelayproject"}, {urls:"turn:openrelay.metered.ca:443", username:"openrelayproject", credential:"openrelayproject"}, {urls:"turn:openrelay.metered.ca:443?transport=tcp", username:"openrelayproject", credential:"openrelayproject"} ] };
+function liveSet(k, ok, text){ if (!LIVE.ui) return; const el = LIVE.ui[k]; if (!el) return; el.className = "msg " + (ok === true ? "ok" : ok === false ? "bad" : "info"); el.textContent = text; }
+function liveBox(startB){
+  const scr = h("div", {class:"msg info"}, "Screen: not shared"), cam = h("div", {class:"msg info"}, "Camera and microphone: not shared"), net = h("div", {class:"msg info"}, "Invigilator link: waiting");
+  LIVE.ui = { scr, cam, net };
+  const b = h("button", {class:"go"}, "Share screen and camera");
+  b.addEventListener("click", async () => {
+    b.disabled = true;
+    try {
+      const ds = await navigator.mediaDevices.getDisplayMedia({ video:{ displaySurface:"monitor", frameRate:{ ideal:10, max:15 } }, audio:false, selfBrowserSurface:"exclude", surfaceSwitching:"exclude", monitorTypeSurfaces:"include" });
+      const tr = ds.getVideoTracks()[0], surf = tr && tr.getSettings ? tr.getSettings().displaySurface : "monitor";
+      if (surf && surf !== "monitor") { ds.getTracks().forEach(t => t.stop()); liveSet("scr", false, "You shared a window or tab. Click again and choose \"Entire screen\"."); b.disabled = false; return; }
+      LIVE.screen = ds; liveSet("scr", true, "Screen: entire screen shared ✓");
+      tr.addEventListener("ended", () => { LIVE.screen = null; liveSet("scr", false, "Screen sharing stopped"); if (S.phase === "exam") mal("Stopped sharing the screen"); });
+    } catch(e){ liveSet("scr", false, "Screen sharing was cancelled or blocked. Click the button again and choose \"Entire screen\"."); b.disabled = false; return; }
+    try {
+      const cs = await navigator.mediaDevices.getUserMedia({ video:{ width:{ ideal:640 }, height:{ ideal:480 }, facingMode:"user" }, audio:true });
+      LIVE.cam = cs; liveSet("cam", true, "Camera and microphone: on ✓");
+      cs.getTracks().forEach(t => t.addEventListener("ended", () => { LIVE.cam = null; liveSet("cam", false, "Camera or microphone turned off"); if (S.phase === "exam") mal("Turned off the camera or microphone"); }));
+      let v = document.getElementById("selfcam");
+      if (!v) { v = h("video", {id:"selfcam", autoplay:true, muted:true, playsinline:true}); v.muted = true; document.body.append(v); }
+      v.srcObject = cs; v.play().catch(()=>{});
+    } catch(e){ liveSet("cam", false, "Camera or microphone was blocked. Allow them in Chrome (camera icon in the address bar) and click again."); b.disabled = false; return; }
+    b.textContent = "Shared ✓"; liveConnect();
+  });
+  return h("div", {class:"card stack", style:"background:var(--bg)"}, h("h3", null, "Step 1: share your screen and camera"), h("p", {class:"note"}, "Choose \"Entire screen\" when Chrome asks. Your invigilator sees your screen, face and voice live and records them."), b, scr, cam, net, h("h3", null, "Step 2: start the exam"));
+}
+function liveConnect(){
+  if (!window.Peer) { liveSet("net", false, "Live link could not load. Check your internet and reload the page."); return; }
+  if (LIVE.peer) { try { LIVE.peer.destroy(); } catch(e){} }
+  liveSet("net", null, "Invigilator link: connecting…");
+  const peer = new Peer(undefined, { config: ICE }); LIVE.peer = peer;
+  peer.on("open", () => {
+    const conn = peer.connect(INV_ID, { reliable:true, metadata:{ name: S.name || "Student" } }); LIVE.conn = conn;
+    conn.on("open", () => {
+      LIVE.ok = true; liveSet("net", true, "Invigilator link: connected ✓ (your invigilator can see you)");
+      const meta = n => ({ metadata:{ kind:n, name: S.name || "Student" } });
+      const watch = (c, nm) => { try { const pc = c && c.peerConnection; if (pc) pc.addEventListener("iceconnectionstatechange", () => { const st = pc.iceConnectionState; if (st === "failed") liveSet("net", false, "Video link blocked by this network (" + nm + "). Tell your invigilator; use the Google Meet backup."); }); } catch(e){} };
+      if (LIVE.screen) { const c1 = peer.call(INV_ID, LIVE.screen, meta("screen")); watch(c1, "screen"); LIVE.calls.push(c1); }
+      if (LIVE.cam) { const c2 = peer.call(INV_ID, LIVE.cam, meta("cam")); watch(c2, "camera"); LIVE.calls.push(c2); }
+      pres();
+    });
+    conn.on("close", () => { LIVE.ok = false; liveSet("net", false, "Invigilator link lost. Reconnecting…"); setTimeout(liveConnect, 4000); });
+  });
+  peer.on("error", e => {
+    LIVE.ok = false;
+    const t = e && e.type === "peer-unavailable" ? "Waiting for your invigilator to open the monitor page… retrying" : "Live link problem (" + ((e && e.type) || "error") + "). Retrying…";
+    liveSet("net", false, t); setTimeout(liveConnect, 5000);
+  });
+}
+
+route();
+})();
+</script>
+</body></html>
