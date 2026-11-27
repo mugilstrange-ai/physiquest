@@ -1,0 +1,426 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Sports Quiz Exam</title></head><body style="margin:0"><title>Sports Quiz Exam 3</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: a scoreboard-style top bar, one centred working column; exam mode fills the screen. */
+:root{--bg:#f3f5f1;--card:#ffffff;--ink:#14201b;--mut:#5c6b64;--line:#d9e0d9;--turf:#17694a;--turf-ink:#ffffff;--amber:#c77d0a;--soft:#e6f0ea;--bad:#b42318;--bad-soft:#fdecea;--ok:#13795b;--ok-soft:#e3f4ec;--board:#10231b;--board-ink:#f4f7f2;--ans:#1a7f37;--nans:#c23b22;--rev:#6b4bc4;--nv:#e9ece8;
+--display:"Barlow Condensed","Arial Narrow",sans-serif;--body:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1512;--card:#16201b;--ink:#e8efe9;--mut:#9fb1a8;--line:#2a3832;--turf:#2fa776;--turf-ink:#06130d;--amber:#f0b445;--soft:#1b2c24;--bad:#ff8a7a;--bad-soft:#3a1d1a;--ok:#5fd3a5;--ok-soft:#163327;--board:#0a120e;--board-ink:#f4f7f2;--ans:#2ea85a;--nans:#e5674f;--rev:#9b7ff0;--nv:#26332c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1512;--card:#16201b;--ink:#e8efe9;--mut:#9fb1a8;--line:#2a3832;--turf:#2fa776;--turf-ink:#06130d;--amber:#f0b445;--soft:#1b2c24;--bad:#ff8a7a;--bad-soft:#3a1d1a;--ok:#5fd3a5;--ok-soft:#163327;--board:#0a120e;--board-ink:#f4f7f2;--ans:#2ea85a;--nans:#e5674f;--rev:#9b7ff0;--nv:#26332c;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--board)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--board);color:var(--board-ink)}
+.bar .in{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.brand{font-family:var(--display);font-size:1.5rem;letter-spacing:.04em;text-transform:uppercase}
+.brand small{font-family:var(--body);font-size:.75rem;letter-spacing:.08em;opacity:.7;margin-left:8px}
+.sp{flex:1}
+.clock{font-family:var(--display);font-size:1.7rem;letter-spacing:.05em;font-variant-numeric:tabular-nums;background:rgba(255,255,255,.08);border-radius:8px;padding:0 12px}
+.clock.low{color:#ffb4a8}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+h1,h2,h3{font-family:var(--display);letter-spacing:.02em;text-wrap:balance;margin:0}
+h1{font-size:2.4rem;line-height:1.05}h2{font-size:1.6rem}h3{font-size:1.2rem}
+.lead{color:var(--mut);max-width:62ch}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.stack{display:flex;flex-direction:column;gap:12px}
+label{font-weight:600;font-size:.9rem}
+input[type=text],textarea{width:100%;font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+input:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+button{font:inherit;font-weight:600;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 16px;cursor:pointer}
+button.go{background:var(--turf);color:var(--turf-ink);border-color:var(--turf)}
+button.warn{background:var(--bad-soft);color:var(--bad);border-color:var(--bad)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.rules{margin:0;padding-left:20px}.rules li{margin:4px 0}
+.note{font-size:.85rem;color:var(--mut)}
+.msg{border-radius:10px;padding:10px 12px;font-size:.92rem}
+.msg.bad{background:var(--bad-soft);color:var(--bad)}.msg.ok{background:var(--ok-soft);color:var(--ok)}.msg.info{background:var(--soft)}
+.pill{display:inline-block;border-radius:99px;padding:2px 10px;font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.pill.live{background:var(--ok-soft);color:var(--ok)}.pill.done{background:var(--soft);color:var(--turf)}.pill.bad{background:var(--bad-soft);color:var(--bad)}.pill.wait{background:var(--soft);color:var(--mut)}
+/* exam */
+.exam{user-select:none;-webkit-user-select:none}
+.qhead{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.qnum{font-family:var(--display);font-size:1.2rem;color:var(--amber);letter-spacing:.06em;text-transform:uppercase}
+.qtext{font-size:1.35rem;font-weight:600;margin:6px 0 16px;line-height:1.35}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;padding:12px 14px;border-radius:12px;font-weight:500}
+.opt .k{font-family:var(--display);font-size:1.2rem;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--soft);flex:none}
+.opt.sel{border-color:var(--turf);background:var(--soft)}.opt.sel .k{background:var(--turf);color:var(--turf-ink)}
+.nav{display:flex;gap:10px;justify-content:space-between;margin-top:16px;flex-wrap:wrap}
+.pal{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+.pal button{padding:6px 0;font-size:.85rem;font-variant-numeric:tabular-nums}
+.pal button.an{background:var(--turf);color:var(--turf-ink);border-color:var(--turf)}
+.pal button.cur{outline:3px solid var(--amber);outline-offset:1px}
+.examgrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px}
+@media (max-width:760px){.examgrid{grid-template-columns:1fr}}
+.mark{position:fixed;inset:0;pointer-events:none;z-index:1;display:grid;place-items:center;opacity:.05;font-family:var(--display);font-size:5vw;transform:rotate(-24deg);color:var(--ink);text-align:center;white-space:pre}
+.banner{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 70px);z-index:20;max-width:min(560px,92vw)}
+/* result */
+.score{font-family:var(--display);font-size:5rem;line-height:1;color:var(--turf)}
+.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.78rem;word-break:break-all;background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:10px;user-select:all;-webkit-user-select:all}
+/* invigilator */
+.big{font-family:var(--display);font-size:2.6rem;letter-spacing:.12em}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:.92rem}.kv b{color:var(--mut);font-weight:600}
+.log{max-height:220px;overflow:auto;font-size:.85rem;border-top:1px solid var(--line);margin-top:8px;padding-top:6px}
+.log div{padding:3px 0;border-bottom:1px dashed var(--line)}
+.tbl{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.86rem}th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}th{color:var(--mut);font-weight:600}
+.right{color:var(--ok);font-weight:700}.wrong{color:var(--bad);font-weight:700}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* test layout */
+.tl{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;align-items:start}
+@media (max-width:820px){.tl{grid-template-columns:1fr}}
+.qpanel{display:flex;flex-direction:column;min-height:60vh}
+.qtop{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding-bottom:10px;flex-wrap:wrap}
+.qmeta{display:flex;gap:8px;flex-wrap:wrap}.qmeta span{font-size:.78rem;border:1px solid var(--line);border-radius:99px;padding:2px 10px;color:var(--mut)}
+.qbody{flex:1;padding:16px 0}
+.opt{width:100%}
+.opt .rad{width:20px;height:20px;border-radius:50%;border:2px solid var(--mut);flex:none;display:grid;place-items:center}
+.opt.sel .rad{border-color:var(--turf)}.opt.sel .rad::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--turf)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;border-top:1px solid var(--line);padding-top:12px}
+.actions .l,.actions .r{display:flex;gap:8px;flex-wrap:wrap}
+button.revb{background:var(--card);color:var(--rev);border-color:var(--rev)}
+.cand{display:flex;gap:10px;align-items:center}
+.ava{width:42px;height:42px;border-radius:10px;background:var(--board);color:var(--board-ink);display:grid;place-items:center;font-family:var(--display);font-size:1.3rem;flex:none}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.8rem}
+.legend div{display:flex;gap:8px;align-items:center}
+.pal5{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
+.pb{position:relative;font:inherit;font-weight:700;font-size:.85rem;padding:0;height:36px;border-radius:8px;border:1px solid var(--line);cursor:pointer;font-variant-numeric:tabular-nums}
+.pb.nv{background:var(--nv);color:var(--ink)}
+.pb.na{background:var(--nans);color:#fff;border-color:var(--nans);border-radius:8px 8px 18px 18px}
+.pb.an{background:var(--ans);color:#fff;border-color:var(--ans);border-radius:18px 18px 8px 8px}
+.pb.rv{background:var(--rev);color:#fff;border-color:var(--rev);border-radius:50%}
+.pb.ar{background:var(--rev);color:#fff;border-color:var(--rev);border-radius:50%}
+.pb.ar::after{content:"";position:absolute;right:1px;bottom:1px;width:11px;height:11px;border-radius:50%;background:var(--ans);border:2px solid var(--card)}
+.pb.cur{outline:3px solid var(--amber);outline-offset:2px}
+.legend .pb{display:inline-grid;place-items:center;flex:none;width:32px;height:28px;font-size:.78rem;cursor:default}
+.modal{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.45);display:grid;place-items:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px}
+.modal .card{max-width:520px;width:100%}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="bar"><div class="in"><div class="brand">Sports Quiz<small id="sub">Online exam</small></div><div class="sp"></div><div id="barRight"></div></div></div>
+<div class="wrap" id="app"></div>
+<div class="banner" id="banner" hidden></div>
+<script>if(!location.hash)location.hash="#student";</script>
+<script id="payload" type="application/json">{"salt":"GCFl/lb0FjC3J8akctMFHA==","iv":"a4wLYX5EZw1HC+e1","ct":"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","n":30}</script>
+<script>
+(function(){
+"use strict";
+const P = JSON.parse(document.getElementById("payload").textContent);
+const app = document.getElementById("app"), barRight = document.getElementById("barRight"), sub = document.getElementById("sub"), banner = document.getElementById("banner");
+const h = (tag, attrs, ...kids) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs || {})) { if (k === "class") e.className = v; else if (k.startsWith("on")) e.addEventListener(k.slice(2), v); else if (v !== false && v != null) e.setAttribute(k, v === true ? "" : v); } for (const c of kids.flat()) { if (c == null || c === false) continue; e.append(c instanceof Node ? c : document.createTextNode(String(c))); } return e; };
+const store = { get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } }, set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
+const b64d = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const norm = c => String(c || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+async function decrypt(code){
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(norm(code)), "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey({name:"PBKDF2", salt:b64d(P.salt), iterations:200000, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["decrypt"]);
+  const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv:b64d(P.iv)}, key, b64d(P.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+async function sha(s){ const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2,"0")).join(""); }
+const toB64u = obj => { const bytes = new TextEncoder().encode(JSON.stringify(obj)); let s = ""; bytes.forEach(b => s += String.fromCharCode(b)); return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); };
+const fromB64u = str => { const s = atob(str.replace(/-/g,"+").replace(/_/g,"/")); return JSON.parse(new TextDecoder().decode(Uint8Array.from(s, c => c.charCodeAt(0)))); };
+const mmss = s => { s = Math.max(0, Math.round(s)); return String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0"); };
+function showBanner(text, kind){ banner.replaceChildren(h("div", {class:"msg " + (kind||"bad"), role:"alert"}, text)); banner.hidden = false; clearTimeout(showBanner.t); showBanner.t = setTimeout(() => banner.hidden = true, 6000); }
+async function copyText(text, btn){ try { await navigator.clipboard.writeText(text); btn.textContent = "Copied"; } catch(e){ btn.textContent = "Select the text and copy it"; } }
+let roomP = null; const getRoom = () => roomP || (roomP = (window.claude && claude.use ? claude.use("room").catch(() => null) : Promise.resolve(null)));
+
+/* ---------------- routing ---------------- */
+function route(){
+  const v = (location.hash || "").replace("#","");
+  barRight.replaceChildren();
+  if (v === "student") return student();
+  if (v === "invigilator") return invigilator();
+  home();
+}
+window.addEventListener("hashchange", () => { if (!S.active) route(); });
+
+function home(){
+  sub.textContent = "Online exam";
+  app.replaceChildren(
+    h("div", {class:"stack"},
+      h("h1", null, "Sports Quiz: online exam"),
+      h("p", {class:"lead"}, "30 questions · 20 minutes · full screen only. Pick your role."),
+      h("div", {class:"grid2"},
+        h("div", {class:"card stack"}, h("h2", null, "Student"), h("p", {class:"note"}, "Take the exam. You need a laptop or desktop with Chrome or Edge, and the exam code from your invigilator."), h("a", {href:"#student"}, h("button", {class:"go"}, "Open student page"))),
+        h("div", {class:"card stack"}, h("h2", null, "Invigilator"), h("p", {class:"note"}, "Exam code, live monitoring, force submit and result checking. Only the owner of this page can use it."), h("a", {href:"#invigilator"}, h("button", null, "Open invigilator page")))
+      )
+    )
+  );
+}
+
+/* ---------------- student ---------------- */
+const S = { active:false, phase:"intro", data:null, order:[], ans:[], idx:0, start:0, end:0, name:"", vio:[], armed:false, baseW:0, baseH:0, timer:null, room:null, result:null };
+function shuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function pres(extra){ if (!S.room) return; const answered = S.ans.filter(x => x != null).length; const rv = (S.review || []).filter(Boolean).length; S.room.presence(Object.assign({ role:"student", name:S.name.slice(0,40), st:S.phase, q:S.idx + 1, n:P.n, ans:answered, rv, left: S.phase === "exam" ? Math.round((S.end - Date.now())/1000) : null, fs: !!document.fullscreenElement, vio:S.vio.length, mal:!!S.mal, last: S.vio.length ? S.vio[S.vio.length-1].m : null, at:Date.now() }, extra || {})).catch(() => {}); }
+
+function student(){
+  sub.textContent = "Student";
+  const prev = store.get("sq4_result");
+  if (prev && prev.code) { S.result = prev; return renderResult(); }
+  const fsOK = !!(document.fullscreenEnabled && document.documentElement.requestFullscreen);
+  const touchSmall = matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 820;
+  const extended = !!(window.screen && screen.isExtended);
+  const err = h("div", {class:"msg bad", role:"alert", hidden:true});
+  const nameI = h("input", {type:"text", id:"sname", autocomplete:"name", placeholder:"Your full name", maxlength:"40"});
+  const codeI = h("input", {type:"text", id:"scode", autocomplete:"off", placeholder:"e.g. ABC-123-XYZ", maxlength:"20", spellcheck:"false"});
+  const agree = h("input", {type:"checkbox", id:"sagree"});
+  const startB = h("button", {class:"go", id:"sstart"}, "Start exam in full screen");
+  const blocks = [];
+  if (!fsOK) blocks.push("This browser cannot open full screen here. Use a laptop or desktop with Chrome or Edge.");
+  if (touchSmall) blocks.push("Phones and tablets are not allowed. Open this link on a laptop or desktop.");
+  if (extended) blocks.push("A second monitor is connected. Disconnect it, reload this page and try again.");
+  if (STANDALONE && foreignNodes().length) blocks.push("A browser extension is changing this page. Open the exam in a Chrome Incognito window (Ctrl+Shift+N) and try again.");
+  if (blocks.length) startB.disabled = true;
+  app.replaceChildren(h("div", {class:"stack"},
+    h("h1", null, "Sports Quiz"),
+    h("p", {class:"lead"}, "30 multiple-choice questions · 1 mark each · 20 minutes · no negative marks."),
+    h("div", {class:"grid2"},
+      h("div", {class:"card stack"}, h("h3", null, "Exam rules"),
+        h("ul", {class:"rules"},
+          h("li", null, "The exam runs in full screen. ", h("b", null, "Leaving full screen (Esc) submits your exam at once.")),
+          h("li", null, h("b", null, "Switching to another tab, window or app, or clicking outside the exam, submits it at once.")),
+          h("li", null, h("b", null, "Using any AI app, screen helper, sidebar, screenshot, copy, paste or right-click is malpractice: the test is auto-submitted and marked MALPRACTICE.")),
+          h("li", null, "Open this exam in a Chrome Incognito window (Ctrl+Shift+N) so no extensions run."),
+          h("li", null, "Copy, paste, right-click and developer tools are blocked and recorded."),
+          h("li", null, "Do not use AI apps, phones, books or other people. Your invigilator watches you on a video call."),
+          h("li", null, "The exam submits by itself when the 20 minutes end."),
+          h("li", null, "Use Save & Next, Mark for Review & Next and Clear Response; the coloured palette on the right shows each question's status."),
+          h("li", null, "You can attempt the exam only once on this device."))),
+      h("div", {class:"card stack"}, h("h3", null, "Start"),
+        h("div", {class:"stack"}, h("label", {for:"sname"}, "Name"), nameI),
+        h("div", {class:"stack"}, h("label", {for:"scode"}, "Exam code (your invigilator reads it out)"), codeI),
+        h("label", {class:"row", style:"font-weight:500"}, agree, "I have read the rules and will follow them."),
+        blocks.map(b => h("div", {class:"msg bad"}, b)), err, startB,
+        h("p", {class:"note"}, "Before starting: close other apps, keep your camera and microphone on in the video call, and share your entire screen there.")))
+  ));
+  getRoom().then(r => { S.room = r; if (r) { S.name = nameI.value || "Student"; pres({st:"intro"}); r.on("ctl", m => { if (m.isMe) return; const d = m.data || {}; if (d.action === "warn" && typeof d.msg === "string") showBanner("Invigilator: " + d.msg.slice(0,200)); if (d.action === "submit") submit("Submitted by the invigilator"); }); } });
+  nameI.addEventListener("input", () => { S.name = nameI.value.trim(); pres({st:"intro"}); });
+  startB.addEventListener("click", async () => {
+    err.hidden = true;
+    const name = nameI.value.trim(), code = codeI.value;
+    if (!name) { err.textContent = "Enter your name."; err.hidden = false; return; }
+    if (norm(code).length < 9) { err.textContent = "Enter the 9-character exam code from your invigilator."; err.hidden = false; return; }
+    if (!agree.checked) { err.textContent = "Tick the box to accept the rules."; err.hidden = false; return; }
+    startB.disabled = true; startB.textContent = "Opening full screen…";
+    let fsErr = null;
+    try { await document.documentElement.requestFullscreen({navigationUI:"hide"}); } catch(e){ fsErr = e; }
+    let data = null;
+    try { data = await decrypt(code); } catch(e){ data = null; }
+    if (!data) { if (document.fullscreenElement) document.exitFullscreen().catch(()=>{}); err.textContent = "That exam code is not correct. Check it with your invigilator."; err.hidden = false; startB.disabled = false; startB.textContent = "Start exam in full screen"; return; }
+    if (fsErr || !document.fullscreenElement) { err.textContent = "Full screen was blocked, so the exam cannot start. Allow full screen in your browser and try again."; err.hidden = false; startB.disabled = false; startB.textContent = "Start exam in full screen"; return; }
+    S.name = name; startExam(data);
+  });
+}
+
+function startExam(data){
+  S.data = data; S.active = true; S.phase = "exam";
+  S.order = shuffle(data.q.map((q, i) => ({ i, perm: shuffle([0,1,2,3]) })));
+  S.ans = new Array(data.q.length).fill(null); S.review = new Array(data.q.length).fill(false); S.visited = new Array(data.q.length).fill(false); S.idx = 0; S.vio = [];
+  S.start = Date.now(); S.end = S.start + data.mins * 60000;
+  document.body.classList.add("exam");
+  const mark = h("div", {class:"mark", "aria-hidden":"true"}, S.name + "\n" + new Date().toLocaleDateString()); document.body.append(mark); S.mark = mark;
+  const clock = h("div", {class:"clock", id:"clock"}, mmss(data.mins*60)); barRight.replaceChildren(h("span", {class:"note", style:"color:inherit;opacity:.8;margin-right:10px"}, S.name), clock);
+  sub.textContent = "Exam in progress";
+  renderQ();
+  setTimeout(() => { S.armed = true; S.baseW = innerWidth; S.baseH = innerHeight; }, 1200);
+  S.timer = setInterval(() => {
+    const left = (S.end - Date.now())/1000; clock.textContent = mmss(left); clock.classList.toggle("low", left < 120);
+    if (left <= 0) submit("Time is up");
+  }, 500);
+  S.presTimer = setInterval(() => pres(), 5000);
+  pres();
+}
+function violation(m){ S.vio.push({ t: Math.round((Date.now() - S.start)/1000), m }); pres(); }
+const STANDALONE = !(window.claude && window.claude.use);
+function mal(reason){ if (S.phase !== "exam") return; S.mal = true; violation("MALPRACTICE: " + reason); submit("Malpractice: " + reason); }
+function guard(reason){ if (S.phase === "exam" && S.armed) mal(reason); }
+document.addEventListener("fullscreenchange", () => { if (S.phase === "exam" && !document.fullscreenElement) mal("Left full screen"); });
+document.addEventListener("visibilitychange", () => { if (document.hidden) guard("Switched to another tab or app"); });
+window.addEventListener("blur", () => { setTimeout(() => { if (!document.hasFocus()) guard("Exam window lost focus (AI helper, overlay or other app)"); }, 250); });
+window.addEventListener("resize", () => { if (S.phase === "exam" && S.armed && (innerWidth < S.baseW * 0.85 || innerHeight < S.baseH * 0.85)) guard("Screen size changed (side panel, AI sidebar or developer tools)"); });
+setInterval(() => { if (S.phase === "exam" && S.armed) { if (!document.hasFocus()) { S.nf = (S.nf || 0) + 1; if (S.nf >= 2) mal("Exam window lost focus (AI helper, overlay or other app)"); } else S.nf = 0; } }, 600);
+document.documentElement.addEventListener("mouseleave", () => { if (S.phase === "exam" && S.armed) { clearTimeout(S.mlT); S.mlT = setTimeout(() => guard("Mouse moved off the exam screen (second screen or overlay)"), 1500); } });
+document.documentElement.addEventListener("mouseenter", () => clearTimeout(S.mlT));
+["contextmenu","copy","cut","paste","dragstart","selectstart"].forEach(ev => document.addEventListener(ev, e => { if (S.phase === "exam") { e.preventDefault(); if (ev !== "selectstart" && ev !== "dragstart") guard("Tried to " + (ev === "contextmenu" ? "right-click" : ev) + " (possible AI use)"); } }));
+const OURS = n => !!(n.closest && n.closest("#app, #banner, .mark, .modal, .bar"));
+const SAFE_TAGS = /^(SCRIPT|STYLE|LINK|META|TITLE|NOSCRIPT|TEMPLATE)$/;
+function foreignNodes(){ const out = []; for (const root of [document.documentElement, document.body]) { if (!root) continue; for (const c of root.children) { if (c === document.head || c === document.body || SAFE_TAGS.test(c.tagName) || OURS(c) || c.classList.contains("bar") || c.id === "app" || c.id === "banner" || c.classList.contains("mark") || c.classList.contains("modal")) continue; out.push(c); } } return out; }
+if (STANDALONE && window.MutationObserver) new MutationObserver(muts => { if (S.phase !== "exam" || !S.armed) return; for (const m of muts) for (const n of m.addedNodes) { if (n.nodeType !== 1 || SAFE_TAGS.test(n.tagName)) continue; const el = n; if (OURS(el) || el.classList.contains("mark") || el.classList.contains("modal")) continue; if (el.parentElement && OURS(el.parentElement)) continue; mal("Unknown content added to the exam page (AI or browser extension)"); return; } }).observe(document.documentElement, { childList:true, subtree:true });
+document.addEventListener("keydown", e => {
+  if (S.phase !== "exam") return;
+  const k = (e.key || "").toLowerCase(), mod = e.ctrlKey || e.metaKey;
+  const dev = k === "f12" || (mod && e.shiftKey && ["i","j","c","k"].includes(k)) || (mod && e.altKey && ["i","j","c"].includes(k)) || (mod && k === "u");
+  const ai = k === "meta" || k === "os" || (e.altKey && k === " ") || (mod && k === " ") || (mod && k === "enter") || (mod && k === "\\") || (mod && e.shiftKey && ["s","3","4","5"].includes(k)) || (e.altKey && k === "c");
+  if (dev) { e.preventDefault(); e.stopPropagation(); guard("Developer tools shortcut pressed"); return; }
+  if (ai) { e.preventDefault(); e.stopPropagation(); guard("AI assistant or screenshot shortcut pressed (" + (e.metaKey ? "Win/Cmd+" : "") + (e.ctrlKey ? "Ctrl+" : "") + (e.altKey ? "Alt+" : "") + (e.shiftKey ? "Shift+" : "") + (e.key === " " ? "Space" : e.key) + ")"); return; }
+  const blocked = (mod && ["c","v","x","a","p","s","f","r","t","n","w","l"].includes(k)) || k === "f5" || k === "f11" || (e.altKey && k === "tab");
+  if (blocked) { e.preventDefault(); e.stopPropagation(); if (mod && ["c","v","x"].includes(k)) guard("Tried to copy or paste (possible AI use)"); else { violation("Blocked key: " + (mod ? "Ctrl/Cmd+" : "") + e.key); showBanner("That shortcut is disabled during the exam."); } }
+}, true);
+document.addEventListener("keyup", e => { if (S.phase === "exam" && (e.key === "PrintScreen")) guard("Screenshot key pressed"); });
+
+function qStatus(i){ const a = S.ans[i] != null, r = S.review[i]; return a && r ? "ar" : r ? "rv" : a ? "an" : S.visited[i] ? "na" : "nv"; }
+function qCounts(){ const c = {an:0, na:0, nv:0, rv:0, ar:0}; S.order.forEach(x => c[qStatus(x.i)]++); return c; }
+function goQ(j){ S.idx = Math.max(0, Math.min(S.order.length - 1, j)); renderQ(); pres(); }
+const LEG = [["an","Answered"],["na","Not answered"],["nv","Not visited"],["rv","Marked for review"],["ar","Answered & marked for review (will be evaluated)"]];
+function renderQ(){
+  const o = S.order[S.idx], q = S.data.q[o.i], letters = "ABCD", last = S.idx === S.order.length - 1;
+  S.visited[o.i] = true;
+  const c = qCounts();
+  const opts = o.perm.map((oi, pos) => h("button", {class:"opt" + (S.ans[o.i] === oi ? " sel" : ""), role:"radio", "aria-checked": S.ans[o.i] === oi ? "true" : "false", onclick: () => { S.ans[o.i] = oi; renderQ(); pres(); }}, h("span", {class:"rad"}), h("span", {class:"k"}, letters[pos]), q.o[oi]));
+  const pal = S.order.map((x, j) => h("button", {class:"pb " + qStatus(x.i) + (j === S.idx ? " cur" : ""), "aria-label":"Question " + (j+1) + ", " + (LEG.find(l => l[0] === qStatus(x.i)) || ["",""])[1], onclick: () => goQ(j)}, String(j+1)));
+  app.replaceChildren(h("div", {class:"tl"},
+    h("div", {class:"card qpanel"},
+      h("div", {class:"qtop"}, h("span", {class:"qnum"}, "Question " + (S.idx+1) + " of " + S.order.length), h("div", {class:"qmeta"}, h("span", null, "Single correct"), h("span", null, "+1 mark"), h("span", null, "No negative marking"))),
+      h("div", {class:"qbody"}, h("p", {class:"qtext"}, q.t), h("div", {class:"opts", role:"radiogroup"}, opts)),
+      h("div", {class:"actions"},
+        h("div", {class:"l"},
+          h("button", {class:"revb", onclick: () => { S.review[o.i] = true; if (!last) goQ(S.idx + 1); else { renderQ(); pres(); } }}, "Mark for Review & Next"),
+          h("button", {onclick: () => { S.ans[o.i] = null; renderQ(); pres(); }, disabled: S.ans[o.i] == null}, "Clear Response")),
+        h("div", {class:"r"},
+          h("button", {onclick: () => goQ(S.idx - 1), disabled: S.idx === 0}, "← Previous"),
+          h("button", {class:"go", onclick: () => { if (S.ans[o.i] != null) S.review[o.i] = false; if (!last) goQ(S.idx + 1); else openSummary(); }}, last ? "Save & Finish" : "Save & Next")))),
+    h("div", {class:"card stack"},
+      h("div", {class:"cand"}, h("div", {class:"ava", "aria-hidden":"true"}, (S.name.trim()[0] || "S").toUpperCase()), h("div", null, h("div", {style:"font-weight:700"}, S.name), h("div", {class:"note"}, "Candidate"))),
+      h("div", {class:"legend"}, LEG.map(([k, t]) => h("div", {style: k === "ar" ? "grid-column:1/-1" : ""}, h("span", {class:"pb " + k}, String(c[k])), t))),
+      h("div", {style:"font-weight:700"}, "Sports Quiz · choose a question"),
+      h("div", {class:"pal5"}, pal),
+      h("button", {class:"warn", onclick: openSummary}, "Submit test"),
+      h("p", {class:"note"}, "Your answers save as soon as you pick an option. Stay in full screen: leaving it submits your test."))
+  ));
+}
+function openSummary(){
+  const c = qCounts(), total = S.order.length;
+  const rows = [["Total questions", total], ["Answered", c.an], ["Answered & marked for review", c.ar], ["Marked for review (no answer)", c.rv], ["Not answered", c.na], ["Not visited", c.nv]];
+  const m = h("div", {class:"modal", role:"dialog", "aria-modal":"true", "aria-label":"Submit test"},
+    h("div", {class:"card stack"},
+      h("h2", null, "Submit your test?"),
+      h("div", {class:"tbl"}, h("table", null, rows.map(r => h("tr", null, h("td", null, r[0]), h("td", {style:"text-align:right;font-weight:700"}, String(r[1])))))),
+      h("p", {class:"note"}, "Answered & marked questions are evaluated. Marked questions with no answer, not answered and not visited get 0. You cannot change answers after submitting."),
+      h("div", {class:"row", style:"justify-content:flex-end"}, h("button", {onclick: () => m.remove()}, "Back to test"), h("button", {class:"go", onclick: () => { m.remove(); submit("Submitted by the student"); }}, "Submit test"))));
+  document.body.append(m);
+}
+async function submit(reason){
+  if (S.phase !== "exam") return;
+  S.phase = "done"; S.active = false; clearInterval(S.timer); clearInterval(S.presTimer);
+  const d = S.data; let score = 0; const a = d.q.map((q, i) => { const x = S.ans[i]; if (x === q.a) score++; return x == null ? "-" : String(x); }).join("");
+  const body = { n:S.name, s:score, T:d.q.length, r:reason, d:Math.round((Date.now() - S.start)/1000), a, m:S.mal ? 1 : 0, v:S.vio.slice(0,12).map(x => [x.t, x.m.slice(0,60)]), ts:new Date().toISOString() };
+  const sig = (await sha(d.secret + "|" + JSON.stringify(body))).slice(0,12);
+  const code = toB64u(body) + "." + sig;
+  S.result = { name:S.name, score, total:d.q.length, reason, mal:!!S.mal, secs:body.d, code, vio:S.vio.length, ts:body.ts };
+  store.set("sq4_result", S.result);
+  if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  document.body.classList.remove("exam"); if (S.mark) S.mark.remove(); document.querySelectorAll(".modal").forEach(x => x.remove());
+  pres({ st:"submitted", score, total:d.q.length, reason, rc:code, left:null });
+  renderResult();
+}
+function renderResult(){
+  const r = S.result; sub.textContent = "Result"; barRight.replaceChildren();
+  const copyB = h("button", null, "Copy result code"); copyB.addEventListener("click", () => copyText(r.code, copyB));
+  const auto = r.reason !== "Submitted by the student" && r.reason !== "Time is up";
+  app.replaceChildren(h("div", {class:"stack"},
+    h("h1", null, "Exam submitted"),
+    h("div", {class:"grid2"},
+      h("div", {class:"card stack"}, h("span", {class:"note"}, r.name), h("div", {class:"score"}, r.score + " / " + r.total), h("div", null, "Time used: " + mmss(r.secs)),
+        r.mal ? h("div", {class:"msg bad", style:"font-size:1.15rem;font-weight:800"}, "MALPRACTICE DETECTED · test auto-submitted") : null,
+        h("div", {class:"msg " + (auto ? "bad" : "ok")}, (auto ? "Auto-submitted: " : "") + r.reason),
+        r.vio ? h("div", {class:"note"}, r.vio + " rule event(s) were recorded and sent to your invigilator.") : null),
+      h("div", {class:"card stack"}, h("h3", null, "Result code"), h("p", {class:"note"}, "Show this screen to your invigilator, or copy this code and send it to them. They use it to check your result."), h("div", {class:"code"}, r.code), copyB))
+  ));
+  pres({ st:"submitted", score:r.score, total:r.total, reason:r.reason, rc:r.code, left:null });
+}
+
+/* ---------------- invigilator ---------------- */
+async function invigilator(){
+  sub.textContent = "Invigilator";
+  app.replaceChildren(h("p", {class:"note"}, "Checking that you are the owner…"));
+  let user = null; try { user = window.claude && claude.use ? await claude.use("user") : null; } catch(e){}
+  const owner = user ? ((await user.isOwner().catch(() => false)) ?? false) : false;
+  if (!owner) { app.replaceChildren(h("div", {class:"card stack"}, h("h2", null, "Invigilator page"), h("p", null, "Only the owner of this exam can open this page. If you are the student, open the student page."), h("a", {href:"#student"}, h("button", {class:"go"}, "Go to the student page")))); return; }
+  let code = null; let db = null;
+  try { db = await claude.use("db"); const snap = db ? await db.doc("exam/secret").get() : null; code = snap && snap.exists ? String((snap.data() || {}).code || "") : null; } catch(e){ code = null; }
+  let data = null; if (code) { try { data = await decrypt(code); } catch(e){ data = null; } }
+  const codeBox = h("div", {class:"big"}, code || "—");
+  const copyB = h("button", null, "Copy code"); copyB.addEventListener("click", () => copyText(code || "", copyB));
+  const monitor = h("div", {class:"stack"}, h("p", {class:"note"}, "Connecting to live monitoring…"));
+  const logEl = h("div", {class:"log"});
+  const keyWrap = h("div", {class:"tbl", hidden:true});
+  const keyB = h("button", null, "Show answer key"); keyB.addEventListener("click", () => { if (!data) return; keyWrap.hidden = !keyWrap.hidden; keyB.textContent = keyWrap.hidden ? "Show answer key" : "Hide answer key"; });
+  if (data) keyWrap.append(h("table", null, h("tr", null, h("th", null, "#"), h("th", null, "Question"), h("th", null, "Answer")), data.q.map((q, i) => h("tr", null, h("td", null, String(i+1)), h("td", null, q.t), h("td", {class:"right"}, q.o[q.a])))));
+  const rcIn = h("textarea", {id:"rcin", rows:"3", placeholder:"Paste the student's result code"});
+  const rcOut = h("div", {class:"stack"});
+  const rcB = h("button", {class:"go"}, "Check result"); rcB.addEventListener("click", () => checkCode(rcIn.value.trim(), rcOut, data));
+  app.replaceChildren(h("div", {class:"stack"},
+    h("h1", null, "Invigilator"),
+    h("div", {class:"grid2"},
+      h("div", {class:"card stack"}, h("h3", null, "Exam code"), codeBox,
+        h("p", {class:"note"}, code ? "Read this code to the student only when you are ready to start. The questions stay locked until it is typed in." : "The exam code could not be loaded. Reload this page; if it still fails, ask Claude to reset the code."), copyB),
+      h("div", {class:"card stack"}, h("h3", null, "Before you start"),
+        h("ol", {class:"rules"},
+          h("li", null, "Start a video call (Google Meet or Zoom) with the student. Ask them to keep camera and microphone on and to share their ", h("b", null, "entire screen"), ". Record the call there."),
+          h("li", null, "Ask them to close every other app and tab."),
+          h("li", null, "Send them the student link (the same link ending in #student)."),
+          h("li", null, "When they are on the start page, read out the exam code."),
+          h("li", null, "Watch the live panel below. It updates while the student's page is open.")))),
+    h("div", {class:"card stack"}, h("div", {class:"row", style:"justify-content:space-between"}, h("h2", null, "Live monitor"), h("span", {class:"note"}, "Updates every few seconds")), monitor, h("h3", null, "Event log"), logEl),
+    h("div", {class:"card stack"}, h("h2", null, "Check a result code"), h("p", {class:"note"}, "If live monitoring is not available, ask the student to copy the result code from their result screen and send it to you."), rcIn, rcB, rcOut),
+    h("div", {class:"card stack"}, h("div", {class:"row", style:"justify-content:space-between"}, h("h2", null, "Answer key"), keyB), keyWrap)
+  ));
+  const room = await getRoom();
+  if (!room) { monitor.replaceChildren(h("div", {class:"msg info"}, "Live monitoring is not available in this view. Use the video call to watch the student and check their result code below.")); return; }
+  const seen = new Map();
+  const log = (who, text) => { logEl.prepend(h("div", null, new Date().toLocaleTimeString() + " · " + who + ": " + text)); };
+  const render = (peers) => {
+    const studs = peers.filter(p => !p.isMe && p.presence && p.presence.role === "student");
+    if (!studs.length) { monitor.replaceChildren(h("div", {class:"msg info"}, "No student connected yet. When the student opens the student page while signed in to Claude, they appear here.")); return; }
+    monitor.replaceChildren(...studs.map(p => {
+      const s = p.presence, name = typeof s.name === "string" && s.name ? s.name : "Student", st = String(s.st || "");
+      const prev = seen.get(p.peer) || {};
+      if (prev.st !== st) log(name, st === "exam" ? "started the exam" : st === "submitted" ? "submitted (" + (s.reason || "") + ")" : st === "intro" ? "is on the start page" : st);
+      if ((s.vio || 0) > (prev.vio || 0) && s.last) log(name, "⚠ " + s.last);
+      seen.set(p.peer, { st, vio: s.vio || 0 });
+      const pill = st === "exam" ? h("span", {class:"pill live"}, "In exam") : st === "submitted" ? h("span", {class:"pill done"}, "Submitted") : h("span", {class:"pill wait"}, "Waiting");
+      const warnI = h("input", {type:"text", placeholder:"Message to the student", maxlength:"200"});
+      const sendB = h("button", null, "Send warning"); sendB.addEventListener("click", () => { const m = warnI.value.trim(); if (!m) return; room.emit("ctl", { action:"warn", msg:m, to:p.peer }).catch(() => {}); log(name, "warning sent: " + m); warnI.value = ""; });
+      const forceB = h("button", {class:"warn", disabled: st !== "exam"}, "Force submit");
+      const sure = h("div", {class:"row", hidden:true}, h("span", {class:"note"}, "Submit this student's exam now?"), h("button", {class:"warn", onclick: () => { room.emit("ctl", { action:"submit", to:p.peer }).catch(() => {}); log(name, "force submit sent"); sure.hidden = true; }}, "Yes, submit"), h("button", {onclick: () => { sure.hidden = true; }}, "Cancel"));
+      forceB.addEventListener("click", () => { sure.hidden = false; });
+      const rcBox = s.rc ? h("button", {onclick: () => { rcIn.value = String(s.rc); checkCode(String(s.rc), rcOut, data); rcOut.scrollIntoView({behavior:"smooth", block:"start"}); }}, "Check this result") : null;
+      return h("div", {class:"card stack", style:"background:var(--bg)"},
+        h("div", {class:"row", style:"justify-content:space-between"}, h("h3", null, name), pill),
+        h("div", {class:"kv"},
+          h("b", null, "Question"), h("span", null, st === "exam" ? (s.q || "?") + " of " + (s.n || 30) : "—"),
+          h("b", null, "Answered"), h("span", null, (s.ans ?? 0) + " of " + (s.n || 30)),
+          h("b", null, "Marked for review"), h("span", null, String(s.rv ?? 0)),
+          h("b", null, "Time left"), h("span", null, typeof s.left === "number" ? mmss(s.left) : "—"),
+          h("b", null, "Full screen"), h("span", {class: s.fs ? "right" : (st === "exam" ? "wrong" : "")}, s.fs ? "Yes" : "No"),
+          h("b", null, "Rule events"), h("span", {class:(s.vio || 0) ? "wrong" : ""}, String(s.vio || 0) + (s.last ? " · last: " + s.last : "")),
+          st === "submitted" ? [h("b", null, "Score"), h("span", {class:"right"}, (s.score ?? "?") + " / " + (s.total ?? 30) + " · " + (s.reason || ""))] : null),
+        st === "exam" ? h("div", {class:"row"}, warnI, sendB, forceB) : null, sure, rcBox);
+    }));
+  };
+  room.onPeers(ch => { ch.left.forEach(p => { if (p.presence && p.presence.role === "student") log(typeof p.presence.name === "string" ? p.presence.name : "Student", p.presence.st === "submitted" ? "closed the result page" : "disconnected (page closed or reloaded)"); }); render(ch.peers); }, () => monitor.replaceChildren(h("div", {class:"msg info"}, "Live monitoring stopped. Reload this page to reconnect.")));
+}
+async function checkCode(str, out, data){
+  out.replaceChildren();
+  if (!data) { out.append(h("div", {class:"msg bad"}, "The answer key is not loaded, so the code cannot be checked.")); return; }
+  const [p1, sig] = String(str).split(".");
+  let body = null; try { body = fromB64u(p1); } catch(e){}
+  if (!body || !sig) { out.append(h("div", {class:"msg bad"}, "This is not a valid result code. Ask the student to copy it again.")); return; }
+  const good = (await sha(data.secret + "|" + JSON.stringify(body))).slice(0,12) === sig;
+  let score = 0; const rows = data.q.map((q, i) => { const c = body.a && body.a[i]; const ci = c === "-" || c == null ? null : Number(c); const ok = ci === q.a; if (ok) score++; return h("tr", null, h("td", null, String(i+1)), h("td", null, q.t), h("td", {class: ci == null ? "" : ok ? "right" : "wrong"}, ci == null ? "Not answered" : q.o[ci] || "?"), h("td", null, q.o[q.a])); });
+  out.append(
+    h("div", {class:"msg " + (good && score === body.s ? "ok" : "bad")}, good && score === body.s ? "Genuine result code." : "Warning: this code does not match the exam. It may have been edited."),
+    body.m ? h("div", {class:"msg bad", style:"font-size:1.15rem;font-weight:800"}, "MALPRACTICE: " + String(body.r || "")) : null,
+    h("div", {class:"kv"}, h("b", null, "Name"), h("span", null, String(body.n || "")), h("b", null, "Score"), h("span", {class:"right"}, score + " / " + data.q.length), h("b", null, "How it ended"), h("span", null, String(body.r || "")), h("b", null, "Time used"), h("span", null, mmss(body.d || 0)), h("b", null, "Submitted at"), h("span", null, body.ts ? new Date(body.ts).toLocaleString() : "")),
+    Array.isArray(body.v) && body.v.length ? h("div", null, h("h3", null, "Rule events"), h("ul", {class:"rules"}, body.v.map(v => h("li", null, mmss(v[0]) + " · " + v[1])))) : h("p", {class:"note"}, "No rule events recorded."),
+    h("div", {class:"tbl"}, h("table", null, h("tr", null, h("th", null, "#"), h("th", null, "Question"), h("th", null, "Student's answer"), h("th", null, "Correct answer")), rows)));
+}
+route();
+})();
+</script>
+</body></html>
