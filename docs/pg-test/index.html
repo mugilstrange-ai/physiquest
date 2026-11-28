@@ -143,7 +143,7 @@ function home(){
   sub.textContent = "Online exam";
   app.replaceChildren(
     h("div", {class:"stack"},
-      h("h1", null, "Artificial Intelligence Test 3"),
+      h("h1", null, "Medical PG Mock Test · Human Reproduction"),
       h("p", {class:"lead"}, "60 questions · 60 minutes · full screen only. Pick your role."),
       h("div", {class:"grid2"},
         h("div", {class:"card stack"}, h("h2", null, "Student"), h("p", {class:"note"}, "Take the exam. You need a laptop or desktop with Chrome or Edge, and the exam code from your invigilator."), h("a", {href:"#student"}, h("button", {class:"go"}, "Open student page"))),
@@ -186,8 +186,8 @@ function student(){
     lockT = setInterval(tick, 1000); tick();
   }
   app.replaceChildren(h("div", {class:"stack"},
-    h("h1", null, "Artificial Intelligence Test 3"),
-    h("p", {class:"lead"}, "60 multiple-choice questions · 1 mark each · 60 minutes · no negative marks."),
+    h("h1", null, "Medical PG Mock Test · Human Reproduction"),
+    h("p", {class:"lead"}, "60 multiple-choice questions · +4 correct, −1 wrong · 240 marks · 60 minutes (9:40 PM to 10:40 PM)."),
     h("div", {class:"grid2"},
       h("div", {class:"card stack"}, h("h3", null, "Exam rules"),
         h("ul", {class:"rules"},
