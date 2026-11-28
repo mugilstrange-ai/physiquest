@@ -219,7 +219,7 @@ function student(){
     if (STANDALONE && !(LIVE.screen && LIVE.cam)) { err.textContent = "First click \"Share screen and camera\" and share your ENTIRE screen."; err.hidden = false; return; }
     const name = nameI.value.trim(), code = codeI.value;
     if (!name) { err.textContent = "Enter your name."; err.hidden = false; return; }
-    if (norm(code).length < 9) { err.textContent = "Enter the 9-character exam code from your invigilator."; err.hidden = false; return; }
+    if (norm(code).length < 6) { err.textContent = "Enter the 6-digit exam code from your invigilator."; err.hidden = false; return; }
     if (!agree.checked) { err.textContent = "Tick the box to accept the rules."; err.hidden = false; return; }
     startB.disabled = true; startB.textContent = "Opening full screen…";
     let fsErr = null;
